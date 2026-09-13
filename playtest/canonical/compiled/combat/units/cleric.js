@@ -1,0 +1,28 @@
+import { futureBenefit } from '../benefit-ledger.js';
+import { ruleTurn, seat, unit, cellKey, destroyed, syncDamage, emit } from '../access.js';
+import { releaseHeldPlague } from './necromancer.js';
+export function clericRule(ctx, meta) { if (meta.source === 'plague')
+    return; const p = seat(ctx.state, meta.targetPlayerId), direct = meta.source.startsWith('direct-'); if (ctx.state.ring)
+    p.clericNow = true;
+else if (!direct && p.playerId === ruleTurn(ctx))
+    p.clericNow = true;
+else
+    p.clericLater = true; if (direct || meta.source === 'archer')
+    releaseHeldPlague(ctx, p.playerId);
+else
+    p.releaseNow = true; if (direct || p.playerId !== ruleTurn(ctx))
+    futureBenefit(ctx, meta, 'resurrection', 1); emit(ctx, 'benefit-scheduled', meta, null, [], 1, 'resurrection'); }
+export function resurrectionCandidates(ctx, ownerId) { const p = seat(ctx.state, ownerId), types = ['inf', 'archer', 'monk', 'cav']; return types.flatMap(type => ctx.state.match.units.filter(u => u.ownerId === ownerId && u.type === type && destroyed(ctx.state, u) && u.cells.every(c => !p.plagueExcluded.includes(cellKey(c)))).map(u => u.id)); }
+export function resurrect(ctx, ownerId, unitId) { const p = seat(ctx.state, ownerId), choices = resurrectionCandidates(ctx, ownerId); if (!choices.includes(unitId))
+    throw Error('Illegal resurrection choice'); const u = unit(ctx.state, unitId); p.resurrection = { searchActive: true, actualUnitId: unitId, suspects: choices }; p.shots = p.shots.filter(k => !u.cells.some(c => cellKey(c) === k)); if (u.type === 'monk') {
+    const a = u.abilities.find(a => a.kind === 'monk');
+    if (a)
+        a.spent = true;
+    else
+        u.abilities.push({ kind: 'monk', spent: true });
+} syncDamage(ctx.state, u); u.resurrectionCount = (u.resurrectionCount || 0) + 1; p.clericLater = false; emit(ctx, 'resurrection', null, u.id, u.cells); }
+export function discoverResurrection(ctx, meta, k) { const p = seat(ctx.state, meta.targetPlayerId); if (!p.resurrection.searchActive || !p.resurrection.actualUnitId)
+    return false; const u = unit(ctx.state, p.resurrection.actualUnitId); if (!u.cells.some(c => cellKey(c) === k))
+    return false; for (const c of u.cells)
+    if (!p.shots.includes(cellKey(c)))
+        p.shots.push(cellKey(c)); syncDamage(ctx.state, u); p.resurrection = { searchActive: false, actualUnitId: null, suspects: [] }; emit(ctx, 'resurrection-discovered', meta, u.id, u.cells); return true; }

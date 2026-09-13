@@ -1,0 +1,80 @@
+import {openStore,checkpointId} from './store.mjs';
+import {createHash} from 'node:crypto';
+import os from 'node:os';import {createPvpService} from './multiplayer.mjs';
+import http from 'node:http';import fs from 'node:fs';import path from 'node:path';import {randomBytes,randomInt} from 'node:crypto';import {fileURLToPath} from 'node:url';
+import {createLocalSession} from '../canonical/compiled/local-host/session.js';
+const root=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'..');
+export const roster={inf:5,cav:3,archer:3,monk:1,castle:2,dwarf:1,goblin:1,catapult:2,elf:1,cleric:1,demon:1,dragon:1,wizard:1,necro:2,hero:1};
+const initial=()=>({size:15,story:false,battle:0,player:{size:15,...roster},enemy:{size:15,...roster}});
+function configuration(c,seed){
+ if(!c||Object.keys(c).sort().join(',')!=='battle,enemy,player,size,story'||typeof c.story!=='boolean'||!Number.isInteger(c.size)||c.size<5||c.size>15||!Number.isInteger(c.battle)||c.battle<0||c.battle>100)throw Error('invalid-configuration');
+ const army=a=>{if(!a||typeof a!=='object'||Array.isArray(a))throw Error('invalid-configuration');const out={};for(const[k,v]of Object.entries(a)){if(k==='size'){if(v!==c.size)throw Error('invalid-configuration');continue;}if(!Object.hasOwn(roster,k)||!Number.isInteger(v)||v<0||v>20)throw Error('invalid-configuration');out[k]=v;}return out;};
+ return {matchId:'node-private-match',rulesVersion:'stone-throw-v1.427',size:c.size,story:c.story,seed,players:[{id:'node-human',boardId:'node-home',roster:army(c.player),decisionMode:'interactive'},{id:'node-ai',boardId:'node-away',roster:army(c.enemy),decisionMode:'policy'}]};
+}
+export async function startServer({port=3211,development=false,seed,lan=false,bind,stateDir,publicOrigin,secureCookies=false,logger=event=>console.log(JSON.stringify(event))}={}){
+ if(!Number.isInteger(port)||port<0||port>65535)throw Error('invalid-port');
+ if(publicOrigin){const u=new URL(publicOrigin);if(!['http:','https:'].includes(u.protocol)||u.origin!==publicOrigin)throw Error('invalid-public-origin');secureCookies=u.protocol==='https:';}
+ const log=(event,extra={})=>logger({event,...extra});
+ const build=createHash('sha256').update(fs.readFileSync(path.join(root,'build-manifest.json'))).digest('hex'),started=Date.now();let recovery='disabled',fatal=false,stopping=false,requestQueue=Promise.resolve();
+ const sessions=new Map(),pvp=createPvpService(roster,{seed});let origin;const addresses=['127.0.0.1',...Object.values(os.networkInterfaces()).flat().filter(a=>a?.family==='IPv4').map(a=>a.address)];const address=bind||(lan?'0.0.0.0':'127.0.0.1');if(!['0.0.0.0',...addresses].includes(address))throw Error('Select a local interface');if(!lan&&address!=='127.0.0.1')throw Error('Non-loopback bind requires --lan');
+ const cookieFlags='; HttpOnly; SameSite=Strict; Path=/'+(secureCookies?'; Secure':'');
+ let store;try{store=openStore(stateDir,build,development?'development':'production');}catch(e){log('restore-failed',{reason:['checkpoint-unavailable','incompatible-checkpoint','state-locked'].includes(e.message)?e.message:'state-unavailable'});throw Error('Server state unavailable; inspect operator checkpoint');}
+ const make=(c=initial(),checkpoint)=>{const token=randomBytes(32).toString('hex'),config=configuration(c,seed??randomInt(0,0x100000000)),session=createLocalSession(config,checkpoint,development),entry={session,configuration:structuredClone(c),queue:Promise.resolve()};sessions.set(token,entry);log('session-created');return {token,entry};};
+ const ordered=(e,fn)=>{const task=e.queue.then(fn);e.queue=task.catch(()=>{});return task;};
+ async function save(){if(!store)return;const local=[];for(const [token,e]of sessions)local.push({token,configuration:e.configuration,checkpoint:await e.session.serializePrivate()});store.write({local,multiplayer:pvp.exportState()});}
+ try{if(store?.value){for(const e of store.value.local){const saved=JSON.parse(e.checkpoint);saved.epoch=randomInt(1,2**48);saved.revision++;saved.unitHandles=[];saved.choiceHandles=[];saved.presentation=[];const entry={configuration:e.configuration,session:createLocalSession(configuration(e.configuration,0),JSON.stringify(saved),development),queue:Promise.resolve()};sessions.set(e.token,entry);}pvp.restoreState(store.value.multiplayer);recovery='restored';await save();log('restore-success');}else if(store)recovery='new';}catch{store?.release();log('restore-failed',{reason:'checkpoint-unavailable'});throw Error('Checkpoint unavailable; no sessions served');}
+ const assets=JSON.parse(fs.readFileSync(path.join(root,'asset-manifest.json'))).assets.map(a=>a.file);
+ const staticFiles=new Set([...assets,'asset-manifest.json','client/story-presentation.js','client/loading-screen.js',...Array.from({length:23},(_,i)=>'styles-'+String(i).padStart(2,'0')+'.css'),...['placement','coordinates','footprints'].map(x=>'public-rules/'+x+'.js'),...['combat-playback','legacy-animations','shell','presentation','action-instructions','resurrection-sparks','combat-feedback','battle-log','placement-feedback','castle-art-ready','story-browser','story-policy','story-tutorials','transport','bootstrap-production','lan',...(development?['bootstrap-development','node-development']:[])].map(x=>'client-v13/'+x+'.js'),'StoneThrow-v1.427-stage13-'+(development?'development':'production')+'.html']);
+ const handle=async(req,res)=>{
+  const reply=async(status,body)=>{if(store&&req.url.startsWith('/api/')&&!fatal){try{await save();}catch{fatal=true;log('checkpoint-write-failed');status=503;body={error:'server-recovery-unavailable'};}}res.writeHead(status,{'Content-Type':'application/json','Cache-Control':'no-store','X-Content-Type-Options':'nosniff'});res.end(JSON.stringify(body));};
+  try{
+   if(!(publicOrigin?req.headers.host===new URL(publicOrigin).host:addresses.some(a=>req.headers.host===a+':'+server.address().port)))return reply(403,{error:'invalid-host'});
+   const url=new URL(req.url,origin);
+   if(fatal||stopping)return reply(503,{error:'server-recovering'});
+   if(url.pathname==='/health'&&req.method==='GET')return reply(200,{healthy:true,checkpoint:checkpointId,build,mode:development?'development':'production',recovery,uptimeSeconds:Math.floor((Date.now()-started)/1000),sessions:sessions.size,games:pvp.rooms.size});
+   if(!url.pathname.startsWith('/api/')){let name=decodeURIComponent(url.pathname.slice(1));if(!name)name='StoneThrow-v1.427-stage13-'+(development?'development':'production')+'.html';if(req.method!=='GET'||!staticFiles.has(name))return reply(404,{error:'not-found'});const file=path.join(root,name);res.writeHead(200,{'Content-Type':({'.html':'text/html','.js':'text/javascript','.css':'text/css','.png':'image/png','.webp':'image/webp','.svg':'image/svg+xml','.json':'application/json'})[path.extname(file)],'Cache-Control':'no-store','X-Content-Type-Options':'nosniff'});return res.end(fs.readFileSync(file));}
+   if(req.method!=='POST')return reply(405,{error:'method-not-allowed'});
+   if(req.headers.origin&&req.headers.origin!==(publicOrigin||'http://'+req.headers.host))return reply(403,{error:'invalid-origin'});
+   if(req.headers['content-type']?.split(';')[0].trim().toLowerCase()!=='application/json')return reply(400,{error:'malformed-request'});
+   let bytes=0,chunks=[];for await(const chunk of req){bytes+=chunk.length;if(bytes>65536)return reply(413,{error:'request-too-large'});chunks.push(chunk);}let body;try{body=JSON.parse(Buffer.concat(chunks));if(!body||typeof body!=='object'||Array.isArray(body))throw Error();}catch{return reply(400,{error:'malformed-request'});}
+   const token=(req.headers.cookie||'').split(';').map(s=>s.trim()).find(s=>s.startsWith('st11sid='))?.slice(8);let entry=token&&sessions.get(token);
+   const seatToken=(req.headers.cookie||'').split(';').map(s=>s.trim()).find(s=>s.startsWith('st12seat='))?.slice(9);
+   if(url.pathname==='/api/pvp/leave'){if(lan&&seatToken){try{await pvp.route(seatToken,token,'leave');}catch{}}res.setHeader('Set-Cookie','st12seat='+cookieFlags+'; Max-Age=0');log('game-left');return reply(200,{left:true});}
+   if(url.pathname.startsWith('/api/pvp/')||(seatToken&&['/api/open','/api/read','/api/command','/api/configure'].includes(url.pathname))){
+    if(!lan)return reply(403,{error:'lan-disabled'});
+    try{const action=url.pathname.split('/').at(-1);if(['make','join'].includes(action)){if(!entry)return reply(404,{error:'unknown-session'});const result=await pvp.lobby(action,body,token);res.setHeader('Set-Cookie',`st12seat=${result.token}${cookieFlags}`);delete result.token;log(action==='make'?'game-created':'seat-joined');return reply(200,result);}if(action==='configure')return reply(403,{error:'lan-configuration-locked'});return reply(200,await pvp.route(seatToken,token,action,body));}catch(e){return reply(400,{error:['unknown-seat','bad-game-code','game-full','invalid-name','already-seated','not-complete','invalid-configuration','unknown-session'].includes(e.message)?e.message:'invalid-request'});}
+   }
+   if(url.pathname==='/api/open'){
+    if(Object.keys(body).some(k=>k!=='fresh')||body.fresh!==undefined&&body.fresh!==true)return reply(400,{error:'malformed-request'});
+    if(token&&!entry&&!body.fresh)return reply(404,{error:'unknown-session'});
+    const reconnected=!!entry&&!body.fresh;if(!reconnected){const made=make();entry=made.entry;res.setHeader('Set-Cookie',`st11sid=${made.token}${cookieFlags}`);}
+    return await ordered(entry,async()=>reply(200,{configuration:entry.configuration,reconnected,development,update:await entry.session.client.read()}));
+   }
+   if(!entry)return reply(404,{error:'unknown-session'});
+   return await ordered(entry,async()=>{
+    if(url.pathname==='/api/read'){if(Object.keys(body).some(k=>k!=='after'))return reply(400,{error:'malformed-request'});try{return reply(200,await entry.session.client.read(body.after??0));}catch{return reply(400,{error:'invalid-cursor'});}}
+    if(url.pathname==='/api/command')return reply(200,await entry.session.client.dispatch(body));
+    if(url.pathname==='/api/configure'){
+     if(Object.keys(body).sort().join(',')!=='battle,configuration,revision')return reply(400,{error:'malformed-request'});
+     const current=await entry.session.client.read();if(body.battle!==current.snapshot.battle||body.revision!==current.snapshot.revision)return reply(409,{error:'stale'});
+     let config;try{config=configuration(body.configuration,0);}catch{return reply(400,{error:'invalid-configuration'});}
+     try{const update=await entry.session.configure(config);entry.configuration=structuredClone(body.configuration);return reply(200,{configuration:entry.configuration,update});}catch{return reply(400,{error:'invalid-configuration'});}
+    }
+    if(url.pathname.startsWith('/api/dev/')){if(!development)return reply(403,{error:'development-denied'});if(url.pathname==='/api/dev/inspect')return reply(200,await entry.session.dev.inspect());if(url.pathname==='/api/dev/takeover'&&typeof body.enabled==='boolean')return reply(200,await entry.session.dev.takeover(body.enabled));if(url.pathname==='/api/dev/shoot')return reply(200,await entry.session.dev.shoot(body.cell));}
+    return reply(404,{error:'not-found'});
+   });
+  }catch{log('request-failed');return reply(400,{error:'malformed-request'});}
+ };
+ const server=http.createServer((req,res)=>{requestQueue=requestQueue.then(()=>handle(req,res)).catch(()=>{log('unexpected-server-error');if(!res.headersSent)res.writeHead(500,{'Content-Type':'application/json'});res.end(JSON.stringify({error:'server-error'}));});});
+ server.requestTimeout=15000;server.headersTimeout=10000;server.keepAliveTimeout=5000;server.setTimeout(20000,socket=>socket.destroy());
+ await new Promise((resolve,reject)=>{server.once('error',reject);server.listen(port,address,resolve);}).catch(e=>{store?.release();throw e;});origin='http://127.0.0.1:'+server.address().port;
+ log('startup',{checkpoint:checkpointId,build,mode:development?'development':'production',address,port:server.address().port,lan,persistence:!!store,recovery});
+ return {origin,lan,address,pvp,close:async()=>{stopping=true;const closed=new Promise(resolve=>server.close(resolve));await requestQueue;try{if(!fatal)await save();}finally{await closed;store?.release();log('shutdown');}},
+  // Process-local test/restart capabilities. Never routed over production HTTP.
+  checkpoint:token=>sessions.get(token)?.session.serializePrivate(),
+  install:(c,checkpoint)=>make(c,checkpoint).token,
+  sessions};
+}
+if(process.argv[1]&&path.resolve(process.argv[1])===fileURLToPath(import.meta.url)){
+ try{const mode=process.env.ST_MODE||'production';if(!['production','development'].includes(mode))throw Error('Invalid ST_MODE');const app=await startServer({port:Number(process.env.PORT||3211),development:mode==='development'||process.argv.includes('--development'),lan:process.argv.includes('--lan'),bind:process.env.ST_BIND||process.env.LAN_BIND,stateDir:process.env.ST_STATE_DIR,publicOrigin:process.env.ST_PUBLIC_ORIGIN,secureCookies:process.env.ST_SECURE_COOKIES==='1'});console.log(app.origin);let closing=false;for(const signal of ['SIGINT','SIGTERM'])process.on(signal,async()=>{if(closing)return;closing=true;await app.close();process.exit(0);});}catch{console.error('Stone Throw startup failed: check configuration, state lock and checkpoint compatibility.');process.exitCode=1;}
+}

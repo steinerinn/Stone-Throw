@@ -1,0 +1,2 @@
+# Local private playtest state belongs outside the served/versioned artifact.
+/playtest-state-*/

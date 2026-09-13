@@ -1,0 +1,31 @@
+{
+  "checkpoint": "presentation-parity-batch5-v1",
+  "status": "accepted",
+  "acceptedAt": "2026-09-13T23:27:48.932Z",
+  "authorization": "User final manual Batch 5 playtest PASS, including Castle partial-build microfix; explicit promotion request.",
+  "acceptedPath": "outputs/presentation-parity-batch5/accepted",
+  "sourcePath": "outputs/presentation-parity-batch5/candidate",
+  "sourceBranch": "presentation-parity/batch-5",
+  "sourceCommit": "9ec602ca253add04ca3d6bb62c21cef383d6f986",
+  "manifestSha256": "2305d704be4a6c6dead31fe758bb54d3bad3618a4c1198ece7e8973cd3c58ee5",
+  "payloadFiles": 439,
+  "copiedFiles": 440,
+  "byteIdenticalToTestedCandidate": true,
+  "manifestMetadata": "Frozen tested build manifest/README retain historical pre-acceptance wording. This external acceptance record is authoritative; no build bytes or build-bound recovery identity were changed.",
+  "stage14": {
+    "checkpoint": "controlled-playtest-v1",
+    "path": "outputs/stage14/accepted",
+    "files": 422,
+    "manifestSha256": "bc10318e4884874e77acd001f5c1cc549bfa1934f971c6d30d1894aba2bcc488",
+    "unchanged": true
+  },
+  "goldenSha256": "d7ad1caeb091d5b36812fa3f5a34f8303200dca75a1cd4653380e30861625518",
+  "hashes": {
+    "productionHtml": "5c09810e42f3a3e004e9259107fce92b5b9e04c0411246c2ffac64526db46e57",
+    "presentation": "fdc46842e771d34657bcf27ec38feaa7289243b28539d431d2229eebb11dbbab",
+    "launcher": "c6f835be01526dd6c5ffd6e72d70cf619cf7044d4f7c25e635a4cc8891106c2c",
+    "server": "4ea60f7b612de349068567aa32743fa80e3c27624ed6500bed2f5d72456be0e0"
+  },
+  "runtimeStateCopied": false,
+  "batch6Started": false
+}

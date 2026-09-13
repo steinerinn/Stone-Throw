@@ -1,0 +1,2 @@
+# Frozen accepted artifacts: preserve exact bytes in Git blobs and checkouts.
+/playtest/** -text -filter -ident !working-tree-encoding
