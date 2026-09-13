@@ -1,0 +1,2256 @@
+{
+  "schemaVersion": 1,
+  "description": "Byte-exact external images from accepted Stage 3. Logical aliases and every source occurrence retained. Runtime continues to use original lookup objects; manifest is deployment/audit metadata, not a new runtime loader.",
+  "assets": [
+    {
+      "auditId": "A001",
+      "logicalId": "cursors/spy",
+      "mime": "image/svg+xml",
+      "sha256": "210ea39fe3559358a9559a4b4588656e5e7d1f9376bde5ff7c13caa0656ac6d7",
+      "byteLength": 341,
+      "dataUrlSha256": "c86d0480b39e8f32d6e3d8768deb83e6e4a3077e09dfafd78bd199d1eebece6f",
+      "encodedLength": 572,
+      "file": "assets/cursors/spy.svg",
+      "role": "cursors/spy",
+      "aliases": [],
+      "references": [
+        {
+          "logicalReferenceId": "cursors/spy/reference-1",
+          "sourceOffset": 13925,
+          "contextBefore": "5a3b29;} .cell.scout-elf{background:#2563eb;border-color:#1d4ed8;} .grid.spy-mode .cell{cursor:url(\"",
+          "contextAfter": "\") 9 9,zoom-in!important;} .grid.spy-mode .cell:not(.hit):not(.sc"
+        }
+      ],
+      "dimensions": {
+        "width": 22,
+        "height": 22
+      }
+    },
+    {
+      "auditId": "A002",
+      "logicalId": "cursors/resurrection",
+      "mime": "image/png",
+      "sha256": "fa30aab185942aab5679461e099f161ea462925d79860242eb6f240ec09c751e",
+      "byteLength": 116,
+      "dataUrlSha256": "0d9876cc35e11c33732d71ed87a702e9ec567a243f6f65c08d2ce69e43c4138f",
+      "encodedLength": 178,
+      "file": "assets/cursors/resurrection.png",
+      "role": "cursors/resurrection",
+      "aliases": [],
+      "references": [
+        {
+          "logicalReferenceId": "cursors/resurrection/reference-1",
+          "sourceOffset": 16131,
+          "contextBefore": "solute!important;inset:0!important;width:22px!important;height:22px!important;background-image:url(\"",
+          "contextAfter": "\")!important;background-repeat:no-repeat!important;background-pos"
+        },
+        {
+          "logicalReferenceId": "cursors/resurrection/reference-2",
+          "sourceOffset": 16707,
+          "contextBefore": "-cursor,body.resurrection-cursor #playerGrid,body.resurrection-cursor #playerGrid .cell{cursor:url(\"",
+          "contextAfter": "\") 11 11,crosshair!important;} body.player-shooting #enemyGrid,bo"
+        },
+        {
+          "logicalReferenceId": "cursors/resurrection/reference-3",
+          "sourceOffset": 121862,
+          "contextBefore": "t-resurrection-icon{width:22px;height:22px;flex:0 0 22px;background:no-repeat center/22px 22px url(\"",
+          "contextAfter": "\")} @keyframes combatFloatUp{0%{opacity:0;transform:translate(-50"
+        },
+        {
+          "logicalReferenceId": "cursors/resurrection/reference-4",
+          "sourceOffset": 134094,
+          "contextBefore": "!important;inset:0!important;width:22px!important;height:22px!important;background:transparent url(\"",
+          "contextAfter": "\") center/22px 22px no-repeat!important;border:0!important;outlin"
+        },
+        {
+          "logicalReferenceId": "cursors/resurrection/reference-5",
+          "sourceOffset": 135124,
+          "contextBefore": "!important;inset:0!important;width:22px!important;height:22px!important;background:transparent url(\"",
+          "contextAfter": "\") center/22px 22px no-repeat!important;border:0!important;outlin"
+        }
+      ],
+      "dimensions": {
+        "width": 22,
+        "height": 22
+      }
+    },
+    {
+      "auditId": "A003",
+      "logicalId": "cursors/player-shot",
+      "mime": "image/png",
+      "sha256": "f1e472fc1127825522abc5e170ba9ca68cdf836d91929630e1690a24e8ac10ac",
+      "byteLength": 248,
+      "dataUrlSha256": "93e3c6ef0fba7ff33672ce4b031cd0ed02239689cb4a96d281cd33a26dd58fa3",
+      "encodedLength": 354,
+      "file": "assets/cursors/player-shot.png",
+      "role": "cursors/player-shot",
+      "aliases": [],
+      "references": [
+        {
+          "logicalReferenceId": "cursors/player-shot/reference-1",
+          "sourceOffset": 16998,
+          "contextBefore": "shair!important;} body.player-shooting #enemyGrid,body.player-shooting #enemyGrid .cell{cursor:url(\"",
+          "contextAfter": "\") 11 11,crosshair!important;} #resurrectionHint{position:fixed;z"
+        },
+        {
+          "logicalReferenceId": "cursors/player-shot/reference-2",
+          "sourceOffset": 29446,
+          "contextBefore": "solute!important;inset:0!important;width:22px!important;height:22px!important;background-image:url(\"",
+          "contextAfter": "\")!important;background-repeat:no-repeat!important;background-pos"
+        },
+        {
+          "logicalReferenceId": "cursors/player-shot/reference-3",
+          "sourceOffset": 94380,
+          "contextBefore": "solute!important;inset:0!important;width:22px!important;height:22px!important;background-image:url(\"",
+          "contextAfter": "\")!important;background-repeat:no-repeat!important;background-pos"
+        },
+        {
+          "logicalReferenceId": "cursors/player-shot/reference-4",
+          "sourceOffset": 95210,
+          "contextBefore": "solute!important;inset:0!important;width:22px!important;height:22px!important;background-image:url(\"",
+          "contextAfter": "\")!important;background-repeat:no-repeat!important;background-pos"
+        },
+        {
+          "logicalReferenceId": "cursors/player-shot/reference-5",
+          "sourceOffset": 97977,
+          "contextBefore": "solute!important;inset:0!important;width:22px!important;height:22px!important;background-image:url(\"",
+          "contextAfter": "\")!important;background-repeat:no-repeat!important;background-pos"
+        }
+      ],
+      "dimensions": {
+        "width": 22,
+        "height": 22
+      }
+    },
+    {
+      "auditId": "A004",
+      "logicalId": "units/hero-alive",
+      "mime": "image/png",
+      "sha256": "98d37a17cd0245304b89f1884f068a1ab5709537e9e5804388f288b523775ac9",
+      "byteLength": 3023,
+      "dataUrlSha256": "1f2b801896fcc62d30641a26c9f98575547c7344495a333a83f515e04dd4548e",
+      "encodedLength": 4054,
+      "file": "assets/units/hero-alive.png",
+      "role": "units/hero-alive",
+      "aliases": [],
+      "references": [
+        {
+          "logicalReferenceId": "units/hero-alive/reference-1",
+          "sourceOffset": 20273,
+          "contextBefore": ".hero,.cell.hero-cell{background-color:#d4af37;border-color:#facc15;opacity:1;background-image:url(\"",
+          "contextAfter": "\");background-repeat:no-repeat;background-position:center;backgro"
+        },
+        {
+          "logicalReferenceId": "units/hero-alive/reference-2",
+          "sourceOffset": 24993,
+          "contextBefore": "e!important;background-color:#d4af37!important;border-color:#facc15!important;background-image:url(\"",
+          "contextAfter": "\")!important;background-repeat:no-repeat!important;background-pos"
+        },
+        {
+          "logicalReferenceId": "units/hero-alive/reference-3",
+          "sourceOffset": 44150,
+          "contextBefore": " .hero-cursor-ghost{position:fixed;width:22px;height:22px;border-radius:4px;background:#15803d url(\"",
+          "contextAfter": "\") center/22px 22px no-repeat;border:2px solid #166534;pointer-ev"
+        },
+        {
+          "logicalReferenceId": "units/hero-alive/reference-4",
+          "sourceOffset": 144261,
+          "contextBefore": "nter;background-size:22px 22px} .st-hero-state.start{background-color:#d4af37;background-image:url(\"",
+          "contextAfter": "\");border-color:#facc15} .st-hero-state.active{background-color:#"
+        },
+        {
+          "logicalReferenceId": "units/hero-alive/reference-5",
+          "sourceOffset": 148409,
+          "contextBefore": "5CYII=\");border-color:#facc15} .st-hero-state.active{background-color:#178c43;background-image:url(\"",
+          "contextAfter": "\");border-color:#166534} .st-hero-state.hit{background-color:#b52"
+        },
+        {
+          "logicalReferenceId": "units/hero-alive/reference-6",
+          "sourceOffset": 152554,
+          "contextBefore": "ORK5CYII=\");border-color:#166534} .st-hero-state.hit{background-color:#b52020;background-image:url(\"",
+          "contextAfter": "\");border-color:#8b1515} .st-hero-state.dead{background-color:#b5"
+        }
+      ],
+      "dimensions": {
+        "width": 22,
+        "height": 22
+      }
+    },
+    {
+      "auditId": "A005",
+      "logicalId": "units/hero-dead",
+      "mime": "image/png",
+      "sha256": "d9f5568ebdf4a043302dc77e1a7b2db017e69898a04eddb1e87fb17ddc9f3c98",
+      "byteLength": 2623,
+      "dataUrlSha256": "10073fd503d8539ffc00980e10e51180af7e55b2e97fcd60dd2f0003d2aab8f6",
+      "encodedLength": 3522,
+      "file": "assets/units/hero-dead.png",
+      "role": "units/hero-dead",
+      "aliases": [],
+      "references": [
+        {
+          "logicalReferenceId": "units/hero-dead/reference-1",
+          "sourceOffset": 30194,
+          "contextBefore": "l.hero-dead{background-color:#b52020!important;border-color:#8b1515!important;background-image:url(\"",
+          "contextAfter": "\")!important;background-repeat:no-repeat!important;background-pos"
+        },
+        {
+          "logicalReferenceId": "units/hero-dead/reference-2",
+          "sourceOffset": 34145,
+          "contextBefore": "o.hero-dead{background-color:#b52020!important;border-color:#8b1515!important;background-image:url(\"",
+          "contextAfter": "\")!important;opacity:1!important;} .hero-btn{border-color:#facc15"
+        },
+        {
+          "logicalReferenceId": "units/hero-dead/reference-3",
+          "sourceOffset": 156700,
+          "contextBefore": "RK5CYII=\");border-color:#8b1515} .st-hero-state.dead{background-color:#b52020;background-image:url(\"",
+          "contextAfter": "\");border-color:#8b1515} .st-wizard-range-wrap{margin-top:6px} .s"
+        }
+      ],
+      "dimensions": {
+        "width": 22,
+        "height": 22
+      }
+    },
+    {
+      "auditId": "A008",
+      "logicalId": "units/necromancer",
+      "mime": "image/png",
+      "sha256": "86c85916ce6c262cb861dee94eb29c8e439d0b9477b4715d5efbf0c4677fdd41",
+      "byteLength": 2537,
+      "dataUrlSha256": "7afa873d499a84e4d37f5f0880f3da2500e52dcbae4f614ebae68c0cef39632f",
+      "encodedLength": 3406,
+      "file": "assets/units/necromancer.png",
+      "role": "units/necromancer",
+      "aliases": [],
+      "references": [
+        {
+          "logicalReferenceId": "units/necromancer/reference-1",
+          "sourceOffset": 57473,
+          "contextBefore": "cell.necro,.cell.necro-btn,.cell.necro-cell,.cell.necro-hit,.cell.scout-necro{background-image:url(\"",
+          "contextAfter": "\")!important;background-repeat:no-repeat!important;background-pos"
+        }
+      ],
+      "dimensions": {
+        "width": 22,
+        "height": 22
+      }
+    },
+    {
+      "auditId": "A009",
+      "logicalId": "units/infantry",
+      "mime": "image/png",
+      "sha256": "32481052e0e477d75bfa1fdcc3341b16a5d15218fe8e78f168ef44fdcc918af3",
+      "byteLength": 240,
+      "dataUrlSha256": "ce5ce25839b82e3ffaeeb54c95c3f120f0b7f9159a77fd0171f5cd0ea5e5fc33",
+      "encodedLength": 342,
+      "file": "assets/units/infantry.png",
+      "role": "units/infantry",
+      "aliases": [],
+      "references": [
+        {
+          "logicalReferenceId": "units/infantry/reference-1",
+          "sourceOffset": 61291,
+          "contextBefore": "ransparent!important;} .cell.infantry-cell{background-color:#178c43!important;background-image:url(\"",
+          "contextAfter": "\")!important;background-repeat:no-repeat!important;background-pos"
+        },
+        {
+          "logicalReferenceId": "units/infantry/reference-2",
+          "sourceOffset": 61922,
+          "contextBefore": ".infantry-cell.hit,.cell.hit.infantry-cell{background-color:#b52020!important;background-image:url(\"",
+          "contextAfter": "\")!important;background-repeat:no-repeat!important;background-pos"
+        }
+      ],
+      "dimensions": {
+        "width": 22,
+        "height": 22
+      }
+    },
+    {
+      "auditId": "A010",
+      "logicalId": "units/archer",
+      "mime": "image/png",
+      "sha256": "140b34eaff4c31c06e263382e7a89a89c9412cb12c74e02b4a121d0b973d7e4c",
+      "byteLength": 399,
+      "dataUrlSha256": "a2d1b45de1db587701059a65c8355793119bbe2159be86bfb296ad875f303a9d",
+      "encodedLength": 554,
+      "file": "assets/units/archer.png",
+      "role": "units/archer",
+      "aliases": [],
+      "references": [
+        {
+          "logicalReferenceId": "units/archer/reference-1",
+          "sourceOffset": 62587,
+          "contextBefore": ":transparent!important;} .cell.archer-cell{background-color:#178c43!important;background-image:url(\"",
+          "contextAfter": "\")!important;background-repeat:no-repeat!important;background-pos"
+        },
+        {
+          "logicalReferenceId": "units/archer/reference-2",
+          "sourceOffset": 63396,
+          "contextBefore": "cell.archer-cell.hit,.cell.hit.archer-cell{background-color:#b52020!important;background-image:url(\"",
+          "contextAfter": "\")!important;background-repeat:no-repeat!important;background-pos"
+        },
+        {
+          "logicalReferenceId": "units/archer/reference-3",
+          "sourceOffset": 84625,
+          "contextBefore": ";display:none!important;} .cell.archer-hit{background-color:#b52020!important;background-image:url(\"",
+          "contextAfter": "\")!important;background-repeat:no-repeat!important;background-pos"
+        }
+      ],
+      "dimensions": {
+        "width": 22,
+        "height": 22
+      }
+    },
+    {
+      "auditId": "A011",
+      "logicalId": "units/monk-earlier",
+      "mime": "image/png",
+      "sha256": "e8957e4f358ec2efe4162d1eef97ae0c9125b4dd897ab0639799d7ddc974231b",
+      "byteLength": 2438,
+      "dataUrlSha256": "86b2c1afbafb1e6e1e9ca2423fe0f54834f8f7f6f27d51d2712ffdbf3f74f7f6",
+      "encodedLength": 3274,
+      "file": "assets/units/monk-earlier.png",
+      "role": "units/monk-earlier",
+      "aliases": [],
+      "references": [
+        {
+          "logicalReferenceId": "units/monk-earlier/reference-1",
+          "sourceOffset": 64545,
+          "contextBefore": "r-cell{background-position:center calc(50% - 1px)!important;} .cell.monk-cell{background-image:url(\"",
+          "contextAfter": "\")!important;background-repeat:no-repeat!important;background-pos"
+        },
+        {
+          "logicalReferenceId": "units/monk-earlier/reference-2",
+          "sourceOffset": 68109,
+          "contextBefore": "nt:-9999px!important;} .cell.monk-cell.hit,.cell.hit.monk-cell,.cell.monk-hit{background-image:url(\"",
+          "contextAfter": "\")!important;background-repeat:no-repeat!important;background-pos"
+        }
+      ],
+      "dimensions": {
+        "width": 22,
+        "height": 22
+      }
+    },
+    {
+      "auditId": "A012",
+      "logicalId": "units/dwarf",
+      "mime": "image/png",
+      "sha256": "4c3105ad7964631cc4f8aba3e7d6e896b6a49974ec9e776a913fb3dea40492ad",
+      "byteLength": 2630,
+      "dataUrlSha256": "30cf7bd6e0b101bccc0044030e5c9573988dae0eb66c637c56a78531b62c0e9b",
+      "encodedLength": 3530,
+      "file": "assets/units/dwarf.png",
+      "role": "units/dwarf",
+      "aliases": [],
+      "references": [
+        {
+          "logicalReferenceId": "units/dwarf/reference-1",
+          "sourceOffset": 71791,
+          "contextBefore": "tent:none!important;display:none!important;} .cell.dwarf-cell,.cell.dwarf-hit{background-image:url(\"",
+          "contextAfter": "\")!important;background-repeat:no-repeat!important;background-pos"
+        }
+      ],
+      "dimensions": {
+        "width": 22,
+        "height": 22
+      }
+    },
+    {
+      "auditId": "A013",
+      "logicalId": "units/catapult",
+      "mime": "image/png",
+      "sha256": "2c9f8734c6bf8387036be19940dec537fa06685ded9f573cf12ea701589e2f4a",
+      "byteLength": 346,
+      "dataUrlSha256": "0513bf6eb08e3a58074ef992000798254f873a60da886fa4ec33d997880354d7",
+      "encodedLength": 486,
+      "file": "assets/units/catapult.png",
+      "role": "units/catapult",
+      "aliases": [],
+      "references": [
+        {
+          "logicalReferenceId": "units/catapult/reference-1",
+          "sourceOffset": 75704,
+          "contextBefore": "one!important;display:none!important;} .cell.catapult-cell,.cell.catapult-hit{background-image:url(\"",
+          "contextAfter": "\")!important;background-repeat:no-repeat!important;background-pos"
+        }
+      ],
+      "dimensions": {
+        "width": 22,
+        "height": 22
+      }
+    },
+    {
+      "auditId": "A014",
+      "logicalId": "units/goblin",
+      "mime": "image/png",
+      "sha256": "0b2872e8da95dccd97dae1d546e33b160aea717ee339bc848a0a79775d3768c0",
+      "byteLength": 312,
+      "dataUrlSha256": "e33fd6c21632146fbfe83f382e728e0b89b2abf4f0111e9ec3d8feae0997b53a",
+      "encodedLength": 438,
+      "file": "assets/units/goblin.png",
+      "role": "units/goblin",
+      "aliases": [],
+      "references": [
+        {
+          "logicalReferenceId": "units/goblin/reference-1",
+          "sourceOffset": 76581,
+          "contextBefore": "nt:none!important;display:none!important;} .cell.goblin-cell,.cell.goblin-hit{background-image:url(\"",
+          "contextAfter": "\")!important;background-repeat:no-repeat!important;background-pos"
+        }
+      ],
+      "dimensions": {
+        "width": 22,
+        "height": 22
+      }
+    },
+    {
+      "auditId": "A015",
+      "logicalId": "units/elf",
+      "mime": "image/png",
+      "sha256": "5006e53d4720392e38c45273ee3e51bc33c3f54bbf2879435bcbcf10d823763b",
+      "byteLength": 354,
+      "dataUrlSha256": "da7663f5293fb01ae878a516efc6cca6b3fab406c7206155528c804f38f84100",
+      "encodedLength": 494,
+      "file": "assets/units/elf.png",
+      "role": "units/elf",
+      "aliases": [],
+      "references": [
+        {
+          "logicalReferenceId": "units/elf/reference-1",
+          "sourceOffset": 77396,
+          "contextBefore": "{content:none!important;display:none!important;} .cell.elf-cell,.cell.elf-hit{background-image:url(\"",
+          "contextAfter": "\")!important;background-repeat:no-repeat!important;background-pos"
+        }
+      ],
+      "dimensions": {
+        "width": 22,
+        "height": 22
+      }
+    },
+    {
+      "auditId": "A016",
+      "logicalId": "units/cleric",
+      "mime": "image/png",
+      "sha256": "593c89dc8fdc98653b619f07d0dc1ef8d27ff45c66fdc9a13c0d52a4993f747d",
+      "byteLength": 2954,
+      "dataUrlSha256": "2f26c1a7b49e198510339d827156b0f70d8e5765a84aa5132f771924ce2b3c05",
+      "encodedLength": 3962,
+      "file": "assets/units/cleric.png",
+      "role": "units/cleric",
+      "aliases": [],
+      "references": [
+        {
+          "logicalReferenceId": "units/cleric/reference-1",
+          "sourceOffset": 78261,
+          "contextBefore": "nt:none!important;display:none!important;} .cell.cleric-cell,.cell.cleric-hit{background-image:url(\"",
+          "contextAfter": "\")!important;background-repeat:no-repeat!important;background-pos"
+        }
+      ],
+      "dimensions": {
+        "width": 22,
+        "height": 22
+      }
+    },
+    {
+      "auditId": "A017",
+      "logicalId": "units/demon",
+      "mime": "image/png",
+      "sha256": "1d969e0750aa4098734dd8b81b16cf9cdd1ddd20aedf8f162e8e8a14ff548b43",
+      "byteLength": 1176,
+      "dataUrlSha256": "4d50bce729774bc03be556f48746ad60d4323499a115ed68f5f8bbf4a06ba3b9",
+      "encodedLength": 1590,
+      "file": "assets/units/demon.png",
+      "role": "units/demon",
+      "aliases": [],
+      "references": [
+        {
+          "logicalReferenceId": "units/demon/reference-1",
+          "sourceOffset": 82639,
+          "contextBefore": "tent:none!important;display:none!important;} .cell.demon-cell,.cell.demon-hit{background-image:url(\"",
+          "contextAfter": "\")!important;background-repeat:no-repeat!important;background-pos"
+        },
+        {
+          "logicalReferenceId": "units/demon/reference-2",
+          "sourceOffset": 169631,
+          "contextBefore": ".75} .st-demon-range-cell.demon{background-color:#7e22ce;border-color:#581c87;background-image:url(\"",
+          "contextAfter": "\");background-repeat:no-repeat;background-position:center;backgro"
+        }
+      ],
+      "dimensions": {
+        "width": 22,
+        "height": 22
+      }
+    },
+    {
+      "auditId": "A018",
+      "logicalId": "units/dragon",
+      "mime": "image/png",
+      "sha256": "41b5a7a067d2b0882f3623edaf8468cd339885127b83c23ddb3a10e51c4fece4",
+      "byteLength": 1596,
+      "dataUrlSha256": "398d5f901bc8813a3a45c1ab57afc77bdb0670971305cccc85d8f8c225c1d59d",
+      "encodedLength": 2150,
+      "file": "assets/units/dragon.png",
+      "role": "units/dragon",
+      "aliases": [],
+      "references": [
+        {
+          "logicalReferenceId": "units/dragon/reference-1",
+          "sourceOffset": 85577,
+          "contextBefore": "lay:none!important;font-size:0!important;} .cell.dragon-cell,.cell.dragon-hit{background-image:url(\"",
+          "contextAfter": "\")!important;background-repeat:no-repeat!important;background-pos"
+        },
+        {
+          "logicalReferenceId": "units/dragon/reference-2",
+          "sourceOffset": 165961,
+          "contextBefore": "5} .st-dragon-range-cell.dragon{background-color:#7f1d1d;border-color:#581313;background-image:url(\"",
+          "contextAfter": "\");background-repeat:no-repeat;background-position:center;backgro"
+        }
+      ],
+      "dimensions": {
+        "width": 22,
+        "height": 22
+      }
+    },
+    {
+      "auditId": "A019",
+      "logicalId": "units/wizard",
+      "mime": "image/png",
+      "sha256": "c7f86e4b8a918bc22556229ea851dbf1340237e62163371965d4582676b62f2e",
+      "byteLength": 2925,
+      "dataUrlSha256": "04ab67ae0e237000f496f4b55f91e26c94f93c7a076e95942d7bc150d33b7790",
+      "encodedLength": 3922,
+      "file": "assets/units/wizard.png",
+      "role": "units/wizard",
+      "aliases": [],
+      "references": [
+        {
+          "logicalReferenceId": "units/wizard/reference-1",
+          "sourceOffset": 88110,
+          "contextBefore": "nt:none!important;display:none!important;} .cell.wizard-cell,.cell.wizard-hit{background-image:url(\"",
+          "contextAfter": "\")!important;background-repeat:no-repeat!important;background-pos"
+        },
+        {
+          "logicalReferenceId": "units/wizard/reference-2",
+          "sourceOffset": 161117,
+          "contextBefore": "2} .st-wizard-range-cell.wizard{background-color:#c026d3;border-color:#86198f;background-image:url(\"",
+          "contextAfter": "\");background-repeat:no-repeat;background-position:center;backgro"
+        }
+      ],
+      "dimensions": {
+        "width": 22,
+        "height": 22
+      }
+    },
+    {
+      "auditId": "A020",
+      "logicalId": "units/cavalry",
+      "mime": "image/png",
+      "sha256": "4ab3b02b4ef545aba0d95a0662659fe9539ce0923bf2b3701ce8a631c7d3bb9f",
+      "byteLength": 1303,
+      "dataUrlSha256": "605f25f82bf7f03e6528dcc31b4b0dd21a24929270d57677b53a1b6882cf6d5d",
+      "encodedLength": 1762,
+      "file": "assets/units/cavalry.png",
+      "role": "units/cavalry",
+      "aliases": [],
+      "references": [
+        {
+          "logicalReferenceId": "units/cavalry/reference-1",
+          "sourceOffset": 98704,
+          "contextBefore": "important;pointer-events:none!important;z-index:50!important;} .cell.cav-cell{background-image:url(\"",
+          "contextAfter": "\")!important;background-repeat:no-repeat!important;background-pos"
+        },
+        {
+          "logicalReferenceId": "units/cavalry/reference-2",
+          "sourceOffset": 100780,
+          "contextBefore": "lor:#1f7a3a!important;} .cell.cavalry-dead{background-color:#d32f2f!important;background-image:url(\"",
+          "contextAfter": "\")!important;background-repeat:no-repeat!important;background-pos"
+        }
+      ],
+      "dimensions": {
+        "width": 22,
+        "height": 22
+      }
+    },
+    {
+      "auditId": "A021",
+      "logicalId": "units/monk-later",
+      "mime": "image/png",
+      "sha256": "05525c130e895e780fb004d8f5577735e97e1e269ba089afff5509af314cb04e",
+      "byteLength": 2470,
+      "dataUrlSha256": "9da49dc504ecb99c256873709d47096d878c06308f1b174ae9deffcd60010402",
+      "encodedLength": 3318,
+      "file": "assets/units/monk-later.png",
+      "role": "units/monk-later",
+      "aliases": [],
+      "references": [
+        {
+          "logicalReferenceId": "units/monk-later/reference-1",
+          "sourceOffset": 103464,
+          "contextBefore": "tant;text-shadow:0 1px 2px #3a0909!important;} .cell.monk-cell,.cell.monk-hit{background-image:url(\"",
+          "contextAfter": "\")!important;background-repeat:no-repeat!important;background-pos"
+        }
+      ],
+      "dimensions": {
+        "width": 22,
+        "height": 22
+      }
+    },
+    {
+      "auditId": "A022",
+      "logicalId": "effects/combat-rock",
+      "mime": "image/svg+xml",
+      "sha256": "4652fda4eb416554e7691aaf318d5cd50943bdc080a56fd494270e351e908d5c",
+      "byteLength": 239,
+      "dataUrlSha256": "6f242c8a1f407427634167cbe9636c6d082efcd5b177cf88da402e4fa8b5b8fa",
+      "encodedLength": 416,
+      "file": "assets/effects/combat-rock.svg",
+      "role": "effects/combat-rock",
+      "aliases": [],
+      "references": [
+        {
+          "logicalReferenceId": "effects/combat-rock/reference-1",
+          "sourceOffset": 120354,
+          "contextBefore": "t .combat-rock-icon{width:22px;height:22px;flex:0 0 22px;background:no-repeat center/22px 22px url(\"",
+          "contextAfter": "\")} .combat-float .combat-scout-icon{width:20px;height:20px;flex:"
+        },
+        {
+          "logicalReferenceId": "effects/combat-rock/reference-2",
+          "sourceOffset": 127107,
+          "contextBefore": "form:translate(-50%,-50%);will-change:left,top,transform;background:no-repeat center/28px 28px url(\"",
+          "contextAfter": "\");filter:drop-shadow(0 3px 3px rgba(0,0,0,.72));} .st-settings{p"
+        },
+        {
+          "logicalReferenceId": "effects/combat-rock/reference-3",
+          "sourceOffset": 136487,
+          "contextBefore": "y.catapult-aiming,body.catapult-aiming #enemyGrid,body.catapult-aiming #enemyGrid .cell{cursor:url(\"",
+          "contextAfter": "\") 11 11,crosshair!important;}</style><style>.st-battle-legend{di"
+        },
+        {
+          "logicalReferenceId": "effects/combat-rock/reference-4",
+          "sourceOffset": 143366,
+          "contextBefore": "dth:18px;height:18px;margin-left:5px;vertical-align:-5px;background:no-repeat center/18px 18px url(\"",
+          "contextAfter": "\")} .st-hero-info-states{margin-top:6px;display:grid;gap:4px} .st"
+        }
+      ],
+      "dimensions": {
+        "width": 22,
+        "height": 22
+      }
+    },
+    {
+      "auditId": "A023",
+      "logicalId": "ui/menu-story",
+      "mime": "image/webp",
+      "sha256": "cf382b305113f3748295f0174d7d91c6d21b988a3b51abb95b8c98267938cd6d",
+      "byteLength": 9362,
+      "dataUrlSha256": "a374bb2c7ad07de11c2962b60b8f0cea853ad78ff43a740db9b3413023c099ee",
+      "encodedLength": 12507,
+      "file": "assets/ui/menu-story.webp",
+      "role": "ui/menu-story",
+      "aliases": [],
+      "references": [
+        {
+          "logicalReferenceId": "ui/menu-story/reference-1",
+          "sourceOffset": 217824,
+          "contextBefore": "ria-hidden=\"true\">FINISHED</span><span class=\"st-menu-button-layout\"><img class=\"st-menu-icon\" src=\"",
+          "contextAfter": "\" alt=\"\" aria-hidden=\"true\"><span class=\"st-menu-button-text\"><sp"
+        }
+      ],
+      "dimensions": {
+        "width": 80,
+        "height": 80
+      }
+    },
+    {
+      "auditId": "A024",
+      "logicalId": "ui/menu-full",
+      "mime": "image/webp",
+      "sha256": "830d9e172a6d7ecca8aaff29e4019e8dd90614ee15ccacd28579693df5127499",
+      "byteLength": 9436,
+      "dataUrlSha256": "2ff2a64bfe09c5ee44481feb292f23ce081495098be1b67d4174351e55fab9ee",
+      "encodedLength": 12607,
+      "file": "assets/ui/menu-full.webp",
+      "role": "ui/menu-full",
+      "aliases": [],
+      "references": [
+        {
+          "logicalReferenceId": "ui/menu-full/reference-1",
+          "sourceOffset": 230885,
+          "contextBefore": "s=\"st-menu-button\" type=\"button\"><span class=\"st-menu-button-layout\"><img class=\"st-menu-icon\" src=\"",
+          "contextAfter": "\" alt=\"\" aria-hidden=\"true\"><span class=\"st-menu-button-text\"><sp"
+        }
+      ],
+      "dimensions": {
+        "width": 80,
+        "height": 80
+      }
+    },
+    {
+      "auditId": "A025",
+      "logicalId": "ui/menu-online",
+      "mime": "image/webp",
+      "sha256": "4ce6cbb9d34a8de960fbe0a68a3dc5c01f235743d8458d7d9b642eb825e222b2",
+      "byteLength": 11426,
+      "dataUrlSha256": "589bd972f940268054b687b3d7609609ffe3ebd1a813b8fb170b5475ace5aaea",
+      "encodedLength": 15259,
+      "file": "assets/ui/menu-online.webp",
+      "role": "ui/menu-online",
+      "aliases": [],
+      "references": [
+        {
+          "logicalReferenceId": "ui/menu-online/reference-1",
+          "sourceOffset": 243856,
+          "contextBefore": "s=\"st-menu-button\" type=\"button\"><span class=\"st-menu-button-layout\"><img class=\"st-menu-icon\" src=\"",
+          "contextAfter": "\" alt=\"\" aria-hidden=\"true\"><span class=\"st-menu-button-text\"><sp"
+        }
+      ],
+      "dimensions": {
+        "width": 80,
+        "height": 80
+      }
+    },
+    {
+      "auditId": "A026",
+      "logicalId": "ui/menu-story-progress",
+      "mime": "image/webp",
+      "sha256": "a2ea30fa7fec7238b2c4b56e311b483c4e2331a4ebe2714b260effa5a656233a",
+      "byteLength": 8608,
+      "dataUrlSha256": "f93306cbcdaedfaa24fb66848cf33a789d711154ff24912fd97277a85d6a7759",
+      "encodedLength": 11503,
+      "file": "assets/ui/menu-story-progress.webp",
+      "role": "ui/menu-story-progress",
+      "aliases": [],
+      "references": [
+        {
+          "logicalReferenceId": "ui/menu-story-progress/reference-1",
+          "sourceOffset": 259542,
+          "contextBefore": "y-progress-button\" type=\"button\"><span class=\"st-menu-button-layout\"><img class=\"st-menu-icon\" src=\"",
+          "contextAfter": "\" alt=\"\" aria-hidden=\"true\"><span class=\"st-menu-button-text\"><sp"
+        }
+      ],
+      "dimensions": {
+        "width": 80,
+        "height": 80
+      }
+    },
+    {
+      "auditId": "A027",
+      "logicalId": "ui/menu-unit-lore",
+      "mime": "image/webp",
+      "sha256": "ca248379e74c7aafb452ac069203c26e295e76ff5021a05c30add60df17c218f",
+      "byteLength": 7288,
+      "dataUrlSha256": "ad61ec209b835d21783fc656023f855e20fb852178dc1f1a87b3971978a8a2bd",
+      "encodedLength": 9743,
+      "file": "assets/ui/menu-unit-lore.webp",
+      "role": "ui/menu-unit-lore",
+      "aliases": [],
+      "references": [
+        {
+          "logicalReferenceId": "ui/menu-unit-lore/reference-1",
+          "sourceOffset": 271391,
+          "contextBefore": "-unit-lore-button\" type=\"button\"><span class=\"st-menu-button-layout\"><img class=\"st-menu-icon\" src=\"",
+          "contextAfter": "\" alt=\"\" aria-hidden=\"true\"><span class=\"st-menu-button-text\"><sp"
+        }
+      ],
+      "dimensions": {
+        "width": 80,
+        "height": 80
+      }
+    },
+    {
+      "auditId": "A028",
+      "logicalId": "ui/menu-options",
+      "mime": "image/webp",
+      "sha256": "a0d7482f9181e4acaba2e265f979951ea82059ff40262c8f51f1654f7ad8c4f6",
+      "byteLength": 8946,
+      "dataUrlSha256": "3b1729318c0e75d795a9c4b885a0fd60b04939f9b361839cd4e25e80ccf4eeaa",
+      "encodedLength": 11951,
+      "file": "assets/ui/menu-options.webp",
+      "role": "ui/menu-options",
+      "aliases": [],
+      "references": [
+        {
+          "logicalReferenceId": "ui/menu-options/reference-1",
+          "sourceOffset": 281497,
+          "contextBefore": "s=\"st-menu-button\" type=\"button\"><span class=\"st-menu-button-layout\"><img class=\"st-menu-icon\" src=\"",
+          "contextAfter": "\" alt=\"\" aria-hidden=\"true\"><span class=\"st-menu-button-text\"><sp"
+        }
+      ],
+      "dimensions": {
+        "width": 80,
+        "height": 80
+      }
+    },
+    {
+      "auditId": "A029",
+      "logicalId": "ui/menu-exit",
+      "mime": "image/webp",
+      "sha256": "0a94551df5d0fb16d1170106fcccd3eadeabd7c9bc7b8af28f7fffd61b465c91",
+      "byteLength": 5574,
+      "dataUrlSha256": "0cb07b3459b2355a8a5c1bf085452b3e910fb8423ca9d95283b020c88d47cea8",
+      "encodedLength": 7455,
+      "file": "assets/ui/menu-exit.webp",
+      "role": "ui/menu-exit",
+      "aliases": [],
+      "references": [
+        {
+          "logicalReferenceId": "ui/menu-exit/reference-1",
+          "sourceOffset": 293785,
+          "contextBefore": "-menu-button exit\" type=\"button\"><span class=\"st-menu-button-layout\"><img class=\"st-menu-icon\" src=\"",
+          "contextAfter": "\" alt=\"\" aria-hidden=\"true\"><span class=\"st-menu-button-text\"><sp"
+        }
+      ],
+      "dimensions": {
+        "width": 80,
+        "height": 80
+      }
+    },
+    {
+      "auditId": "A030",
+      "logicalId": "ui/logo",
+      "mime": "image/png",
+      "sha256": "509523134fdfdb190b3aad782b6eb18fa84659247b10ecbf8687d907851cf83b",
+      "byteLength": 26259,
+      "dataUrlSha256": "462a4c81c9f998802d8244d7f6cef57204aa1a03fd49099e96070f533b3af4ac",
+      "encodedLength": 35034,
+      "file": "assets/ui/logo.png",
+      "role": "ui/logo",
+      "aliases": [],
+      "references": [
+        {
+          "logicalReferenceId": "ui/logo/reference-1",
+          "sourceOffset": 305198,
+          "contextBefore": " class=\"st-topbar st-frame\"><div class=\"st-brand st-brand-logo-wrap\"><img class=\"st-game-logo\" src=\"",
+          "contextAfter": "\" alt=\"Stone Throw — Fantasy Battle\"></div><div class=\"st-center-"
+        }
+      ],
+      "dimensions": {
+        "width": 520,
+        "height": 174
+      }
+    },
+    {
+      "auditId": "A031",
+      "logicalId": "ui/player-banner",
+      "mime": "image/png",
+      "sha256": "56e1129527b2b6284d1d2d2160c28f3317f160b203a50d9e9b3dd4eb19ed10dd",
+      "byteLength": 42026,
+      "dataUrlSha256": "85997f338dbf256517b089a5a5c49d16ced069f0c87b4a4f7f67b819d9823829",
+      "encodedLength": 56058,
+      "file": "assets/ui/player-banner.png",
+      "role": "ui/player-banner",
+      "aliases": [],
+      "references": [
+        {
+          "logicalReferenceId": "ui/player-banner/reference-1",
+          "sourceOffset": 345422,
+          "contextBefore": "t-board-wrap\"><div class=\"st-board-head st-board-head-player\"><img class=\"st-board-banner-img\" src=\"",
+          "contextAfter": "\" alt=\"\"><div class=\"st-board-title\">Your Battlefield</div><div c"
+        }
+      ],
+      "dimensions": {
+        "width": 620,
+        "height": 107
+      }
+    },
+    {
+      "auditId": "A032",
+      "logicalId": "ui/enemy-banner",
+      "mime": "image/png",
+      "sha256": "5c6fbb1b508a3433680cbc0fe648633f3a825d6de0a587897f6dae02bcd33f7d",
+      "byteLength": 43201,
+      "dataUrlSha256": "5bdb5c2edd214f32ffa90f2dde7e00e0e6c96ac61ddfa2edf3ff4d71f723a086",
+      "encodedLength": 57626,
+      "file": "assets/ui/enemy-banner.png",
+      "role": "ui/enemy-banner",
+      "aliases": [],
+      "references": [
+        {
+          "logicalReferenceId": "ui/enemy-banner/reference-1",
+          "sourceOffset": 401814,
+          "contextBefore": "st-board-wrap\"><div class=\"st-board-head st-board-head-enemy\"><img class=\"st-board-banner-img\" src=\"",
+          "contextAfter": "\" alt=\"\"><div class=\"st-board-title\">Enemy Battlefield</div><div "
+        }
+      ],
+      "dimensions": {
+        "width": 620,
+        "height": 107
+      }
+    },
+    {
+      "auditId": "A033",
+      "logicalId": "units/castle/tile-00",
+      "mime": "image/png",
+      "sha256": "2b17dce7898376b87be90dfd0852de07c21af6a179f4ab1733ce583e0c9ba83c",
+      "byteLength": 345,
+      "dataUrlSha256": "e50cddad47343a83a1c6847c1e7a76792bd8db3755a1d2efc4a23f73b6e96a71",
+      "encodedLength": 482,
+      "file": "assets/units/castle/tile-00.png",
+      "role": "units/castle/tile-00",
+      "aliases": [],
+      "references": [
+        {
+          "logicalReferenceId": "units/castle/tile-00/reference-1",
+          "sourceOffset": 514841,
+          "contextBefore": "t nx=x+dx, ny=y+dy;if(inBounds(nx,ny)) out.push(key(nx,ny));}\nreturn out;}\nconst CASTLE_TILE_ART=[\n'",
+          "contextAfter": "',\n'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABYAAAAWCAYAAAD"
+        }
+      ],
+      "dimensions": {
+        "width": 22,
+        "height": 22
+      }
+    },
+    {
+      "auditId": "A034",
+      "logicalId": "units/castle/tile-01",
+      "mime": "image/png",
+      "sha256": "00186e4136b6430a5dfe9e2f4992835d0956355978f8b56ea66afa5221dfd5aa",
+      "byteLength": 315,
+      "dataUrlSha256": "33a9f397112ba96621d01351ad04e2d22a0c67b60a3e570ea2d89ea499cbae0d",
+      "encodedLength": 442,
+      "file": "assets/units/castle/tile-01.png",
+      "role": "units/castle/tile-01",
+      "aliases": [],
+      "references": [
+        {
+          "logicalReferenceId": "units/castle/tile-01/reference-1",
+          "sourceOffset": 515327,
+          "contextBefore": "7dr2+EXXEi4RX97Gad4QbPM6Jw/c/9rnp0Un5julvc3r2wZtnrlBYPhVZMeqolR9NxzMDzjkotqFoF0DAAAAAElFTkSuQmCC',\n'",
+          "contextAfter": "',\n'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABYAAAAWCAYAAAD"
+        }
+      ],
+      "dimensions": {
+        "width": 22,
+        "height": 22
+      }
+    },
+    {
+      "auditId": "A035",
+      "logicalId": "units/castle/tile-02",
+      "mime": "image/png",
+      "sha256": "1d6621a432f82ecc5e60d70af9032cc76155423d40909476463012d446d64441",
+      "byteLength": 285,
+      "dataUrlSha256": "444febd88d97f163f21b853479e1109c129afccaec058476e305e732ab454c64",
+      "encodedLength": 402,
+      "file": "assets/units/castle/tile-02.png",
+      "role": "units/castle/tile-02",
+      "aliases": [],
+      "references": [
+        {
+          "logicalReferenceId": "units/castle/tile-02/reference-1",
+          "sourceOffset": 515773,
+          "contextBefore": "bBExJ6Lz2gmfTV3w5k02DxhvH8tHYTDJybZU2TzVNjDzLKD/5wF95UNyaa4uK0u1YG18ALxKh99oLNCPAAAAAElFTkSuQmCC',\n'",
+          "contextAfter": "',\n'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABYAAAAWCAYAAAD"
+        }
+      ],
+      "dimensions": {
+        "width": 22,
+        "height": 22
+      }
+    },
+    {
+      "auditId": "A036",
+      "logicalId": "units/castle/tile-03",
+      "mime": "image/png",
+      "sha256": "60c70a3543b033e68db0f2e2acda7835102a0a35ab5c1f0b76707a9cbac47373",
+      "byteLength": 275,
+      "dataUrlSha256": "5b160de883d3048fbe90ca69fd5dec8572b7491d8aa2936bbba7c2d38717d047",
+      "encodedLength": 390,
+      "file": "assets/units/castle/tile-03.png",
+      "role": "units/castle/tile-03",
+      "aliases": [],
+      "references": [
+        {
+          "logicalReferenceId": "units/castle/tile-03/reference-1",
+          "sourceOffset": 516179,
+          "contextBefore": "/zVPLaG+a73mVjL7pHWjiW9X1wkrBW0eYN61h32jKnbZyc4Vr5FBVZyXxQT4/YpMtiC8Ae6hdJeLQqTXAAAAAElFTkSuQmCC',\n'",
+          "contextAfter": "',\n'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABYAAAAWCAYAAAD"
+        }
+      ],
+      "dimensions": {
+        "width": 22,
+        "height": 22
+      }
+    },
+    {
+      "auditId": "A037",
+      "logicalId": "units/castle/tile-04",
+      "mime": "image/png",
+      "sha256": "1250fab82a769a066267f45d1dc6c479d4ff830e49dc9edb14af486f1f333a8d",
+      "byteLength": 329,
+      "dataUrlSha256": "e72b62129ed31ddfebcecacf90637984f6ada08eaf174f73c213d93904b61dbe",
+      "encodedLength": 462,
+      "file": "assets/units/castle/tile-04.png",
+      "role": "units/castle/tile-04",
+      "aliases": [],
+      "references": [
+        {
+          "logicalReferenceId": "units/castle/tile-04/reference-1",
+          "sourceOffset": 516573,
+          "contextBefore": "9laQWzimoIlfV9fZdxRd86BvoDylp2PaKpaYqU5ikxXPGUOrOIjCGpoHH5o/UVgT24U3YqtTwake9yEAAAAASUVORK5CYII=',\n'",
+          "contextAfter": "',\n'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABYAAAAWCAYAAAD"
+        }
+      ],
+      "dimensions": {
+        "width": 22,
+        "height": 22
+      }
+    },
+    {
+      "auditId": "A038",
+      "logicalId": "units/castle/tile-05",
+      "mime": "image/png",
+      "sha256": "04b365013d7e20c3bd5809e4ced6b6dd882173640ea457f2edc4694bf22a5829",
+      "byteLength": 294,
+      "dataUrlSha256": "ae7cb82d21b56ceae6c7bfd7ced215aa095f57844388daaea7c4a804283e37cc",
+      "encodedLength": 414,
+      "file": "assets/units/castle/tile-05.png",
+      "role": "units/castle/tile-05",
+      "aliases": [],
+      "references": [
+        {
+          "logicalReferenceId": "units/castle/tile-05/reference-1",
+          "sourceOffset": 517039,
+          "contextBefore": "Wm9MMVTUxf+YJyJB2bV7h/FLLhVcIr66jdO8GK4yb4w0nY72RJnnSk30zQuZL9zxt3kCl/SXYD9lcgUAAAAASUVORK5CYII=',\n'",
+          "contextAfter": "',\n'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABYAAAAWCAYAAAD"
+        }
+      ],
+      "dimensions": {
+        "width": 22,
+        "height": 22
+      }
+    },
+    {
+      "auditId": "A039",
+      "logicalId": "units/castle/tile-06",
+      "mime": "image/png",
+      "sha256": "4ae6d6b5e487117a1c1099fd21a6b2e6d6cc72a5424ea33f2400fabe8a6ca56d",
+      "byteLength": 275,
+      "dataUrlSha256": "11f3bb56f1267f79893a990dba6fb798a1a2502d8f70b503466d4ca789674059",
+      "encodedLength": 390,
+      "file": "assets/units/castle/tile-06.png",
+      "role": "units/castle/tile-06",
+      "aliases": [],
+      "references": [
+        {
+          "logicalReferenceId": "units/castle/tile-06/reference-1",
+          "sourceOffset": 517457,
+          "contextBefore": "6utDGDR5rqI6pjGPiJx6Vz372X6RKaETcdl2xrXpipe1adtyklHm6bpm9OS51Bf449p8ABtpfGUatWa5AAAAAElFTkSuQmCC',\n'",
+          "contextAfter": "',\n'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABYAAAAWCAYAAAD"
+        }
+      ],
+      "dimensions": {
+        "width": 22,
+        "height": 22
+      }
+    },
+    {
+      "auditId": "A040",
+      "logicalId": "units/castle/tile-07",
+      "mime": "image/png",
+      "sha256": "6604eaefe52fa945eca412c0a45cb5a4f518b030270dc4258edc6a4aada2ba0d",
+      "byteLength": 253,
+      "dataUrlSha256": "f9e1f3c174ab6f1444bf1a80fe3779941c930bc33ab86a53d879afcc04e3cfa4",
+      "encodedLength": 362,
+      "file": "assets/units/castle/tile-07.png",
+      "role": "units/castle/tile-07",
+      "aliases": [],
+      "references": [
+        {
+          "logicalReferenceId": "units/castle/tile-07/reference-1",
+          "sourceOffset": 517851,
+          "contextBefore": "WBMzlgcf9H/F00OoqaugvlXMvrRptLH2dJNoUuix2Xa9nqtrbOkarxtvmXKz4u1JNI0/eH1k95jfG/8AAAAASUVORK5CYII=',\n'",
+          "contextAfter": "',\n'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABYAAAAWCAYAAAD"
+        }
+      ],
+      "dimensions": {
+        "width": 22,
+        "height": 22
+      }
+    },
+    {
+      "auditId": "A041",
+      "logicalId": "units/castle/tile-08",
+      "mime": "image/png",
+      "sha256": "7dd2eb1f82a71ca8676eba276ed71887beb703d80db96d57d790513ee4ed6278",
+      "byteLength": 312,
+      "dataUrlSha256": "4fbb4c998420af0875ae9d4f351a7eac2caf07eec1443513c7ce47c4edc1c086",
+      "encodedLength": 438,
+      "file": "assets/units/castle/tile-08.png",
+      "role": "units/castle/tile-08",
+      "aliases": [],
+      "references": [
+        {
+          "logicalReferenceId": "units/castle/tile-08/reference-1",
+          "sourceOffset": 518217,
+          "contextBefore": "4marmG+MM3HMvvr4P/EEsJzNX/bWYLqQrk8X31rnlL3HsWczZGuSKg65civxclJsxm/seEQhTAWWEQAAAABJRU5ErkJggg==',\n'",
+          "contextAfter": "',\n'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABYAAAAWCAYAAAD"
+        }
+      ],
+      "dimensions": {
+        "width": 22,
+        "height": 22
+      }
+    },
+    {
+      "auditId": "A042",
+      "logicalId": "units/castle/tile-09",
+      "mime": "image/png",
+      "sha256": "a8bf561863ec2b39fecbdb24c8de6911015d207d4bcf906fb72f3c700e972cc6",
+      "byteLength": 292,
+      "dataUrlSha256": "1d8c348f119356a23ddffd63263b276e17e287cbe1a732ea8c72434d5eddcabf",
+      "encodedLength": 414,
+      "file": "assets/units/castle/tile-09.png",
+      "role": "units/castle/tile-09",
+      "aliases": [],
+      "references": [
+        {
+          "logicalReferenceId": "units/castle/tile-09/reference-1",
+          "sourceOffset": 518659,
+          "contextBefore": "TDyrj12Yez7t19nH1N1hgxRvCKZ4HhWk7trtZm1dZ9JZvK5tUOLppwkY73kqC8m6FtybJyHUjIbRjfKRAAAAAElFTkSuQmCC',\n'",
+          "contextAfter": "',\n'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABYAAAAWCAYAAAD"
+        }
+      ],
+      "dimensions": {
+        "width": 22,
+        "height": 22
+      }
+    },
+    {
+      "auditId": "A043",
+      "logicalId": "units/castle/tile-10",
+      "mime": "image/png",
+      "sha256": "9363e5f6307f8f246e8ac6123197f82e4dca6555007eed4f339f5fe5ee7e30fb",
+      "byteLength": 257,
+      "dataUrlSha256": "5ae5d013b92daaced12da65bf2b80fd5487da07203ca9fed4826f200f774a9f6",
+      "encodedLength": 366,
+      "file": "assets/units/castle/tile-10.png",
+      "role": "units/castle/tile-10",
+      "aliases": [],
+      "references": [
+        {
+          "logicalReferenceId": "units/castle/tile-10/reference-1",
+          "sourceOffset": 519077,
+          "contextBefore": "/Jxz7PvaGZ9NX1TzIl2TMzqp7crCuk7F2TzXY5DmkfV2M/zzsiz9ac6ttXVDXDfszQfgDGq/6eP+6gAAAABJRU5ErkJggg==',\n'",
+          "contextAfter": "',\n'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABYAAAAWCAYAAAD"
+        }
+      ],
+      "dimensions": {
+        "width": 22,
+        "height": 22
+      }
+    },
+    {
+      "auditId": "A044",
+      "logicalId": "units/castle/tile-11",
+      "mime": "image/png",
+      "sha256": "14c7063d1bb0467387160b9727cccba20742d625488553566e99891691d6ee47",
+      "byteLength": 236,
+      "dataUrlSha256": "e5629ba34bdd2e924f82c2106beb1a4ad7431e3842201d3e5111174252c895b4",
+      "encodedLength": 338,
+      "file": "assets/units/castle/tile-11.png",
+      "role": "units/castle/tile-11",
+      "aliases": [],
+      "references": [
+        {
+          "logicalReferenceId": "units/castle/tile-11/reference-1",
+          "sourceOffset": 519447,
+          "contextBefore": "hc3dt2AVjslrlHAOvDkOYetREVyd41BuTcpbAf5/7e16WXWfWls9cewnr48myH88FeEP7gtmsLVSvukAAAAASUVORK5CYII=',\n'",
+          "contextAfter": "',\n'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABYAAAAWCAYAAAD"
+        }
+      ],
+      "dimensions": {
+        "width": 22,
+        "height": 22
+      }
+    },
+    {
+      "auditId": "A045",
+      "logicalId": "units/castle/tile-12",
+      "mime": "image/png",
+      "sha256": "46e4eb7babac821c83775071cab0937b82803b79a95f1cb04637efdce4249869",
+      "byteLength": 296,
+      "dataUrlSha256": "89c667094cecb2b3f1666bac063af8b240d7ca332dea2a9cbd1613cc13962970",
+      "encodedLength": 418,
+      "file": "assets/units/castle/tile-12.png",
+      "role": "units/castle/tile-12",
+      "aliases": [],
+      "references": [
+        {
+          "logicalReferenceId": "units/castle/tile-12/reference-1",
+          "sourceOffset": 519789,
+          "contextBefore": "gkVLGBgYGBgS4mIwxGytLYlSBxMj2sWkZnlGGTlZeJ0nLS3FwMDAwPD06TMGaojRBAAAnOc/DuS0r7cAAAAASUVORK5CYII=',\n'",
+          "contextAfter": "',\n'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABYAAAAWCAYAAAD"
+        }
+      ],
+      "dimensions": {
+        "width": 22,
+        "height": 22
+      }
+    },
+    {
+      "auditId": "A046",
+      "logicalId": "units/castle/tile-13",
+      "mime": "image/png",
+      "sha256": "4d20b1518bb993619c4b598c4b3b649f6f33834f945e9d61c7da9ea8c03bb5b3",
+      "byteLength": 268,
+      "dataUrlSha256": "84abad6bdb9158942837897a909aac850d87c9c1abd9f8524f11a1f8632b42e0",
+      "encodedLength": 382,
+      "file": "assets/units/castle/tile-13.png",
+      "role": "units/castle/tile-13",
+      "aliases": [],
+      "references": [
+        {
+          "logicalReferenceId": "units/castle/tile-13/reference-1",
+          "sourceOffset": 520211,
+          "contextBefore": "lUK+Ptk8MmNXUYrFmmf0sQ39zKf9JvuYmh0myOb5MKl5NnTPUngJU67xfnmus2SxsfkEq1x5JEM9dzsAAAAASUVORK5CYII=',\n'",
+          "contextAfter": "',\n'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABYAAAAWCAYAAAD"
+        }
+      ],
+      "dimensions": {
+        "width": 22,
+        "height": 22
+      }
+    },
+    {
+      "auditId": "A047",
+      "logicalId": "units/castle/tile-14",
+      "mime": "image/png",
+      "sha256": "07df326248baf010988da073998a0cb248d73a4c6be4b6c24fdb43c1837f5b63",
+      "byteLength": 245,
+      "dataUrlSha256": "4a2792d235f368423e99452b934f9e83b1c986c404a7f52f3c12f1f2a9e9b2c8",
+      "encodedLength": 350,
+      "file": "assets/units/castle/tile-14.png",
+      "role": "units/castle/tile-14",
+      "aliases": [],
+      "references": [
+        {
+          "logicalReferenceId": "units/castle/tile-14/reference-1",
+          "sourceOffset": 520597,
+          "contextBefore": "unmE1FHWAgI3L1bURrHheX38D7NHt1+wj2PTzhmbsWSJTV/KKZKEba5J3rzYLCkWmx9po1ddWCaw7gAAAABJRU5ErkJggg==',\n'",
+          "contextAfter": "',\n'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABYAAAAWCAYAAAD"
+        }
+      ],
+      "dimensions": {
+        "width": 22,
+        "height": 22
+      }
+    },
+    {
+      "auditId": "A048",
+      "logicalId": "units/castle/tile-15",
+      "mime": "image/png",
+      "sha256": "d705899d9322885c2c2621322a250813828311e2603e083c10b0bb7941da107e",
+      "byteLength": 196,
+      "dataUrlSha256": "2433886834b2fc6dc9fababc3ee103ce969aa03fb8321b65b96ec215779910e7",
+      "encodedLength": 286,
+      "file": "assets/units/castle/tile-15.png",
+      "role": "units/castle/tile-15",
+      "aliases": [],
+      "references": [
+        {
+          "logicalReferenceId": "units/castle/tile-15/reference-1",
+          "sourceOffset": 520951,
+          "contextBefore": "xkK0dYzNxliNza/nYDVO6WuS8R54exzCNqMrGN3jUG9N/qvHMa3JMo5pTbRx6r+kWsY/gnlQxNWz5IwAAAAASUVORK5CYII=',\n'",
+          "contextAfter": "'\n];function clearPlayerCastleArt(){\nfor(const cell of playerGrid"
+        }
+      ],
+      "dimensions": {
+        "width": 22,
+        "height": 22
+      }
+    },
+    {
+      "auditId": "A049",
+      "logicalId": "results/win",
+      "mime": "image/svg+xml",
+      "sha256": "f713ddfe3a27a69b596c646cfafaf7778ac8ac7f0629833e727a4c4efe8f7c16",
+      "byteLength": 2390,
+      "dataUrlSha256": "4b9e87bc57fd130e727425a7f0787ac2710602810cd411598bf99864ad0c265b",
+      "encodedLength": 3214,
+      "file": "assets/results/win.svg",
+      "role": "results/win",
+      "aliases": [],
+      "references": [
+        {
+          "logicalReferenceId": "results/win/reference-1",
+          "sourceOffset": 654032,
+          "contextBefore": "('hit','cav-cell','cavalry-question','cavalry-dead','scout-question');}\n}\n}\n}\nconst RESULT_WIN_ART='",
+          "contextAfter": "';const RESULT_LOSE_ART='data:image/svg+xml;base64,PHN2ZyB4bWxucz"
+        }
+      ],
+      "dimensions": {
+        "width": 760,
+        "height": 245
+      }
+    },
+    {
+      "auditId": "A050",
+      "logicalId": "results/lose",
+      "mime": "image/svg+xml",
+      "sha256": "269e39a1c292ad123ccc1b7403e56db27f40941b6d3731eaa424af8ff8b2ea47",
+      "byteLength": 2616,
+      "dataUrlSha256": "37d45c50d937c5359def1340dea32555f9c4bf42b3d7249774e34ba27b8ab99b",
+      "encodedLength": 3514,
+      "file": "assets/results/lose.svg",
+      "role": "results/lose",
+      "aliases": [],
+      "references": [
+        {
+          "logicalReferenceId": "results/lose/reference-1",
+          "sourceOffset": 657271,
+          "contextBefore": "z48Y2lyY2xlIGN4PSI0MjgiIGN5PSIyMDUiIHI9IjUiIGZpbGw9IiNlMmE5M2IiLz48L3N2Zz4=';const RESULT_LOSE_ART='",
+          "contextAfter": "';const RESULT_DRAW_ART='data:image/svg+xml,%3Csvg xmlns=%22http:"
+        }
+      ],
+      "dimensions": {
+        "width": 760,
+        "height": 245
+      }
+    },
+    {
+      "auditId": "A051",
+      "logicalId": "results/draw",
+      "mime": "image/svg+xml",
+      "sha256": "6f1eb9a3990d1cfdc68a6499023a2aab368982f002f9d4f65d9e412addc3e0af",
+      "byteLength": 419,
+      "dataUrlSha256": "10bc724f59ec89a16eecd4c61a0d93c22908bbeb91e8dad5ee6a80871bd315e7",
+      "encodedLength": 556,
+      "file": "assets/results/draw.svg",
+      "role": "results/draw",
+      "aliases": [],
+      "references": [
+        {
+          "logicalReferenceId": "results/draw/reference-1",
+          "sourceOffset": 660810,
+          "contextBefore": "GZpbGw9IiM1YzRhMzYiIHN0cm9rZT0iIzhlNjIyOSIgc3Ryb2tlLXdpZHRoPSIyIi8+PC9zdmc+';const RESULT_DRAW_ART='",
+          "contextAfter": "';const RESULT_DRAW_LINES=['At least the bards won’t have to choo"
+        }
+      ],
+      "dimensions": {
+        "width": 760,
+        "height": 245
+      }
+    },
+    {
+      "auditId": "A052",
+      "logicalId": "effects/dragon-flight-right",
+      "mime": "image/png",
+      "sha256": "f77846cd5dbb68b7f30d4885ac016ecc6ec1b05cecec069bde83ce88d820a85a",
+      "byteLength": 5939,
+      "dataUrlSha256": "ae36ccbc2ebd9c904a696766117ca2ae675ba090becc83b6054acec00c58e67c",
+      "encodedLength": 7942,
+      "file": "assets/effects/dragon-flight-right.png",
+      "role": "effects/dragon-flight-right",
+      "aliases": [],
+      "references": [
+        {
+          "logicalReferenceId": "effects/dragon-flight-right/reference-1",
+          "sourceOffset": 685667,
+          "contextBefore": ">fastSimulationMode()?Promise.resolve():new Promise(r=>setTimeout(r,ms));const DRAGON_FLIGHT_RIGHT='",
+          "contextAfter": "';const DRAGON_FLIGHT_LEFT='data:image/png;base64,iVBORw0KGgoAAAA"
+        }
+      ],
+      "dimensions": {
+        "width": 44,
+        "height": 44
+      }
+    },
+    {
+      "auditId": "A053",
+      "logicalId": "effects/dragon-flight-left",
+      "mime": "image/png",
+      "sha256": "d05f5ac5627b6c0352c38966e3a7b97eec98abd0a8ef76a8cac4d5545f8b001f",
+      "byteLength": 5909,
+      "dataUrlSha256": "40831b19510fda26505b0f47e61f6cfe44166075d88faa39a108a83a9f506799",
+      "encodedLength": 7902,
+      "file": "assets/effects/dragon-flight-left.png",
+      "role": "effects/dragon-flight-left",
+      "aliases": [],
+      "references": [
+        {
+          "logicalReferenceId": "effects/dragon-flight-left/reference-1",
+          "sourceOffset": 693637,
+          "contextBefore": "LqbRezaihw6i9+/C/cVDvcMtXbdN3Pb13oNaUzhS4b8BbGsu2Ckl9uUAAAAASUVORK5CYII=';const DRAGON_FLIGHT_LEFT='",
+          "contextAfter": "';function demonPatternFrom(k){\nconst {x,y}=parseKey(k);const cel"
+        }
+      ],
+      "dimensions": {
+        "width": 44,
+        "height": 44
+      }
+    },
+    {
+      "auditId": "A054",
+      "logicalId": "unit-info/inf",
+      "mime": "image/png",
+      "sha256": "d2c706052201ca17cd8432d0384ef5d3a23dda805299932806e38eb7fd83c519",
+      "byteLength": 7631,
+      "dataUrlSha256": "66cf8966cad78c2a8d35191a08a15ed93e5b379cbca1b01deeb473c26f681eb7",
+      "encodedLength": 10198,
+      "file": "assets/unit-info/inf.png",
+      "role": "unit-info/inf",
+      "aliases": [],
+      "references": [
+        {
+          "logicalReferenceId": "unit-info/inf/reference-1",
+          "sourceOffset": 903071,
+          "contextBefore": "rn true;};setup();})();</script><script>\n(function(){\nconst ST_UNIT_INFO_ART = Object.freeze({\ninf:'",
+          "contextAfter": "',\ncav:'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAI"
+        }
+      ],
+      "dimensions": {
+        "width": 64,
+        "height": 64
+      }
+    },
+    {
+      "auditId": "A055",
+      "logicalId": "unit-info/cav",
+      "mime": "image/png",
+      "sha256": "c9d7f3b7c12f23c4817ce0dd603e826547fcf00d155cd43d794f63e8ef7419a3",
+      "byteLength": 9783,
+      "dataUrlSha256": "12c53067572c622722bec2858dc81e155d22818899b9c2a4fd33f5a6d4277687",
+      "encodedLength": 13066,
+      "file": "assets/unit-info/cav.png",
+      "role": "unit-info/cav",
+      "aliases": [],
+      "references": [
+        {
+          "logicalReferenceId": "unit-info/cav/reference-1",
+          "sourceOffset": 913277,
+          "contextBefore": "AvNUq0pCVFSUzrlyte+yLCAqy7KVpa7Ls6qsFpZWuquleb+0vPj8awvHlnyd+f8HfLOGCs4+A9UAAAAASUVORK5CYII=',\ncav:'",
+          "contextAfter": "',\narcher:'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABA"
+        }
+      ],
+      "dimensions": {
+        "width": 64,
+        "height": 64
+      }
+    },
+    {
+      "auditId": "A056",
+      "logicalId": "unit-info/archer",
+      "mime": "image/png",
+      "sha256": "6c56097f2f926b003d2666e43c8e50e0bc93dcef968520586f34994693a44efe",
+      "byteLength": 8036,
+      "dataUrlSha256": "0cf44f28edb414031b6d27ff3971b9022e89e73e3381a215e40150b040295934",
+      "encodedLength": 10738,
+      "file": "assets/unit-info/archer.png",
+      "role": "unit-info/archer",
+      "aliases": [],
+      "references": [
+        {
+          "logicalReferenceId": "unit-info/archer/reference-1",
+          "sourceOffset": 926354,
+          "contextBefore": "tEVgLcRhEuIwkSqnA85VhRMFpGEav4yrTCIOw1em5XsBad7rtOyutckfDQJz4fxO6GEOW8ABZAAAAAElFTkSuQmCC',\narcher:'",
+          "contextAfter": "',\ncastle:'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABA"
+        }
+      ],
+      "dimensions": {
+        "width": 64,
+        "height": 64
+      }
+    },
+    {
+      "auditId": "A057",
+      "logicalId": "unit-info/castle",
+      "mime": "image/png",
+      "sha256": "099989070d65975be6fa27ea45fd8d2b906dd799207c1d75c8f4e279f11ea715",
+      "byteLength": 9265,
+      "dataUrlSha256": "e45a50f3b104b1b44723bf2da40b8e25f64c83f7188a8066ef6c30cc2d433f02",
+      "encodedLength": 12378,
+      "file": "assets/unit-info/castle.png",
+      "role": "unit-info/castle",
+      "aliases": [],
+      "references": [
+        {
+          "logicalReferenceId": "unit-info/castle/reference-1",
+          "sourceOffset": 937103,
+          "contextBefore": "Yp1qRE6KionTO5cPMJUlAkSRJNrp9lyZFXrS7G/1hbt53e513zrcXu75ih/8H5aiM/SpYu7MAAAAASUVORK5CYII=',\ncastle:'",
+          "contextAfter": "',\nmonk:'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACA"
+        }
+      ],
+      "dimensions": {
+        "width": 64,
+        "height": 64
+      }
+    },
+    {
+      "auditId": "A058",
+      "logicalId": "unit-info/monk",
+      "mime": "image/png",
+      "sha256": "a46ac51c972fad8f2ea6499fb6dfd58e5283ab81e602314a7b08851a060b3cfb",
+      "byteLength": 9280,
+      "dataUrlSha256": "10d4f7a49078fa4ce7eb1755c722767b22a4a97be593cdeecb220695e6b0abae",
+      "encodedLength": 12398,
+      "file": "assets/unit-info/monk.png",
+      "role": "unit-info/monk",
+      "aliases": [],
+      "references": [
+        {
+          "logicalReferenceId": "unit-info/monk/reference-1",
+          "sourceOffset": 949490,
+          "contextBefore": "DAjCCtJDApISEhqjAmNN9a21IO1tpxXxtkY4nReVk0Q5vli9uGD6f6cT/dM/z85ytwzii0UZQAAAABJRU5ErkJggg==',\nmonk:'",
+          "contextAfter": "',\nhero:'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACA"
+        }
+      ],
+      "dimensions": {
+        "width": 64,
+        "height": 64
+      }
+    },
+    {
+      "auditId": "A059",
+      "logicalId": "unit-info/hero",
+      "mime": "image/png",
+      "sha256": "74ac344a30be42148722bf605933c9fd799237ab51b1335c58f09c529c6e7ced",
+      "byteLength": 10601,
+      "dataUrlSha256": "e32491f72308c9fb4a7ff110334a52552725cd68b08af72ba2d2983aee339da1",
+      "encodedLength": 14158,
+      "file": "assets/unit-info/hero.png",
+      "role": "unit-info/hero",
+      "aliases": [],
+      "references": [
+        {
+          "logicalReferenceId": "unit-info/hero/reference-1",
+          "sourceOffset": 961897,
+          "contextBefore": "OAgxN4JICEhiVLKVVZpLcIAoLXOZ4Uy2js/meVF5TiEWTb96GByOguLu1TwfwCVF9AX2KrgaQAAAABJRU5ErkJggg==',\nhero:'",
+          "contextAfter": "',\ncatapult:'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAA"
+        }
+      ],
+      "dimensions": {
+        "width": 64,
+        "height": 64
+      }
+    },
+    {
+      "auditId": "A060",
+      "logicalId": "unit-info/catapult",
+      "mime": "image/png",
+      "sha256": "cb4843385b5950d07c92dcb896658cde88f265ae11119daedc56f1e12d2cfb83",
+      "byteLength": 8623,
+      "dataUrlSha256": "5eeacf5e7bf2c5f9997e5f0daed375b2206390de8c7657edfba50a758c8b187e",
+      "encodedLength": 11522,
+      "file": "assets/unit-info/catapult.png",
+      "role": "unit-info/catapult",
+      "aliases": [],
+      "references": [
+        {
+          "logicalReferenceId": "unit-info/catapult/reference-1",
+          "sourceOffset": 976068,
+          "contextBefore": "RA7K4CEhCRKKZsXSmsRBgCtdTJKldHOusEoSXPL3o/GwzdWB9sjf4tWAvw/IbtUzoVXOUcAAAAASUVORK5CYII=',\ncatapult:'",
+          "contextAfter": "',\ndwarf:'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABAC"
+        }
+      ],
+      "dimensions": {
+        "width": 64,
+        "height": 64
+      }
+    },
+    {
+      "auditId": "A061",
+      "logicalId": "unit-info/dwarf",
+      "mime": "image/png",
+      "sha256": "c9c8e5fa319118d97d47cbb4eeac55103639c0241503a9afa1375184028bd836",
+      "byteLength": 9811,
+      "dataUrlSha256": "fb447ce9276620eb7e37272c1da4515471fa36ae4c87999de11debf372f47891",
+      "encodedLength": 13106,
+      "file": "assets/unit-info/dwarf.png",
+      "role": "unit-info/dwarf",
+      "aliases": [],
+      "references": [
+        {
+          "logicalReferenceId": "unit-info/dwarf/reference-1",
+          "sourceOffset": 987600,
+          "contextBefore": "1BvLK4WsOYIasxpi4rY20gGdba8bAwiXW16w/HRVmL98PR4LVr/TtDP9Vw/z8RgB8miPELvAAAAABJRU5ErkJggg==',\ndwarf:'",
+          "contextAfter": "',\nelf:'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAI"
+        }
+      ],
+      "dimensions": {
+        "width": 64,
+        "height": 64
+      }
+    },
+    {
+      "auditId": "A062",
+      "logicalId": "unit-info/elf",
+      "mime": "image/png",
+      "sha256": "b59145eee630e14f404e4bbbab7ad9021905d2fea485bdeb8ed6495225ef5fd8",
+      "byteLength": 9586,
+      "dataUrlSha256": "413bf2b4e4adc52ba6652d9010c4d62815fb4dc25bf06ed7e268b4b2d4367f55",
+      "encodedLength": 12806,
+      "file": "assets/unit-info/elf.png",
+      "role": "unit-info/elf",
+      "aliases": [],
+      "references": [
+        {
+          "logicalReferenceId": "unit-info/elf/reference-1",
+          "sourceOffset": 1000714,
+          "contextBefore": "RWArxCYTQEJCEqVUlqRKaxEGAK11OIiUo01m+oMwSjK2dhD4H6/19wZ2JD+D/w3BodqAYop3twAAAABJRU5ErkJggg==',\nelf:'",
+          "contextAfter": "',\ngoblin:'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABA"
+        }
+      ],
+      "dimensions": {
+        "width": 64,
+        "height": 64
+      }
+    },
+    {
+      "auditId": "A063",
+      "logicalId": "unit-info/goblin",
+      "mime": "image/png",
+      "sha256": "0362b4ada63394cdd2fe90b028dd1f08e0326b04544568b81e79239ef36006fd",
+      "byteLength": 9276,
+      "dataUrlSha256": "d1279fda2c62d60f2fc67ea3c7d783dbf8f6ff4cb8162c0812bf8c2651cdbf0c",
+      "encodedLength": 12390,
+      "file": "assets/unit-info/goblin.png",
+      "role": "unit-info/goblin",
+      "aliases": [],
+      "references": [
+        {
+          "logicalReferenceId": "unit-info/goblin/reference-1",
+          "sourceOffset": 1013531,
+          "contextBefore": "jxGkigISEJEqpJIqV1iIMAFprvx8oS6dJ2u37QZSwMf1B79qd7k7fjIaf/h9Q7PeLG42MvwAAAABJRU5ErkJggg==',\ngoblin:'",
+          "contextAfter": "',\ncleric:'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABA"
+        }
+      ],
+      "dimensions": {
+        "width": 64,
+        "height": 64
+      }
+    },
+    {
+      "auditId": "A064",
+      "logicalId": "unit-info/cleric",
+      "mime": "image/png",
+      "sha256": "c16eb8b8748e299e1ad6d89304ac8a0cbe201a89f942c7a68559b623d1a313db",
+      "byteLength": 8622,
+      "dataUrlSha256": "c1e3f1ad4b54aad049f2943762de49c06e94bd27b8ea54e235130ff227e70c82",
+      "encodedLength": 11518,
+      "file": "assets/unit-info/cleric.png",
+      "role": "unit-info/cleric",
+      "aliases": [],
+      "references": [
+        {
+          "logicalReferenceId": "unit-info/cleric/reference-1",
+          "sourceOffset": 1025932,
+          "contextBefore": "nENgJsTUC3kkUpZQpSqW1bxnSWo9HmQq0NXYwGmeFYedG6fDB6mB35KDqPIT/D8zp8y1fFAkXAAAAAElFTkSuQmCC',\ncleric:'",
+          "contextAfter": "',\nnecro:'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABAC"
+        }
+      ],
+      "dimensions": {
+        "width": 64,
+        "height": 64
+      }
+    },
+    {
+      "auditId": "A065",
+      "logicalId": "unit-info/necro",
+      "mime": "image/png",
+      "sha256": "8b5ed8715f2aa3b9ae3809335ca579eff2f2c3f31e201f0a133c88d35f47e6d4",
+      "byteLength": 9554,
+      "dataUrlSha256": "2ebbdf672452cfca23bcd073562e2ea8c55e7b99e87279eeb67a13b0b8813ace",
+      "encodedLength": 12762,
+      "file": "assets/unit-info/necro.png",
+      "role": "unit-info/necro",
+      "aliases": [],
+      "references": [
+        {
+          "logicalReferenceId": "unit-info/necro/reference-1",
+          "sourceOffset": 1037460,
+          "contextBefore": "qCWGVJE3XzO6sxJmnFJgjcNbEgCOrVhgmDNEnL1XqjlYi11Vpl8kZ5oWqRMbz/A4KsuUMBQbd0AAAAAElFTkSuQmCC',\nnecro:'",
+          "contextAfter": "',\nwizard:'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABA"
+        }
+      ],
+      "dimensions": {
+        "width": 64,
+        "height": 64
+      }
+    },
+    {
+      "auditId": "A066",
+      "logicalId": "unit-info/wizard",
+      "mime": "image/png",
+      "sha256": "d4886adcb67ec4ebed0ead0bafd0f3b0bfedf462debf66782488acde9031dbde",
+      "byteLength": 10348,
+      "dataUrlSha256": "ab0ee574ae04543490953b66fdc8c00023893a842317dfbf3e61d4051336204b",
+      "encodedLength": 13822,
+      "file": "assets/unit-info/wizard.png",
+      "role": "unit-info/wizard",
+      "aliases": [],
+      "references": [
+        {
+          "logicalReferenceId": "unit-info/wizard/reference-1",
+          "sourceOffset": 1050233,
+          "contextBefore": "xEiQqSzgz9liNMb6qjbXNHlprZ5PCOBt8GE1mReUlxsl0/LN7o4eTOEca4P8B2Az3PIDWQTcAAAAASUVORK5CYII=',\nwizard:'",
+          "contextAfter": "',\ndemon:'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABAC"
+        }
+      ],
+      "dimensions": {
+        "width": 64,
+        "height": 64
+      }
+    },
+    {
+      "auditId": "A067",
+      "logicalId": "unit-info/demon",
+      "mime": "image/png",
+      "sha256": "130bff4bb375d4b1db63aa8128d06e2da2895c8aae88ee410aa3e599209c95de",
+      "byteLength": 9240,
+      "dataUrlSha256": "64e1040a20a5d81edfc3508a7af3a45c95042d223bdc45666cabc60e2ad31dca",
+      "encodedLength": 12342,
+      "file": "assets/unit-info/demon.png",
+      "role": "unit-info/demon",
+      "aliases": [],
+      "references": [
+        {
+          "logicalReferenceId": "unit-info/demon/reference-1",
+          "sourceOffset": 1064065,
+          "contextBefore": "/AXoidFUBCQhKllK1qpbUIA4DWOk8LZbSzbpbmRWXZ+zSb39ufnaf+14LJ/wfc1vOMi/8G1QAAAABJRU5ErkJggg==',\ndemon:'",
+          "contextAfter": "',\ndragon:'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABA"
+        }
+      ],
+      "dimensions": {
+        "width": 64,
+        "height": 64
+      }
+    },
+    {
+      "auditId": "A068",
+      "logicalId": "unit-info/dragon",
+      "mime": "image/png",
+      "sha256": "3c8854efe19647717c76019fd38c137727cc7dbe8f6f1af4c0eb99ea54d270b7",
+      "byteLength": 9482,
+      "dataUrlSha256": "41ca6c01b3c26eebfa2ccbe43dc73303bfd45ac54e98eda14744d4a73057bcfe",
+      "encodedLength": 12666,
+      "file": "assets/unit-info/dragon.png",
+      "role": "unit-info/dragon",
+      "aliases": [],
+      "references": [
+        {
+          "logicalReferenceId": "unit-info/dragon/reference-1",
+          "sourceOffset": 1076418,
+          "contextBefore": "ITzJvG4FGoymE0FR1iLErEzHGyWgastg27dFoMq0aT2k0Hr746tHtUcKcxsX/B2rQMbRcqFuYAAAAAElFTkSuQmCC',\ndragon:'",
+          "contextAfter": "'\n});const ST_UNIT_INFO_NAMES = Object.freeze({\ninf:'Infantry', c"
+        }
+      ],
+      "dimensions": {
+        "width": 64,
+        "height": 64
+      }
+    },
+    {
+      "auditId": "A069",
+      "logicalId": "story/border",
+      "mime": "image/webp",
+      "sha256": "a7ebc5c21f8a8fa8f7990a0f0521c368647e9016ea9162a6ada000a359243043",
+      "byteLength": 11964,
+      "dataUrlSha256": "42837b262ab1e6e83d33d6d0a7c7485e3d7765172404e687837cdd74cbd7c49d",
+      "encodedLength": 15975,
+      "file": "assets/story/border.webp",
+      "role": "story/border",
+      "aliases": [],
+      "references": [
+        {
+          "logicalReferenceId": "story/border/reference-1",
+          "sourceOffset": 1132899,
+          "contextBefore": "(type){return window.__stoneThrowUnitInfoData?.(type)?.art||'';}\nconst STORY_NARRATION_ART={border:'",
+          "contextAfter": "',castle:'data:image/webp;base64,UklGRmw2AABXRUJQVlA4IGA2AABwpQCd"
+        }
+      ],
+      "dimensions": {
+        "width": 220,
+        "height": 220
+      }
+    },
+    {
+      "auditId": "A070",
+      "logicalId": "story/castle",
+      "mime": "image/webp",
+      "sha256": "d46194058575f7d24da5a75a64dbb5f1809888259a75bbd551d71a3c6761d118",
+      "byteLength": 13940,
+      "dataUrlSha256": "fc671aba877db5cf6724042763d449adf9f7da973236d1e1417d425851176502",
+      "encodedLength": 18611,
+      "file": "assets/story/castle.webp",
+      "role": "story/castle",
+      "aliases": [],
+      "references": [
+        {
+          "logicalReferenceId": "story/castle/reference-1",
+          "sourceOffset": 1148884,
+          "contextBefore": "OHNaq8BaLgO3IWzO/Ss4JwwD5BI8wyR+SP6Mna0YootevmClcNmkJ8P74uraSBoRNV1CK0vySNX67YHMo3gnAzFJAA',castle:'",
+          "contextAfter": "',catapult:'data:image/webp;base64,UklGRlQ3AABXRUJQVlA4IEg3AADQpg"
+        }
+      ],
+      "dimensions": {
+        "width": 220,
+        "height": 220
+      }
+    },
+    {
+      "auditId": "A071",
+      "logicalId": "story/catapult",
+      "mime": "image/webp",
+      "sha256": "1f1510bd0d296b079ba2ae98429cff8e8e80f342333d7964edc9cae04da19f11",
+      "byteLength": 14172,
+      "dataUrlSha256": "60bdf66678eca1f87d4d1c90bf14b18dfe41f087bdc7785d141ad7f6eb1450f0",
+      "encodedLength": 18919,
+      "file": "assets/story/catapult.webp",
+      "role": "story/catapult",
+      "aliases": [],
+      "references": [
+        {
+          "logicalReferenceId": "story/catapult/reference-1",
+          "sourceOffset": 1167507,
+          "contextBefore": "DGIOyHeiqQ1HHPOFPy1Ru4eRA0/TjsGOt03ubYRwkUWfu2DX5bjbE8udYtru4QrOyNBKAO9j/5r6IIVjbkoQAAA=',catapult:'",
+          "contextAfter": "',phase2_equal:'data:image/webp;base64,UklGRvw5AABXRUJQVlA4IPA5AA"
+        }
+      ],
+      "dimensions": {
+        "width": 220,
+        "height": 220
+      }
+    },
+    {
+      "auditId": "A072",
+      "logicalId": "story/phase2_equal",
+      "mime": "image/webp",
+      "sha256": "693fbead51703b4f206a0c867a39e4c126996e31abae11080207e790991fce07",
+      "byteLength": 14852,
+      "dataUrlSha256": "4342af1ce17d36b854b4184a7bef0d4f4f9c5896c9637b362be6a0f139136d85",
+      "encodedLength": 19827,
+      "file": "assets/story/phase2_equal.webp",
+      "role": "story/phase2_equal",
+      "aliases": [
+        "story/phase3_open"
+      ],
+      "references": [
+        {
+          "logicalReferenceId": "story/phase2_equal/reference-1",
+          "sourceOffset": 1186442,
+          "contextBefore": "LQnmtSFgh/aCBXwqxZnhr//IWd0gKkZJFLWRU94y2j24BHDjZYH9hfKWCVwmjc2xiBtal2YvWr3l9q5OmoAA',phase2_equal:'",
+          "contextAfter": "',phase2_dwarf:'data:image/webp;base64,UklGRtozAABXRUJQVlA4IM4zAA"
+        },
+        {
+          "logicalReferenceId": "story/phase2_equal/reference-2",
+          "sourceOffset": 1282610,
+          "contextBefore": "lFAPmWVJNxSAGC8v+IIR8zD/EKEgOm4uPou5C/A6xGGPFLNJCCcLNJMo8vM+UA0PkSkAedA9qkDAY2F9AAAA=',phase3_open:'",
+          "contextAfter": "',phase3_necro:'data:image/webp;base64,UklGRrosAABXRUJQVlA4IK4sAA"
+        }
+      ],
+      "dimensions": {
+        "width": 220,
+        "height": 220
+      }
+    },
+    {
+      "auditId": "A073",
+      "logicalId": "story/phase2_dwarf",
+      "mime": "image/webp",
+      "sha256": "252b30193ee850cc957a461add8afd8005c57c197b964a72575864daa2b10ef9",
+      "byteLength": 13282,
+      "dataUrlSha256": "99ad091a6f812278b7534e2ab3cab93ebfcf0074cdb225a784bac90c5e51ca22",
+      "encodedLength": 17735,
+      "file": "assets/story/phase2_dwarf.webp",
+      "role": "story/phase2_dwarf",
+      "aliases": [],
+      "references": [
+        {
+          "logicalReferenceId": "story/phase2_dwarf/reference-1",
+          "sourceOffset": 1206285,
+          "contextBefore": "R6g7exDAByW5TU7m4pCfHPjuYm/bU/aB37xeK1n5gLimNRK4jyBDIC2nfswK+/zcIiZR4Lf6/NLofnAAAAA=',phase2_dwarf:'",
+          "contextAfter": "',phase2_elf:'data:image/webp;base64,UklGRoo0AABXRUJQVlA4IH40AAAw"
+        }
+      ],
+      "dimensions": {
+        "width": 220,
+        "height": 220
+      }
+    },
+    {
+      "auditId": "A074",
+      "logicalId": "story/phase2_elf",
+      "mime": "image/webp",
+      "sha256": "f4716152427f2d327ec1211f2ecee0ad9e086f96ae17e80186e9b8de86bcf21d",
+      "byteLength": 13458,
+      "dataUrlSha256": "f3bffc06755d9ac59c2bbda339a35311e1334032b128985a8f214b0c44ee83a7",
+      "encodedLength": 17967,
+      "file": "assets/story/phase2_elf.webp",
+      "role": "story/phase2_elf",
+      "aliases": [],
+      "references": [
+        {
+          "logicalReferenceId": "story/phase2_elf/reference-1",
+          "sourceOffset": 1224034,
+          "contextBefore": "KJtDbfYDee2ul5JYEyDe8s+/JVeAvGHLlwu7oiImYZ3dcQ0clz5TYB2CjqlDPk5ici6NoYydB77hV+bIAAAA==',phase2_elf:'",
+          "contextAfter": "',phase2_goblin:'data:image/webp;base64,UklGRoA1AABXRUJQVlA4IHQ1A"
+        }
+      ],
+      "dimensions": {
+        "width": 220,
+        "height": 220
+      }
+    },
+    {
+      "auditId": "A075",
+      "logicalId": "story/phase2_goblin",
+      "mime": "image/webp",
+      "sha256": "bf8cae5deb49a8e6d0feb5d82424194e814459c905b1796f3d005eb418254556",
+      "byteLength": 13704,
+      "dataUrlSha256": "f23441c6dcc2f3b93990adf85c1554db7c708fc11ec9ae8f5cda61a2f662698a",
+      "encodedLength": 18295,
+      "file": "assets/story/phase2_goblin.webp",
+      "role": "story/phase2_goblin",
+      "aliases": [],
+      "references": [
+        {
+          "logicalReferenceId": "story/phase2_goblin/reference-1",
+          "sourceOffset": 1242018,
+          "contextBefore": "IkDUT3UKdha4RN0VfLr0Kp9Fg4AInCJ3TIeBC7uE8pLQ5n/TV2wVQttabeXaKFy5zU1Xt2+CHbxPCM5qAAA',phase2_goblin:'",
+          "contextAfter": "',phase2_sync:'data:image/webp;base64,UklGRiJBAABXRUJQVlA4IBZBAAA"
+        }
+      ],
+      "dimensions": {
+        "width": 220,
+        "height": 220
+      }
+    },
+    {
+      "auditId": "A076",
+      "logicalId": "story/phase2_sync",
+      "mime": "image/webp",
+      "sha256": "271915c21d57471979879c3ea84b0e4d51b00ce7cc9bd0741e98e52e6feb416f",
+      "byteLength": 16682,
+      "dataUrlSha256": "d3498edb3f5bf52b923a9260cb99a83aadab172b9f33be7d49352aed458433d5",
+      "encodedLength": 22267,
+      "file": "assets/story/phase2_sync.webp",
+      "role": "story/phase2_sync",
+      "aliases": [],
+      "references": [
+        {
+          "logicalReferenceId": "story/phase2_sync/reference-1",
+          "sourceOffset": 1260328,
+          "contextBefore": "2v1PgnXKXSyK3nbCKVTjRR19J5EwleG6wNjT6eKbH0W30ZZS4GRUWFWofgPhgK4/Wqb1Y1L8bm/4Xo0AAAAAA',phase2_sync:'",
+          "contextAfter": "',phase3_open:'data:image/webp;base64,UklGRvw5AABXRUJQVlA4IPA5AAC"
+        }
+      ],
+      "dimensions": {
+        "width": 220,
+        "height": 220
+      }
+    },
+    {
+      "auditId": "A077",
+      "logicalId": "story/phase3_necro",
+      "mime": "image/webp",
+      "sha256": "be8845f8824e4809d38ee512fc79b2513ff80526e9c02e7c015b45293a91431d",
+      "byteLength": 11458,
+      "dataUrlSha256": "adcf62b97bd8a8e7be26b3af3ce5d3581c25dbda9d54990afc592cb70a43c840",
+      "encodedLength": 15303,
+      "file": "assets/story/phase3_necro.webp",
+      "role": "story/phase3_necro",
+      "aliases": [],
+      "references": [
+        {
+          "logicalReferenceId": "story/phase3_necro/reference-1",
+          "sourceOffset": 1302453,
+          "contextBefore": "R6g7exDAByW5TU7m4pCfHPjuYm/bU/aB37xeK1n5gLimNRK4jyBDIC2nfswK+/zcIiZR4Lf6/NLofnAAAAA=',phase3_necro:'",
+          "contextAfter": "',phase3_cleric:'data:image/webp;base64,UklGRmQvAABXRUJQVlA4IFgvA"
+        }
+      ],
+      "dimensions": {
+        "width": 220,
+        "height": 220
+      }
+    },
+    {
+      "auditId": "A078",
+      "logicalId": "story/phase3_cleric",
+      "mime": "image/webp",
+      "sha256": "c234dca38c249115c5772cf01022e7fab4e57755c6dde593e9f6db9c2c57eff6",
+      "byteLength": 12140,
+      "dataUrlSha256": "8269bd6071ad0d655ec552d917289410aac7f9096f0608ebbb5cc5036eea10e4",
+      "encodedLength": 16211,
+      "file": "assets/story/phase3_cleric.webp",
+      "role": "story/phase3_cleric",
+      "aliases": [],
+      "references": [
+        {
+          "logicalReferenceId": "story/phase3_cleric/reference-1",
+          "sourceOffset": 1317773,
+          "contextBefore": "N77fglRk1GrNoAoFRvuWDvxUTpfmg+R8oLLSYP8uLDB/vLpQw7nit7dTHl00XJh7HcVPexnW6RaVI/wAA==',phase3_cleric:'",
+          "contextAfter": "',phase3_complete:'data:image/webp;base64,UklGRuZCAABXRUJQVlA4INp"
+        }
+      ],
+      "dimensions": {
+        "width": 220,
+        "height": 220
+      }
+    },
+    {
+      "auditId": "A079",
+      "logicalId": "story/phase3_complete",
+      "mime": "image/webp",
+      "sha256": "626dc559bf13daba8c3836ea12d7033e878f9f4f05a40e75b94d1b405cc43231",
+      "byteLength": 17134,
+      "dataUrlSha256": "4902deaef682531ed3175d7b09b67b536a74424fb0484a1c898ce16535f5f929",
+      "encodedLength": 22871,
+      "file": "assets/story/phase3_complete.webp",
+      "role": "story/phase3_complete",
+      "aliases": [
+        "story/phase4_open"
+      ],
+      "references": [
+        {
+          "logicalReferenceId": "story/phase3_complete/reference-1",
+          "sourceOffset": 1334003,
+          "contextBefore": "K2SMCxd3cxQW9SL1HEmCyVioy6NGrXX9suGf/V/JKsUIaq2oDA7WH3x0iOMjfmqXfHBRWrfkwnuzsgAA=',phase3_complete:'",
+          "contextAfter": "',phase4_open:'data:image/webp;base64,UklGRuZCAABXRUJQVlA4INpCAAB"
+        },
+        {
+          "logicalReferenceId": "story/phase3_complete/reference-2",
+          "sourceOffset": 1356889,
+          "contextBefore": "eD3NGvm4/hE6omqGSY96CDhHpt+Hnn6ffoNvawE4/Ijzyab2UmaW3YAxrxWP6MsW3irqI6oX/4hRKtC4AAA==',phase4_open:'",
+          "contextAfter": "',phase4_monk:'data:image/webp;base64,UklGRg4xAABXRUJQVlA4IAIxAAD"
+        }
+      ],
+      "dimensions": {
+        "width": 220,
+        "height": 220
+      }
+    },
+    {
+      "auditId": "A080",
+      "logicalId": "story/phase4_monk",
+      "mime": "image/webp",
+      "sha256": "85dc71d6468de43856955f4e97539e031683c9a9e9a472b5088b61f25aa8005c",
+      "byteLength": 12566,
+      "dataUrlSha256": "128b6b9954005faab52b1e36df9729b744d8441aa739e47bcf1718b8e637f204",
+      "encodedLength": 16779,
+      "file": "assets/story/phase4_monk.webp",
+      "role": "story/phase4_monk",
+      "aliases": [],
+      "references": [
+        {
+          "logicalReferenceId": "story/phase4_monk/reference-1",
+          "sourceOffset": 1379775,
+          "contextBefore": "eD3NGvm4/hE6omqGSY96CDhHpt+Hnn6ffoNvawE4/Ijzyab2UmaW3YAxrxWP6MsW3irqI6oX/4hRKtC4AAA==',phase4_monk:'",
+          "contextAfter": "'};STORY_NARRATION_ART.phase5_dragon='data:image/webp;base64,UklG"
+        }
+      ],
+      "dimensions": {
+        "width": 220,
+        "height": 220
+      }
+    },
+    {
+      "auditId": "A081",
+      "logicalId": "story/phase5_dragon",
+      "mime": "image/webp",
+      "sha256": "a8082b1de02d795b61c6e5769be2409410b65fd8d598d793d10f87c0810ff37d",
+      "byteLength": 13584,
+      "dataUrlSha256": "01ee8225d690e6e1c6f80a24144eea3fe8d3d21f9212b9e59371f309f3abd1c5",
+      "encodedLength": 18135,
+      "file": "assets/story/phase5_dragon.webp",
+      "role": "story/phase5_dragon",
+      "aliases": [],
+      "references": [
+        {
+          "logicalReferenceId": "story/phase5_dragon/reference-1",
+          "sourceOffset": 1396592,
+          "contextBefore": "lfRgNYulvTtIO581Xdlk5cExFfXekasmD+j6+/YcWykWQvQtBoIfmVeXLM8AA='};STORY_NARRATION_ART.phase5_dragon='",
+          "contextAfter": "';STORY_NARRATION_ART.phase5_demon='data:image/webp;base64,UklGRm"
+        }
+      ],
+      "dimensions": {
+        "width": 220,
+        "height": 220
+      }
+    },
+    {
+      "auditId": "A082",
+      "logicalId": "story/phase5_demon",
+      "mime": "image/webp",
+      "sha256": "62c7519b35e1692cca710c0fe44e1616440868761facc5d9032bdfd9f0cb833c",
+      "byteLength": 14956,
+      "dataUrlSha256": "fef927aadd6b4bae0ddfc27bcaa27c2528d6d6e2be0b56374f7d936bffcbb9d8",
+      "encodedLength": 19967,
+      "file": "assets/story/phase5_demon.webp",
+      "role": "story/phase5_demon",
+      "aliases": [],
+      "references": [
+        {
+          "logicalReferenceId": "story/phase5_demon/reference-1",
+          "sourceOffset": 1414763,
+          "contextBefore": "QR+t1TXyQcAgFnUDXQXeJt4OqiR++d5vniLkskP2URgEa4ytDHjL9eGdgABeAAAA';STORY_NARRATION_ART.phase5_demon='",
+          "contextAfter": "';STORY_NARRATION_ART.phase5_wizard='data:image/webp;base64,UklGR"
+        }
+      ],
+      "dimensions": {
+        "width": 220,
+        "height": 220
+      }
+    },
+    {
+      "auditId": "A083",
+      "logicalId": "story/phase5_wizard",
+      "mime": "image/webp",
+      "sha256": "8ab3258c1765b15228c412c1a22b324adb59aa4e1d8ab2cd8e9fd0e95207b8bd",
+      "byteLength": 13524,
+      "dataUrlSha256": "8eb3d2d5467f35095f62df2a5c0218cbde7ed23d9074124b261bb4eb68451ca9",
+      "encodedLength": 18055,
+      "file": "assets/story/phase5_wizard.webp",
+      "role": "story/phase5_wizard",
+      "aliases": [],
+      "references": [
+        {
+          "logicalReferenceId": "story/phase5_wizard/reference-1",
+          "sourceOffset": 1434767,
+          "contextBefore": "A6K21X7eiXt2JLw8RlDKarKVVuU8YPLrgX6dYeJmKIPsCB5wkh9OXlK5oAAAA==';STORY_NARRATION_ART.phase5_wizard='",
+          "contextAfter": "';STORY_NARRATION_ART.phase5_complete='data:image/webp;base64,Ukl"
+        }
+      ],
+      "dimensions": {
+        "width": 220,
+        "height": 220
+      }
+    },
+    {
+      "auditId": "A084",
+      "logicalId": "story/phase5_complete",
+      "mime": "image/webp",
+      "sha256": "0eba451c9e50af77d082e4c81293dbc261a008c55112d99d86c8ab9474afe37c",
+      "byteLength": 17262,
+      "dataUrlSha256": "70350a16c70e98e57d5423651e3c687d7a5977f189b5fa51b367a3aa7743a17b",
+      "encodedLength": 23039,
+      "file": "assets/story/phase5_complete.webp",
+      "role": "story/phase5_complete",
+      "aliases": [],
+      "references": [
+        {
+          "logicalReferenceId": "story/phase5_complete/reference-1",
+          "sourceOffset": 1452861,
+          "contextBefore": "pmM/LvNKhMflpy2/wqq7C6SWbgBK90Gj9m8C7c6PVRpz2xMVkCwCoLZHB6AAA';STORY_NARRATION_ART.phase5_complete='",
+          "contextAfter": "';STORY_NARRATION_ART.phase6_final='data:image/webp;base64,UklGRs"
+        }
+      ],
+      "dimensions": {
+        "width": 220,
+        "height": 220
+      }
+    },
+    {
+      "auditId": "A085",
+      "logicalId": "story/phase6_final",
+      "mime": "image/webp",
+      "sha256": "4bd07ef63573b204faa1a05fabeac1890721d0747bb66de52bf599ccbc72151d",
+      "byteLength": 17362,
+      "dataUrlSha256": "31fe0892f76618bb0f7f19c0fec120716efe4ba37877b7d51e5552d404ababc4",
+      "encodedLength": 23175,
+      "file": "assets/story/phase6_final.webp",
+      "role": "story/phase6_final",
+      "aliases": [],
+      "references": [
+        {
+          "logicalReferenceId": "story/phase6_final/reference-1",
+          "sourceOffset": 1475936,
+          "contextBefore": "wgBh1sqWWLD0w76IjWbdDCM1x8LGToNL96lb2HvgSBk75KeCnnlDt0YEcUOJgAAA';STORY_NARRATION_ART.phase6_final='",
+          "contextAfter": "';STORY_NARRATION_ART.hero_intro='data:image/webp;base64,UklGRp5B"
+        }
+      ],
+      "dimensions": {
+        "width": 220,
+        "height": 220
+      }
+    },
+    {
+      "auditId": "A086",
+      "logicalId": "story/hero_intro",
+      "mime": "image/webp",
+      "sha256": "2a9afb3afb5d0ca81fd7f7dbab7fd9360dc0ed29fa222f1841f2999f2ab89d79",
+      "byteLength": 16806,
+      "dataUrlSha256": "f56ad30ebeb01c81638b728fa6d8a6ada49530e54ee8b3ac32c2c04b5a7a01a1",
+      "encodedLength": 22431,
+      "file": "assets/story/hero_intro.webp",
+      "role": "story/hero_intro",
+      "aliases": [],
+      "references": [
+        {
+          "logicalReferenceId": "story/hero_intro/reference-1",
+          "sourceOffset": 1499145,
+          "contextBefore": "7ytPPpqonY1xqX6NJ+nrCknUDjLOK4iupdDwx5lsWesgJLYnBPAnoSz7oKd4AAAA==';STORY_NARRATION_ART.hero_intro='",
+          "contextAfter": "';STORY_NARRATION_ART.story_complete='data:image/webp;base64,UklG"
+        }
+      ],
+      "dimensions": {
+        "width": 220,
+        "height": 220
+      }
+    },
+    {
+      "auditId": "A087",
+      "logicalId": "story/story_complete",
+      "mime": "image/webp",
+      "sha256": "21763a1b34e7cfc6b7d25fbbd2ed02a52b665de4df9fe2a5cac5a7339e474b3c",
+      "byteLength": 54292,
+      "dataUrlSha256": "7597ecfe755a7fe2b474efb9e380ce95b77257410fb7dc35a701bb5642c48898",
+      "encodedLength": 72415,
+      "file": "assets/story/story_complete.webp",
+      "role": "story/story_complete",
+      "aliases": [],
+      "references": [
+        {
+          "logicalReferenceId": "story/story_complete/reference-1",
+          "sourceOffset": 1521614,
+          "contextBefore": "vfp2/jt7kybaJ1uX06w/CFXKmF9Uk83LzOqFep6DLAdKl9+Xvacn/hFhfZD4AA';STORY_NARRATION_ART.story_complete='",
+          "contextAfter": "';function storyVignette(scene='border'){return `<img class=\"st-s"
+        }
+      ],
+      "dimensions": {
+        "width": 400,
+        "height": 400
+      }
+    }
+  ],
+  "retainedEmbedded": [
+    {
+      "auditId": "A006",
+      "logicalId": "ui/player-board-texture",
+      "mime": "image/svg+xml",
+      "sha256": "be95439ce6ec357ea98c7b23440cdbddcf6941a8f1404d07f9bd777fa654460d",
+      "byteLength": 1897,
+      "dataUrlSha256": "6bdecfb181583f3ffc5108b517e62accfc15d29f6323551b39213d308e200b25",
+      "encodedLength": 3212,
+      "file": null,
+      "occurrences": [
+        {
+          "offset": 49840,
+          "before": " rgba(0,0,0,.70),inset 0 0 24px rgba(0,0,0,.30)!important;} #stPlayerGridHost{background-image:url(\"",
+          "after": "\")!important;} #stEnemyGridHost{background-image:url(\"data:image/"
+        }
+      ],
+      "reason": "Unescaped # in original data URL truncates image payload as URL fragment. Externalizing the complete decoded SVG renders previously broken artwork; retain original reference to preserve behavior."
+    },
+    {
+      "auditId": "A007",
+      "logicalId": "ui/enemy-board-texture",
+      "mime": "image/svg+xml",
+      "sha256": "5c506670f654f34049075007957d4d14eb731293c7cea4e9273a01ef17f3d93d",
+      "byteLength": 1898,
+      "dataUrlSha256": "23beb60c23dd5dfdf2257b5f6aa815994a7c0b342fe709712b8315c6c835c51b",
+      "encodedLength": 3213,
+      "file": null,
+      "occurrences": [
+        {
+          "offset": 53106,
+          "before": "20240%200%22%2F%3E%0A%3C%2Fg%3E%0A%3C%2Fsvg%3E\")!important;} #stEnemyGridHost{background-image:url(\"",
+          "after": "\")!important;} .st-grid-host::before{content:\"\";position:absolute"
+        }
+      ],
+      "reason": "Unescaped # in original data URL truncates image payload as URL fragment. Externalizing the complete decoded SVG renders previously broken artwork; retain original reference to preserve behavior."
+    }
+  ]
+}
