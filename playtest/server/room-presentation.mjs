@@ -1,0 +1,10 @@
+import {animationCue,impactSources} from '../canonical/compiled/local-host/animation-cue.js';
+import {normalExecution} from '../canonical/compiled/local-host/demon-entropy.js';
+import {refreshHost} from '../canonical/compiled/host/refresh.js';
+/** Synchronous observer capture; no timer or renderer callback enters the host. */
+export function roomPresentation(project,target){
+ const states=new WeakMap();
+ function begin(r){r.presentation=r.seats.map(()=>[]);const state={cursor:r.host.events.length,positions:[],groups:r.seats.map(()=>new Map()),projecting:true};states.set(r,state);state.positions=r.seats.map((_,i)=>project(r,i).snapshot.eventPosition);state.projecting=false;}
+ function capture(r,live){const state=states.get(r);if(!state)return;const delta=live.events.slice(state.cursor).map(r=>r.event);state.cursor=live.events.length;const old=r.host;r.host={...live,state:structuredClone(live.state)};refreshHost(r.host);state.projecting=true;try{for(let i=0;i<r.seats.length;i++){const update=project(r,i),position=update.snapshot.eventPosition;if(position<=state.positions[i])continue;const j=target(r,i);if(j<0)continue;const view={...r.host,config:{...r.host.config,players:[r.host.config.players[i],r.host.config.players[j]]}},animation=animationCue(view,delta,state.groups[i]);r.presentation[i].push({snapshot:update.snapshot,events:impactSources(update.events.filter(e=>e.position>state.positions[i]),delta,r.host.config.players[i].boardId,r.host.config.players[j].boardId),...(animation?{animation}:{})});state.positions[i]=position;}}finally{state.projecting=false;r.host=old;}}
+ return {begin,execution:r=>({...normalExecution(r.memory),observePresentationStep:h=>capture(r,h)}),decorate(r,i,update,after=0){if(states.get(r)?.projecting)return update;const frames=r.presentation?.[i]?.filter(f=>f.snapshot.battle===update.snapshot.battle&&f.snapshot.eventPosition>after)||[];return frames.length?{...update,presentation:structuredClone(frames)}:update;}};
+}

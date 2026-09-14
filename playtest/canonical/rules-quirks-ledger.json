@@ -1,0 +1,682 @@
+{
+  "schema": "stone-throw-quirks-v1",
+  "compatibility": "golden-v1.427",
+  "correctionsAuthorized": false,
+  "entries": [
+    {
+      "id": "catapult-sibling-truncation",
+      "goldenCompatibleBehavior": "A terminal nested reaction stops later reactive Catapult siblings.",
+      "suspectedDefect": true,
+      "desiredFutureRule": null,
+      "correctionStatus": "not-applied-not-authorized",
+      "legacy": [
+        {
+          "name": "resolveCatapultRoll",
+          "line": 2019,
+          "sha256": "e92519fabd8a3d9fa56f631ffd5a96d07d3df7f5f0991cca8635163472ecf6b7"
+        }
+      ],
+      "stage8ScenarioSelectors": [
+        "catapult-sibling-reaction-cut-short"
+      ],
+      "evidence": "combat-quirk-runtime",
+      "relatedLiteralStage1FixtureIds": [
+        "catapult-sibling-reaction-cut-short"
+      ]
+    },
+    {
+      "id": "plague-sibling-truncation",
+      "goldenCompatibleBehavior": "A terminal nested reaction stops later frontier children/outbreak parents; pending Plagues are cleared by terminal invalidation.",
+      "suspectedDefect": true,
+      "desiredFutureRule": null,
+      "correctionStatus": "not-applied-not-authorized",
+      "legacy": [
+        {
+          "name": "resolvePlagueStep",
+          "line": 2246,
+          "sha256": "c1889cfc6b84db538d2029ef26297ac99099ef95c2576b5add26ae57a2f3ee92"
+        },
+        {
+          "name": "invalidateBattleAsync",
+          "line": 126,
+          "sha256": "ab5fdb8b60a92041867c068c8b337b27ac8b8f35e869c7c52afab6d768e54c49"
+        }
+      ],
+      "stage8ScenarioSelectors": [
+        "plague-parent-sibling-cut-short",
+        "plague-frontier-sibling-cut-short-natural-rng"
+      ],
+      "evidence": "combat-quirk-runtime",
+      "relatedLiteralStage1FixtureIds": [
+        "plague-parent-sibling-cut-short"
+      ]
+    },
+    {
+      "id": "final-core-resurrection",
+      "goldenCompatibleBehavior": "Automatic same-turn resurrection and manual pending resurrection have different terminal timing; manual loss can cancel the decision.",
+      "suspectedDefect": true,
+      "desiredFutureRule": null,
+      "correctionStatus": "not-applied-not-authorized",
+      "legacy": [
+        {
+          "name": "resolvePendingSameTurnEffects",
+          "line": 2322,
+          "sha256": "e90394b43befa017ec0e68e1619fe0c8e9f1ba66091b731a10c3804444ddf77a"
+        },
+        {
+          "name": "resolveEndAfterChain",
+          "line": 2341,
+          "sha256": "9385a8a6a3b5e466648ab5375afaaef283e596d024237341e522d05ffbfe6e1e"
+        }
+      ],
+      "stage8ScenarioSelectors": [
+        "resurrection-final-core-auto",
+        "resurrection-final-core-manual"
+      ],
+      "evidence": "combat-quirk-runtime",
+      "relatedLiteralStage1FixtureIds": []
+    },
+    {
+      "id": "hero-queue-return",
+      "goldenCompatibleBehavior": "Third-hit/trapped processing returns early with siblings still queued at that boundary.",
+      "suspectedDefect": true,
+      "desiredFutureRule": null,
+      "correctionStatus": "not-applied-not-authorized",
+      "legacy": [
+        {
+          "name": "resolvePendingHeroRelocations",
+          "line": 1718,
+          "sha256": "3214cb92d654542261151b1a7d98c8f1c6cca13b41625c48e286b74d15e23881"
+        }
+      ],
+      "stage8ScenarioSelectors": [
+        "hero-queue-early-return"
+      ],
+      "evidence": "combat-quirk-runtime",
+      "relatedLiteralStage1FixtureIds": [
+        "hero-queue-early-return"
+      ]
+    },
+    {
+      "id": "hero-no-destination",
+      "goldenCompatibleBehavior": "Automatic first relocation with no destination can leave an activated Hero key without occupied cell; that key still counts as core.",
+      "suspectedDefect": true,
+      "desiredFutureRule": null,
+      "correctionStatus": "not-applied-not-authorized",
+      "legacy": [
+        {
+          "name": "relocateActivatedHero",
+          "line": 1709,
+          "sha256": "50cb7a6434311dbc7e476edae6c07cd9c7275f9932dbb4a2ca72ea0d505f5b44"
+        },
+        {
+          "name": "resolvePendingHeroRelocations",
+          "line": 1718,
+          "sha256": "3214cb92d654542261151b1a7d98c8f1c6cca13b41625c48e286b74d15e23881"
+        }
+      ],
+      "stage8ScenarioSelectors": [
+        "hero-first-no-destination-auto"
+      ],
+      "evidence": "combat-quirk-runtime",
+      "relatedLiteralStage1FixtureIds": [
+        "hero-first-no-destination-auto"
+      ]
+    },
+    {
+      "id": "archer-catapult",
+      "goldenCompatibleBehavior": "An off-turn Archer hit awards an ordinary future shot; other sources schedule Catapult effects.",
+      "suspectedDefect": true,
+      "desiredFutureRule": null,
+      "correctionStatus": "not-applied-not-authorized",
+      "legacy": [
+        {
+          "name": "resolveArcherUnit",
+          "line": 1781,
+          "sha256": "9b901cfe73653dc40a3df0e6fa938ee5dd92dd43df64f14dddf4555555571ae7"
+        },
+        {
+          "name": "resolveChainCell",
+          "line": 1839,
+          "sha256": "ef587a77de1d2e14fc352f97411313c3720ab6f2f660e809985356d07ccd44f2"
+        }
+      ],
+      "stage8ScenarioSelectors": [
+        "catapult-benefit-"
+      ],
+      "evidence": "combat-quirk-runtime",
+      "relatedLiteralStage1FixtureIds": []
+    },
+    {
+      "id": "dwarf-overwrite",
+      "goldenCompatibleBehavior": "Direct attacks assign seven next-turn shots; chain/Archer/Wizard add five, using same-turn counters when appropriate.",
+      "suspectedDefect": true,
+      "desiredFutureRule": null,
+      "correctionStatus": "not-applied-not-authorized",
+      "legacy": [
+        {
+          "name": "onEnemyGridLeft",
+          "line": 2923,
+          "sha256": "f341e6fd500a941ad32f5c5781604136c4a3df9077ebdc498eb2716f7fd5405a"
+        },
+        {
+          "name": "enemyTurn",
+          "line": 2570,
+          "sha256": "52a96e60ef20ca43e91a72b6fc263126983086d177e1f7a7e35494deb98287b3"
+        },
+        {
+          "name": "resolveChainCell",
+          "line": 1839,
+          "sha256": "ef587a77de1d2e14fc352f97411313c3720ab6f2f660e809985356d07ccd44f2"
+        }
+      ],
+      "stage8ScenarioSelectors": [
+        "dwarf-overwrite",
+        "dwarf-bonus-"
+      ],
+      "evidence": "combat-command-runtime / combat-quirk-runtime",
+      "relatedLiteralStage1FixtureIds": []
+    },
+    {
+      "id": "cleric-release-order",
+      "goldenCompatibleBehavior": "Direct/Archer release held Plague immediately; chain/Wizard defer release; configured second-seat path can resurrect before release.",
+      "suspectedDefect": true,
+      "desiredFutureRule": null,
+      "correctionStatus": "not-applied-not-authorized",
+      "legacy": [
+        {
+          "name": "maybeReleaseHeldPlague",
+          "line": 2153,
+          "sha256": "b836aa81d8428baba94d798b6728ac1604418c6c494ade38678a5fd563d490ab"
+        },
+        {
+          "name": "resolvePendingSameTurnEffects",
+          "line": 2322,
+          "sha256": "e90394b43befa017ec0e68e1619fe0c8e9f1ba66091b731a10c3804444ddf77a"
+        },
+        {
+          "name": "resolveArcherUnit",
+          "line": 1781,
+          "sha256": "9b901cfe73653dc40a3df0e6fa938ee5dd92dd43df64f14dddf4555555571ae7"
+        }
+      ],
+      "stage8ScenarioSelectors": [
+        "release-"
+      ],
+      "evidence": "combat-release-runtime",
+      "relatedLiteralStage1FixtureIds": []
+    },
+    {
+      "id": "zero-necromancer-origin",
+      "goldenCompatibleBehavior": "Zero Necromancers can satisfy the release equality; undefined legacy origin is represented as null and the empty outbreak contains without impact.",
+      "suspectedDefect": true,
+      "desiredFutureRule": null,
+      "correctionStatus": "not-applied-not-authorized",
+      "legacy": [
+        {
+          "name": "maybeReleaseHeldPlague",
+          "line": 2153,
+          "sha256": "b836aa81d8428baba94d798b6728ac1604418c6c494ade38678a5fd563d490ab"
+        },
+        {
+          "name": "resolvePlagueStep",
+          "line": 2246,
+          "sha256": "c1889cfc6b84db538d2029ef26297ac99099ef95c2576b5add26ae57a2f3ee92"
+        }
+      ],
+      "stage8ScenarioSelectors": [
+        "zero-necromancer-empty-origin"
+      ],
+      "evidence": "combat-special-runtime",
+      "relatedLiteralStage1FixtureIds": []
+    },
+    {
+      "id": "plague-infantry-resurrection",
+      "goldenCompatibleBehavior": "The infantry/inf source alias mismatch does not add Plague-killed Infantry to the resurrection exclusion set; Cavalry/Archer/Monk are excluded.",
+      "suspectedDefect": true,
+      "desiredFutureRule": null,
+      "correctionStatus": "not-applied-not-authorized",
+      "legacy": [
+        {
+          "name": "resolvePlagueCell",
+          "line": 2197,
+          "sha256": "8df989847aad839fd7a855187824ad1fdccb368e8cf33fd8d660ec5861b52621"
+        }
+      ],
+      "stage8ScenarioSelectors": [
+        "plague-player-inf",
+        "plague-enemy-inf"
+      ],
+      "evidence": "combat-boundary-runtime",
+      "relatedLiteralStage1FixtureIds": []
+    },
+    {
+      "id": "archer-discovery",
+      "goldenCompatibleBehavior": "Archer hit path omits resurrected-unit discovery; chain/Wizard/Plague paths retain their original discovery transitions.",
+      "suspectedDefect": true,
+      "desiredFutureRule": null,
+      "correctionStatus": "not-applied-not-authorized",
+      "legacy": [
+        {
+          "name": "resolveArcherUnit",
+          "line": 1781,
+          "sha256": "9b901cfe73653dc40a3df0e6fa938ee5dd92dd43df64f14dddf4555555571ae7"
+        },
+        {
+          "name": "resolveChainCell",
+          "line": 1839,
+          "sha256": "ef587a77de1d2e14fc352f97411313c3720ab6f2f660e809985356d07ccd44f2"
+        }
+      ],
+      "stage8ScenarioSelectors": [
+        "revived-"
+      ],
+      "evidence": "combat-special-runtime",
+      "relatedLiteralStage1FixtureIds": []
+    },
+    {
+      "id": "resurrection-retains-spent",
+      "goldenCompatibleBehavior": "Resurrection preserves original Archer/Monk spent-ability state; Cavalry discovery destroys the whole revived unit.",
+      "suspectedDefect": false,
+      "desiredFutureRule": null,
+      "correctionStatus": "not-applied-not-authorized",
+      "legacy": [
+        {
+          "name": "startEnemyResurrection",
+          "line": 1323,
+          "sha256": "bd091dce21cbb05e2278fa5067b70443cd1cd16e0e7c310fbf18801a998d0283"
+        },
+        {
+          "name": "resolveEnemyResurrectedUnitHit",
+          "line": 1294,
+          "sha256": "c88423686890d447b7405898917d25130be27298100b0c39425c25baff506f32"
+        }
+      ],
+      "stage8ScenarioSelectors": [
+        "revived-"
+      ],
+      "evidence": "combat-special-runtime",
+      "relatedLiteralStage1FixtureIds": []
+    },
+    {
+      "id": "goblin-last",
+      "goldenCompatibleBehavior": "Reaction waves process non-Goblins before Goblins without reordering peers.",
+      "suspectedDefect": false,
+      "desiredFutureRule": null,
+      "correctionStatus": "not-applied-not-authorized",
+      "legacy": [
+        {
+          "name": "runChainReaction",
+          "line": 2342,
+          "sha256": "23fe89c78c09f1672fd7b760ffd79635275b641f868b644cec0032f5cdd43b38"
+        }
+      ],
+      "stage8ScenarioSelectors": [
+        "goblin-archer"
+      ],
+      "evidence": "combat-chain-runtime",
+      "relatedLiteralStage1FixtureIds": []
+    },
+    {
+      "id": "monk-negative-clue",
+      "goldenCompatibleBehavior": "Negative clue subtraction retains the old candidate set if subtraction would empty it; duel/nested interrupt barriers stay source-specific.",
+      "suspectedDefect": true,
+      "desiredFutureRule": null,
+      "correctionStatus": "not-applied-not-authorized",
+      "legacy": [
+        {
+          "name": "updateNegativeMonkClue",
+          "line": 283,
+          "sha256": "2eefd9bfe6b3878d34dff75ad82985b141e5b0b2e931d1010500134cb285dcf5"
+        },
+        {
+          "name": "resolveMonkDeflect",
+          "line": 1903,
+          "sha256": "05054b63be9e1aa1f986e986233e1bcdbe3effa489896560283b0ee85bb0b68c"
+        }
+      ],
+      "stage8ScenarioSelectors": [
+        "monk-duel-"
+      ],
+      "evidence": "combat-chain-runtime",
+      "relatedLiteralStage1FixtureIds": [
+        "monk-duel-and-resume"
+      ]
+    },
+    {
+      "id": "victory-before-due-plague",
+      "goldenCompatibleBehavior": "A direct final-core victory occurs before a due Plague can strike; finishCoreVictory invalidates pending Plagues and current transient benefits but retains future counters.",
+      "suspectedDefect": true,
+      "desiredFutureRule": null,
+      "correctionStatus": "not-applied-not-authorized",
+      "legacy": [
+        {
+          "name": "finishCoreVictory",
+          "line": 1232,
+          "sha256": "a2cba7085e7e991648e1df6129a68c89b0ae677cbe9c5dc0845f6975b5a25f5c"
+        },
+        {
+          "name": "invalidateBattleAsync",
+          "line": 126,
+          "sha256": "ab5fdb8b60a92041867c068c8b337b27ac8b8f35e869c7c52afab6d768e54c49"
+        },
+        {
+          "name": "onEnemyGridLeft",
+          "line": 2923,
+          "sha256": "f341e6fd500a941ad32f5c5781604136c4a3df9077ebdc498eb2716f7fd5405a"
+        },
+        {
+          "name": "enemyTurn",
+          "line": 2570,
+          "sha256": "52a96e60ef20ca43e91a72b6fc263126983086d177e1f7a7e35494deb98287b3"
+        }
+      ],
+      "stage8ScenarioSelectors": [
+        "outcome-before-due-plague-",
+        "terminal-clears-transient-work-retains-future-benefits"
+      ],
+      "evidence": "combat-quirk-runtime",
+      "relatedLiteralStage1FixtureIds": [
+        "outcome-before-due-plague-player",
+        "outcome-before-due-plague-enemy"
+      ]
+    },
+    {
+      "id": "mixed-presentation-rng",
+      "goldenCompatibleBehavior": "Manual Demon glyph/result presentation consumes the same legacy RNG stream. Test adapter journals observed external entropy; shared rules consume it explicitly without browser code.",
+      "suspectedDefect": true,
+      "desiredFutureRule": null,
+      "correctionStatus": "not-applied-not-authorized",
+      "legacy": [
+        {
+          "name": "demonWhoosh",
+          "line": 1471,
+          "sha256": "9c986629c8ae34fd2c2c6d56c77066f32dfcb961610d09d6932841be5806352b"
+        },
+        {
+          "name": "finishCoreVictory",
+          "line": 1232,
+          "sha256": "a2cba7085e7e991648e1df6129a68c89b0ae677cbe9c5dc0845f6975b5a25f5c"
+        }
+      ],
+      "stage8ScenarioSelectors": [
+        "resurrection-final-core-manual"
+      ],
+      "evidence": "combat-quirk-runtime",
+      "relatedLiteralStage1FixtureIds": []
+    },
+    {
+      "id": "ai-hero-heuristic",
+      "goldenCompatibleBehavior": "Existing AI Hero destination heuristic is retained in the legacy policy adapter; resolver validates the selected legal command.",
+      "suspectedDefect": true,
+      "desiredFutureRule": null,
+      "correctionStatus": "not-applied-not-authorized",
+      "legacy": [
+        {
+          "name": "chooseEnemyHeroRelocation",
+          "line": 1687,
+          "sha256": "f68ade20211047a203e92623245923dded9a8d2e69f464c1bcc8572613927a68"
+        },
+        {
+          "name": "autoMatchChooseHeroRelocation",
+          "line": 259,
+          "sha256": "91a942897ce84f119e3634a58480edf8cc7b412e544279b889cb3af2f4042a37"
+        }
+      ],
+      "stage8ScenarioSelectors": [
+        "hero"
+      ],
+      "evidence": "combat-boundary-runtime",
+      "relatedLiteralStage1FixtureIds": [
+        "hero-queue-early-return",
+        "hero-first-no-destination-auto",
+        "hero-first-no-destination-manual",
+        "hero-second-trapped",
+        "normal-hero-confirm-reject-accept",
+        "hero-next-turn-bonus"
+      ]
+    },
+    {
+      "id": "dwarf-placement-bias",
+      "goldenCompatibleBehavior": "Possible Dwarf placement bias remains outside combat extraction; no placement algorithm is changed.",
+      "suspectedDefect": true,
+      "desiredFutureRule": null,
+      "correctionStatus": "not-applied-not-authorized",
+      "legacy": [],
+      "stage8ScenarioSelectors": [],
+      "evidence": "inherited Stage 1 / Stage 7 gates",
+      "relatedLiteralStage1FixtureIds": []
+    },
+    {
+      "id": "plague-persistent-trigger-context",
+      "goldenCompatibleBehavior": "Plague stores the triggering currentTurnSide separately from the later movement turn. Its absent ownerSide falls back to that trigger when updating Auto Match memory. Nested accounting follows the enclosing legacy context.",
+      "suspectedDefect": false,
+      "desiredFutureRule": null,
+      "correctionStatus": "preserved-in-stage9-trial-not-browser-corrected",
+      "legacy": [
+        {
+          "name": "schedulePlagueFromNecros",
+          "line": 2125,
+          "sha256": "1a6511ca0c29e167f2dcbb99b5ec30964a229482928342e09f60a7554aad1018"
+        },
+        {
+          "name": "resolvePlagueCell",
+          "line": 2197,
+          "sha256": "8df989847aad839fd7a855187824ad1fdccb368e8cf33fd8d660ec5861b52621"
+        }
+      ],
+      "evidence": "evidence/full-match-initial-memory-stat-differences.json",
+      "stage9Status": "trial-runtime-confirmed"
+    },
+    {
+      "id": "legacy-special-stat-context",
+      "goldenCompatibleBehavior": "Plague cells do not enter ordinary attack-cell totals. Monk deflections do not create an attack-stat context; they count against an existing enclosing attack or no attack context. Interrupt chains still contribute chain counts.",
+      "suspectedDefect": false,
+      "desiredFutureRule": null,
+      "correctionStatus": "preserved-in-stage9-trial-not-browser-corrected",
+      "legacy": [
+        {
+          "name": "recordAttackImpact",
+          "line": 1112,
+          "sha256": "a2741a465fe9641e7d3beb352f6e11b97bd0c906eb07c450a864e26b0f7e60d9"
+        },
+        {
+          "name": "resolveMonkDeflect",
+          "line": 1903,
+          "sha256": "05054b63be9e1aa1f986e986233e1bcdbe3effa489896560283b0ee85bb0b68c"
+        },
+        {
+          "name": "resolvePlagueCell",
+          "line": 2197,
+          "sha256": "8df989847aad839fd7a855187824ad1fdccb368e8cf33fd8d660ec5861b52621"
+        },
+        {
+          "name": "runMonkInterruptChain",
+          "line": 1825,
+          "sha256": "89ed9c52dfc3d90f018b90c91f9f0bdfa218950a0d1d26dab6aed6dc12783961"
+        }
+      ],
+      "evidence": "evidence/full-match-initial-memory-stat-differences.json",
+      "stage9Status": "trial-runtime-confirmed"
+    },
+    {
+      "id": "enemy-plague-awareness-frozen-per-turn",
+      "goldenCompatibleBehavior": "Enemy targeting captures Plague-awareness before turn-entry specials and retains it for the entire turn. Primary Auto Match targeting recalculates it per shot.",
+      "suspectedDefect": false,
+      "desiredFutureRule": null,
+      "correctionStatus": "preserved-in-stage9-trial-not-browser-corrected",
+      "legacy": [
+        {
+          "name": "enemyTurn",
+          "line": 2570,
+          "sha256": "52a96e60ef20ca43e91a72b6fc263126983086d177e1f7a7e35494deb98287b3"
+        },
+        {
+          "name": "autoResolvePlayerTurn",
+          "line": 2566,
+          "sha256": "148e0f247e7c3b80363f2811f58e129932b5d54beb02ea7834de32a109d622bc"
+        }
+      ],
+      "evidence": "evidence/random-match-first-expanded-failures.json",
+      "stage9Status": "trial-runtime-confirmed"
+    },
+    {
+      "id": "resurrection-probe-handoff-shortcut",
+      "goldenCompatibleBehavior": "A wrong repeated primary resurrection probe can hand off without normal turn-end Plague processing. A following ordinary shot takes the ordinary handoff path.",
+      "suspectedDefect": false,
+      "desiredFutureRule": null,
+      "correctionStatus": "preserved-in-stage9-trial-not-browser-corrected",
+      "legacy": [
+        {
+          "name": "onEnemyGridLeft",
+          "line": 2923,
+          "sha256": "f341e6fd500a941ad32f5c5781604136c4a3df9077ebdc498eb2716f7fd5405a"
+        }
+      ],
+      "evidence": "evidence/random-match-first-expanded-failures.json",
+      "stage9Status": "trial-runtime-confirmed"
+    },
+    {
+      "id": "auto-match-original-hero-cells",
+      "goldenCompatibleBehavior": "Auto Match records both original Hero cells before starting play, including a Hero that later dies or moves.",
+      "suspectedDefect": false,
+      "desiredFutureRule": null,
+      "correctionStatus": "preserved-in-stage9-trial-not-browser-corrected",
+      "legacy": [
+        {
+          "name": "autoMatchRunSingle",
+          "line": 2667,
+          "sha256": "d7ba5d83584ac3aba7e0b295edfff239b4b8fe80cd792cf42de4914456eac8d2"
+        }
+      ],
+      "evidence": "evidence/random-match-original-hero-initialization-failure.json",
+      "stage9Status": "trial-runtime-confirmed"
+    },
+    {
+      "id": "ordered-resurrection-policy-suspects",
+      "goldenCompatibleBehavior": "Resurrection targeting samples the legacy ordered suspect-unit list. Reordering suspects into canonical unit-array order changes RNG-selected targets.",
+      "suspectedDefect": false,
+      "desiredFutureRule": null,
+      "correctionStatus": "preserved-in-stage9-trial-not-browser-corrected",
+      "legacy": [
+        {
+          "name": "autoMatchChooseTarget",
+          "line": 226,
+          "sha256": "dbc5769d8bac9c66bfc635ae89c332c152f6a6781db42d8d2de6485a8c9e7ba3"
+        }
+      ],
+      "evidence": "evidence/resurrection-policy-adapter-order-failure.json",
+      "stage9Status": "trial-runtime-confirmed"
+    },
+    {
+      "id": "enemy-local-hero-escape-policy",
+      "goldenCompatibleBehavior": "Second-hit enemy Hero escape prefers unscouted neighbors, then Plague-safe/farthest neighbors. Primary local escape uses its unfiltered legal neighbor order.",
+      "suspectedDefect": false,
+      "desiredFutureRule": null,
+      "correctionStatus": "preserved-in-stage9-trial-not-browser-corrected",
+      "legacy": [
+        {
+          "name": "enemyHeroLocalEscapeCells",
+          "line": 1655,
+          "sha256": "33b79307d8e9892a2a8031f2d08504ce5db196e847f22a8b072d898cec958ef2"
+        },
+        {
+          "name": "playerHeroLocalEscapeCells",
+          "line": 1653,
+          "sha256": "0e322f04871b9be3c6b87622cc3e19c86c45050d504009418b8bce4cfbb5cbc1"
+        },
+        {
+          "name": "heroPlagueSafeCandidates",
+          "line": 1648,
+          "sha256": "43b423e2387b973e685d54091d7395f4f06304800188e809c81a664c8f4dda69"
+        }
+      ],
+      "evidence": "evidence/special-policy-runtime.json",
+      "stage9Status": "trial-runtime-confirmed"
+    },
+    {
+      "id": "enemy-pre-shot-terminal-check",
+      "goldenCompatibleBehavior": "The enemy checks for core victory before selecting a target. A pre-existing terminal board must finish without an extra shot or policy RNG draw.",
+      "suspectedDefect": false,
+      "desiredFutureRule": null,
+      "correctionStatus": "preserved-in-stage9-trial-not-browser-corrected",
+      "legacy": [
+        {
+          "name": "enemyTurn",
+          "line": 2570,
+          "sha256": "52a96e60ef20ca43e91a72b6fc263126983086d177e1f7a7e35494deb98287b3"
+        }
+      ],
+      "evidence": "evidence/enemy-pre-shot-terminal-failure.json",
+      "stage9Status": "trial-runtime-confirmed"
+    },
+    {
+      "id": "plague-nested-benefit-turn-tag",
+      "goldenCompatibleBehavior": "Catapult, Elf, Dwarf and Cleric benefits inside a Plague-triggered chain use the retained triggering turn for same-turn versus future-turn classification and future-work journals. The later mover is not that tag.",
+      "suspectedDefect": false,
+      "desiredFutureRule": null,
+      "correctionStatus": "preserved-in-stage9-trial-not-browser-corrected",
+      "legacy": [
+        {
+          "name": "resolveChainCell",
+          "line": 1839,
+          "sha256": "ef587a77de1d2e14fc352f97411313c3720ab6f2f660e809985356d07ccd44f2"
+        },
+        {
+          "name": "resolvePendingSameTurnEffects",
+          "line": 2322,
+          "sha256": "e90394b43befa017ec0e68e1619fe0c8e9f1ba66091b731a10c3804444ddf77a"
+        }
+      ],
+      "evidence": "evidence/plague-turn-benefits-initial-failure.json",
+      "stage9Status": "trial-runtime-confirmed"
+    },
+    {
+      "id": "plague-every-cell-effect-flush",
+      "goldenCompatibleBehavior": "Every resolved Plague infection drains pending same-turn effects, including non-reactive cells. A held Cleric release flag must not survive until an unrelated later chain.",
+      "suspectedDefect": false,
+      "desiredFutureRule": null,
+      "correctionStatus": "preserved-in-stage9-trial-not-browser-corrected",
+      "legacy": [
+        {
+          "name": "resolvePlagueCell",
+          "line": 2197,
+          "sha256": "8df989847aad839fd7a855187824ad1fdccb368e8cf33fd8d660ec5861b52621"
+        },
+        {
+          "name": "resolvePendingSameTurnEffects",
+          "line": 2322,
+          "sha256": "e90394b43befa017ec0e68e1619fe0c8e9f1ba66091b731a10c3804444ddf77a"
+        }
+      ],
+      "evidence": "evidence/random-match-seed47-initial-failure.json",
+      "stage9Status": "trial-runtime-confirmed"
+    },
+    {
+      "id": "plague-detached-outbreak-continuation",
+      "goldenCompatibleBehavior": "A Plague cell can replace the pending global outbreak during effect flushing. The active step continues the old local outbreak object; the replacement retains round zero. If the old outbreak becomes contained, the legacy wrapper also clears the replacement.",
+      "suspectedDefect": false,
+      "desiredFutureRule": null,
+      "correctionStatus": "preserved-in-stage9-trial-not-browser-corrected",
+      "legacy": [
+        {
+          "name": "resolvePlagueStep",
+          "line": 2246,
+          "sha256": "c1889cfc6b84db538d2029ef26297ac99099ef95c2576b5add26ae57a2f3ee92"
+        },
+        {
+          "name": "resolvePendingPlagueForTurn",
+          "line": 2290,
+          "sha256": "d1a3d0dfe4b82a4176e16b9d3880c966d075c36c57056cf9f71e4fa12325a64e"
+        },
+        {
+          "name": "schedulePlagueFromNecros",
+          "line": 2125,
+          "sha256": "1a6511ca0c29e167f2dcbb99b5ec30964a229482928342e09f60a7554aad1018"
+        }
+      ],
+      "evidence": "evidence/plague-cell-replacement-initial-failure.json",
+      "stage9Status": "trial-runtime-confirmed"
+    }
+  ]
+}
