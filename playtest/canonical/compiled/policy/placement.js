@@ -1,0 +1,11 @@
+import { id } from '../model.js';
+import { parseKey } from '../combat/access.js';
+import { legacyRandomPlacement } from './placement-legacy.js';
+import { acceptCommand } from '../host/lifecycle.js';
+/** Random-placement policy proposes; the unchanged Stage 7 legality gate accepts. */
+export function randomizePlacements(input) { if (input.status !== 'placement' || input.state.match.units.length)
+    throw Error('Random initialization needs an empty placement host'); let h = structuredClone(input); for (const [i, p] of h.config.players.entries()) {
+    const proposals = legacyRandomPlacement(i === 0 ? 'first-seat' : 'second-seat', h.config.size, p.roster, h.rng, h.config.story);
+    for (const [j, proposal] of proposals.entries())
+        h = acceptCommand(h, { id: 'placement-' + i + '-' + j, kind: 'place', placement: { unitId: id('unit-' + i + '-' + j), ownerId: p.id, boardId: p.boardId, type: proposal.type, cells: proposal.cells.map(parseKey) } });
+} return h; }

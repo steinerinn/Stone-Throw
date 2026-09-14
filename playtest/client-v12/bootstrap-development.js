@@ -1,0 +1,10 @@
+import {installLan} from './lan.js';
+import {createHttpSession} from './transport.js';
+import {mountStoryBrowser} from './story-browser.js';
+for(const name of ['__stoneThrowAutoMatchMode','__stoneThrowStoryAutoResolveMode'])Object.defineProperty(window,name,{get:()=>false,configurable:false});
+function showError(error){let box=document.getElementById('stTransportError');if(!box){box=document.createElement('div');box.id='stTransportError';box.setAttribute('role','alert');box.style.cssText='position:fixed;top:0;left:0;right:0;z-index:100001;background:#211;color:white;padding:12px';document.body.append(box);}box.replaceChildren(document.createTextNode('Local host: '+(error.code||'connection-failed')+'. '));const retry=document.createElement('button');retry.textContent='Reconnect';retry.onclick=()=>location.reload();box.append(retry);if(error.code==='unknown-session'){const fresh=document.createElement('button');fresh.textContent='Start new local session';fresh.onclick=async()=>{await session.open(true);location.reload();};box.append(fresh);}}
+const session=createHttpSession();let browserClient,lanClient;
+try{const opened=await session.open();browserClient=await mountStoryBrowser(session.client,{initialConfiguration:opened.configuration,onError:showError,onPublicUpdate:u=>lanClient?.observe(u),additionalBlocked:()=>lanClient?.blocked(),replaceConfiguration:next=>session.configure(next)});lanClient=installLan(session,browserClient,opened);if(opened.reconnected){document.body.classList.remove('st-main-menu-mode');}document.documentElement.dataset.localHost='connected';}
+catch(error){showError(error);}
+
+if(browserClient){const {installNodeDevelopment}=await import("./node-development.js");installNodeDevelopment(session,browserClient);}

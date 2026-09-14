@@ -1,0 +1,27 @@
+import { emit, seat, cellKey, unitAt, boardSize } from '../access.js';
+import { neighbors8 } from '../../rules/coordinates.js';
+export function heroHit(ctx, u, meta) { if (!u.hero)
+    throw Error('Hero state missing'); if (meta.source === 'plague') {
+    killHero(ctx, u, 'plague');
+    return;
+} u.hero.hitsTaken++; u.damage.hitsTaken = u.hero.hitsTaken; if (u.hero.hitsTaken === 1) {
+    u.hero.activated = true;
+    ctx.state.heroQueue.push({ unitId: u.id, kind: 'first' });
+    emit(ctx, 'hero-activated', meta, u.id);
+}
+else if (u.hero.hitsTaken === 2)
+    ctx.state.heroQueue.push({ unitId: u.id, kind: 'second' });
+else if (u.hero.hitsTaken === 3)
+    ctx.state.heroQueue.push({ unitId: u.id, kind: 'third' }); u.hero.relocationPending = ctx.state.heroQueue.some(e => e.unitId === u.id); }
+export function killHero(ctx, u, reason) { const p = seat(ctx.state, u.ownerId); p.occupied = p.occupied.filter(k => !u.cells.some(c => cellKey(c) === k)); u.cells = []; u.damage.cells = []; u.lifecycle = 'destroyed'; if (u.hero) {
+    u.hero.currentCell = null;
+    u.hero.relocationPending = false;
+} emit(ctx, 'hero-killed', null, u.id, [], null, reason); }
+export function heroDestinations(ctx, u, local) { const p = seat(ctx.state, u.ownerId), size = boardSize(ctx.state, u.boardId), origin = u.hero?.currentCell; let cells = []; if (local && origin)
+    cells = neighbors8({ size }, origin.x, origin.y).map(k => { const [x, y] = k.split(',').map(Number); return { x: x, y: y }; });
+else
+    for (let y = 0; y < size; y++)
+        for (let x = 0; x < size; x++)
+            cells.push({ x, y }); return cells.filter(c => !p.shots.includes(cellKey(c)) && !unitAt(ctx.state, u.boardId, cellKey(c))); }
+export function moveHero(ctx, u, cell) { const p = seat(ctx.state, u.ownerId); p.occupied = p.occupied.filter(k => !u.cells.some(c => cellKey(c) === k)); p.occupied.push(cellKey(cell)); u.cells = [{ ...cell }]; u.damage.cells = []; u.lifecycle = 'present'; if (!u.hero)
+    throw Error('Hero state missing'); u.hero.currentCell = { ...cell }; u.hero.relocationPending = false; emit(ctx, 'hero-moved', null, u.id, [cell]); }
