@@ -1,0 +1,42 @@
+{
+  "checkpoint": "core-multiplayer-stabilization-v1",
+  "branch": "core-multiplayer-stabilization-v1",
+  "source": "C:\\Users\\Notandi\\Documents\\Codex\\2026-09-09\\continue-from-the-completed-stone-throw\\outputs\\multiplayer-stabilization\\accepted",
+  "artifact": "playtest",
+  "manifestSha256": "9d7466230c195b9f04e70326cc7248614f288d640e73f7d9124e3cc81dc4e0b2",
+  "payloadFiles": 444,
+  "copiedFiles": 445,
+  "byteIdentical": true,
+  "verification": {
+    "verified": true,
+    "checkpoint": "core-multiplayer-stabilization-batch1",
+    "files": 444,
+    "manifestSha256": "9d7466230c195b9f04e70326cc7248614f288d640e73f7d9124e3cc81dc4e0b2"
+  },
+  "protectedRefs": {
+    "refs/heads/controlled-playtest-v1": "4a6f615a7105f417e290651bd0372f2d67b64cf8",
+    "refs/heads/main": "8f1297f3e13522b6012c12e127d2fbd1d0713f28",
+    "refs/heads/multiplayer-ux-1v1-batch2-v1": "ae620b1519b08783d7c9703c0f218c32318e18be",
+    "refs/heads/presentation-parity-batch5-v1": "c699131fc597dbc48d48de979590ad292dc9eb2e",
+    "refs/heads/presentation-parity-batch6-v1": "9bb8ab4e3a235f8f67d5b4d5da79a5d1e69a8141"
+  },
+  "protectedFiles": {
+    "audit/StoneThrow-v1.427-architecture-audit.md": "bb8596cbe0a74d76ecca80c90ca1080b2ced26a9a3737a9cd6ae7dacc6a0d092",
+    "audit/css-cascade-inventory.md": "ee502c9332a9b58cb9326af1b552fbbc59879ba1d4954f68b62bee9b0b780ed5",
+    "audit/embedded-asset-inventory.md": "f98128abea1d5b34fd86f1d9afadfe501ac5dcc16921e6ecd54c5c5a2894393a",
+    "audit/source-symbol-inventory.md": "8edc97a6c632f8f1989e3652dbcef8132f01b2f6c0f2c05fdd2dc54e4281a964",
+    "index.html": "9df4c730eef0fef63e2aaee026f9434c254ef17f2ba302e423a5ddfa67f0e9a0",
+    "prototype-reference/StoneThrow-v1.427.html": "d7ad1caeb091d5b36812fa3f5a34f8303200dca75a1cd4653380e30861625518"
+  },
+  "changes": "Artifact copy plus Git byte-preservation attributes, private-state ignore rule and promotion records only.",
+  "deferredPolish": [
+    "Rare unconfirmed Catapult/focus incident",
+    "Session/long-match lag watchlist",
+    "Future incremental Plague presentation/performance polish",
+    "Multiplayer UI/presentation polish",
+    "Room-list alignment",
+    "Future room passwords",
+    "3+ Group Battle work"
+  ],
+  "deferredItemsBlockAcceptance": false
+}

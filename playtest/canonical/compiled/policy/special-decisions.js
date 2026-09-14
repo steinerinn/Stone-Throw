@@ -1,0 +1,102 @@
+import { targetKnowledge, seat, parseKey, cellKey, unitAt } from '../combat/access.js';
+import { neighbors8 } from '../rules/coordinates.js';
+import { protectedCells, brain, pick, draw, autoMatchTarget } from './auto-target.js';
+export function catapultOpenScore(h, target, start, protectedSet = new Set(), limit = 5) { const p = seat(h.state, target); if (!start || p.shots.includes(start) || protectedSet.has(start))
+    return 0; const seen = new Set([start]), queue = [start], ctx = { size: h.config.size }; while (queue.length && seen.size < limit) {
+    const q = parseKey(queue.shift()), next = neighbors8(ctx, q.x, q.y).filter(k => !seen.has(k) && !p.shots.includes(k) && !protectedSet.has(k));
+    const score = (k) => { const c = parseKey(k); return neighbors8(ctx, c.x, c.y).filter(n => !seen.has(n) && !p.shots.includes(n) && !protectedSet.has(n)).length; };
+    next.sort((a, b) => score(b) - score(a));
+    for (const n of next) {
+        seen.add(n);
+        queue.push(n);
+        if (seen.size >= limit)
+            break;
+    }
+} return seen.size; }
+export function bestCatapult(h, actor, cells, protectedSet = protectedCells(h, seat(h.state, actor).reactionTarget.playerId)) { if (!cells.length)
+    return null; const safe = cells.filter(k => !protectedSet.has(k)), pool = safe.length ? safe : cells, target = seat(h.state, actor).reactionTarget.playerId; let best = -1, choices = []; for (const k of pool) {
+    const score = catapultOpenScore(h, target, k, protectedSet, 5);
+    if (score > best) {
+        best = score;
+        choices = [k];
+    }
+    else if (score === best)
+        choices.push(k);
+} return pick(h, choices.length ? choices : pool, 'catapult-best'); }
+export function catapultOrigin(h, actor, avoidKnown = [], avoidOrigins = []) { const target = seat(h.state, actor).reactionTarget.playerId, p = seat(h.state, target), safe = protectedCells(h, target), known = new Set(avoidKnown); for (const k of brain(h, actor).knownHits) {
+    const u = unitAt(h.state, p.boardId, k);
+    if (u?.type === 'castle' || u?.type === 'cav')
+        known.add(k);
+} const unshot = []; for (let y = 0; y < h.config.size; y++)
+    for (let x = 0; x < h.config.size; x++) {
+        const k = x + ',' + y;
+        if (!p.shots.includes(k) && !safe.has(k))
+            unshot.push(k);
+    } const far = (k, keys, distance) => { const c = parseKey(k); return ![...keys].some(n => { const v = parseKey(n); return Math.max(Math.abs(v.x - c.x), Math.abs(v.y - c.y)) < distance; }); }; if (unshot.length) {
+    for (const [kd, vd] of [[4, 3], [3, 2], [2, 1], [1, 1]]) {
+        const pool = unshot.filter(k => far(k, known, kd) && far(k, avoidOrigins, vd));
+        if (pool.length)
+            return bestCatapult(h, actor, pool, safe);
+    }
+    const fresh = bestCatapult(h, actor, unshot, safe);
+    if (fresh)
+        return fresh;
+} const chosen = autoMatchTarget(h, actor, h.state.plagues.some(p => p.targetPlayerId === target)); if (chosen && !p.shots.includes(chosen) && !safe.has(chosen) && catapultOpenScore(h, target, chosen, safe, 5) > 1)
+    return chosen; const all = [], outside = []; for (let y = 0; y < h.config.size; y++)
+    for (let x = 0; x < h.config.size; x++) {
+        const k = x + ',' + y;
+        if (p.shots.includes(k))
+            continue;
+        all.push(k);
+        if (!safe.has(k))
+            outside.push(k);
+    } return bestCatapult(h, actor, outside.length ? outside : all, safe); }
+export function heroPlagueSafe(h, owner, candidates) { const p = h.state.plagues.find(p => p.targetPlayerId === owner); if (!candidates.length || !p)
+    return [...candidates]; const protectedSet = protectedCells(h, owner), safe = candidates.filter(k => !protectedSet.has(k)); if (safe.length)
+    return safe; const distance = (k) => { const c = parseKey(k); let best = Infinity; for (const o of p.outbreaks) {
+    const seeds = o.frontier.length ? o.frontier : o.infected.length ? o.infected : o.origin ? [cellKey(o.origin)] : [];
+    for (const seed of seeds) {
+        const q = parseKey(seed);
+        best = Math.min(best, Math.max(Math.abs(c.x - q.x), Math.abs(c.y - q.y)));
+    }
+} return best; }; let best = -1, out = []; for (const k of candidates) {
+    const d = distance(k);
+    if (d > best) {
+        best = d;
+        out = [k];
+    }
+    else if (d === best)
+        out.push(k);
+} return out.length ? out : [...candidates]; }
+export function heroRelocation(h, owner) { const p = seat(h.state, owner), old = h.state.match.units.find(u => u.ownerId === owner && u.type === 'hero')?.hero?.currentCell, oldKey = old ? cellKey(old) : null, all = []; for (let y = 0; y < h.config.size; y++)
+    for (let x = 0; x < h.config.size; x++) {
+        const k = x + ',' + y;
+        if (!p.shots.includes(k) && !p.occupied.includes(k))
+            all.push(k);
+    } if (owner === h.config.players[0].id)
+    return pick(h, all.filter(k => k !== oldKey), 'hero-uniform'); if (!all.length)
+    return null; const observer = seat(h.state, p.reactionTarget.playerId), unscouted = all.filter(k => !targetKnowledge(h.state, observer.playerId, owner).scouted.includes(k)), plagueSafe = heroPlagueSafe(h, owner, unscouted.length ? unscouted : all), ctx = { size: h.config.size }, near = (k) => { const q = parseKey(k); return neighbors8(ctx, q.x, q.y); }; const dangerous = (k) => near(k).some(n => { const u = unitAt(h.state, p.boardId, n); if (!u)
+    return false; if (u.type === 'monk')
+    return true; return ['cav', 'castle'].includes(u.type || '') && u.cells.some(c => !p.shots.includes(cellKey(c))); }), invalid = (k) => near(k).some(n => p.shots.includes(n) && p.occupied.includes(n)), escapes = (k) => near(k).filter(n => !p.shots.includes(n) && (!p.occupied.includes(n) || n === oldKey)).length; let safe = plagueSafe.filter(k => !dangerous(k)); if (!safe.length)
+    safe = [...plagueSafe]; const valid = safe.filter(k => !invalid(k)), wrong = safe.filter(invalid); let primary, secondary; if (valid.length && wrong.length) {
+    if (draw(h, 'hero-invalid-preference') < .75) {
+        primary = wrong;
+        secondary = valid;
+    }
+    else {
+        primary = valid;
+        secondary = wrong;
+    }
+}
+else {
+    primary = wrong.length ? wrong : valid;
+    secondary = [];
+} const openPrimary = primary.filter(k => escapes(k) >= 2); if (openPrimary.length)
+    return pick(h, openPrimary, 'hero-open-primary'); const openSecondary = secondary.filter(k => escapes(k) >= 2); if (openSecondary.length)
+    return pick(h, openSecondary, 'hero-open-secondary'); return pick(h, primary.length ? primary : secondary.length ? secondary : safe.length ? safe : all, 'hero-fallback'); }
+/** Second-hit legacy policy: the second seat prefers unscouted cells, then
+ * applies Plague distance safety; the first seat keeps the raw neighbor order. */
+export function heroLocalEscape(h, owner, legal) { let pool = [...legal]; if (owner === h.config.players[1].id) {
+    const observer = seat(h.state, seat(h.state, owner).reactionTarget.playerId), unscouted = pool.filter(k => !observer.scouted.includes(k));
+    pool = heroPlagueSafe(h, owner, unscouted.length ? unscouted : pool);
+} return pick(h, pool, 'hero-local-escape'); }

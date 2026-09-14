@@ -1,0 +1,13 @@
+{
+  "name": "stone-throw-controlled-playtest",
+  "version": "0.14.0",
+  "private": true,
+  "type": "module",
+  "engines": { "node": ">=24 <25" },
+  "scripts": {
+    "start": "node server/main.mjs",
+    "verify": "node tools/verify.mjs",
+    "build": "tsc -p canonical/tsconfig.json"
+  },
+  "devDependencies": { "typescript": "5.9.3" }
+}

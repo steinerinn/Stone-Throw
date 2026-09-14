@@ -1,0 +1,247 @@
+{
+  "schemaVersion": 1,
+  "group": "04-story-presentation",
+  "resources": [
+    {
+      "file": "styles-00.css",
+      "type": "stylesheet",
+      "mime": "text/css",
+      "sha256": "26a786d7a8497485d98818f6fdb5c6bf938c1e0bdd20129f606169a82a044da2",
+      "bytes": 50326,
+      "originalAttributes": "",
+      "index": 0
+    },
+    {
+      "file": "styles-01.css",
+      "type": "stylesheet",
+      "mime": "text/css",
+      "sha256": "1e349803efc001ca0d040210d9fcddb5396f1fbba972abe8aecb5ce0d37aba80",
+      "bytes": 25035,
+      "originalAttributes": "",
+      "index": 1
+    },
+    {
+      "file": "styles-02.css",
+      "type": "stylesheet",
+      "mime": "text/css",
+      "sha256": "1ea8848693b408c79468932d741d50f6005c1defa2cbea7725d3035b1b3c6789",
+      "bytes": 1961,
+      "originalAttributes": "",
+      "index": 2
+    },
+    {
+      "file": "styles-03.css",
+      "type": "stylesheet",
+      "mime": "text/css",
+      "sha256": "f8dec0465d60b9ae6a23f3d622e68f53a4db9cedfca53f4ac25b1204070917d8",
+      "bytes": 421,
+      "originalAttributes": "",
+      "index": 3
+    },
+    {
+      "file": "styles-04.css",
+      "type": "stylesheet",
+      "mime": "text/css",
+      "sha256": "fcff855e805a6add298e2f815aa8398655560355e3845639c799a6001657d9ba",
+      "bytes": 392,
+      "originalAttributes": "",
+      "index": 4
+    },
+    {
+      "file": "styles-05.css",
+      "type": "stylesheet",
+      "mime": "text/css",
+      "sha256": "a0099a8b0a92c8266f6a9e55e74e525847f16bc4e826f1d0cd2fd88040895ae8",
+      "bytes": 163,
+      "originalAttributes": "",
+      "index": 5
+    },
+    {
+      "file": "styles-06.css",
+      "type": "stylesheet",
+      "mime": "text/css",
+      "sha256": "9391044b55f1d20088ff0649290bc0c40b408827b1da3fc592806be1cf116ded",
+      "bytes": 4578,
+      "originalAttributes": "",
+      "index": 6
+    },
+    {
+      "file": "styles-07.css",
+      "type": "stylesheet",
+      "mime": "text/css",
+      "sha256": "1199599d09c0bcb2154efea462616f2c0610094000c31e9a5a5c0a784638230b",
+      "bytes": 1465,
+      "originalAttributes": "",
+      "index": 7
+    },
+    {
+      "file": "styles-08.css",
+      "type": "stylesheet",
+      "mime": "text/css",
+      "sha256": "43097d47d04eea2704757297ab56f2df255b3f6adbdf960e8e2157a193f28ba2",
+      "bytes": 2240,
+      "originalAttributes": "",
+      "index": 8
+    },
+    {
+      "file": "styles-09.css",
+      "type": "stylesheet",
+      "mime": "text/css",
+      "sha256": "ab1b02b057568b47cb0d48550a2c93d4705bd5364b5cb231a4a89bee577b505e",
+      "bytes": 1536,
+      "originalAttributes": "",
+      "index": 9
+    },
+    {
+      "file": "styles-10.css",
+      "type": "stylesheet",
+      "mime": "text/css",
+      "sha256": "5e109113dcb200d6ba3b63273f701d24b3c655a2dde5a0fdb80181d9ee90537c",
+      "bytes": 5185,
+      "originalAttributes": "",
+      "index": 10
+    },
+    {
+      "file": "styles-11.css",
+      "type": "stylesheet",
+      "mime": "text/css",
+      "sha256": "88ce1974f637f204968d3434cadd193619b0f4b40663d9243736da04114f8391",
+      "bytes": 3505,
+      "originalAttributes": "",
+      "index": 11
+    },
+    {
+      "file": "styles-12.css",
+      "type": "stylesheet",
+      "mime": "text/css",
+      "sha256": "bf0d6974cff9a1095765e20b449051a9ee769a8b95e6504de17641ace80519f6",
+      "bytes": 597,
+      "originalAttributes": "",
+      "index": 12
+    },
+    {
+      "file": "styles-13.css",
+      "type": "stylesheet",
+      "mime": "text/css",
+      "sha256": "02764469cc6076974fc893bd62cf80fa1885e5f89d28062edfbdbac40a07ec1f",
+      "bytes": 2162,
+      "originalAttributes": "",
+      "index": 13
+    },
+    {
+      "file": "styles-14.css",
+      "type": "stylesheet",
+      "mime": "text/css",
+      "sha256": "03484eda1fc5eaae3faa7aa64c5c91d73b151f78fd7a91cd6dd9f60b03e215f4",
+      "bytes": 5813,
+      "originalAttributes": "",
+      "index": 14
+    },
+    {
+      "file": "styles-15.css",
+      "type": "stylesheet",
+      "mime": "text/css",
+      "sha256": "2aa3594176dbc57d699c833ff33f012c5907bc4f64ff035fc96da9e1b24fa499",
+      "bytes": 5284,
+      "originalAttributes": "",
+      "index": 15
+    },
+    {
+      "file": "styles-16.css",
+      "type": "stylesheet",
+      "mime": "text/css",
+      "sha256": "f11475a37791cff824e8f74bf4966e987b0c79152a7841c446b4ebe6fffdaf49",
+      "bytes": 4297,
+      "originalAttributes": "",
+      "index": 16
+    },
+    {
+      "file": "styles-17.css",
+      "type": "stylesheet",
+      "mime": "text/css",
+      "sha256": "544c35ceded6dea92bb0ad616115c5e255582a178071207003ea2074b1dd40c0",
+      "bytes": 5080,
+      "originalAttributes": " id=\"stMenuStoryProgressStyle\"",
+      "index": 17
+    },
+    {
+      "file": "styles-18.css",
+      "type": "stylesheet",
+      "mime": "text/css",
+      "sha256": "910d02218a11f76d00592c055418ccb4ecfa275ff43ccee088160372d1e62e46",
+      "bytes": 3909,
+      "originalAttributes": "",
+      "index": 18
+    },
+    {
+      "file": "styles-19.css",
+      "type": "stylesheet",
+      "mime": "text/css",
+      "sha256": "e4ecd6ace21cc391779ca0fb74529d0af15067a2e73375726028a31f83312ebc",
+      "bytes": 1757,
+      "originalAttributes": "",
+      "index": 19
+    },
+    {
+      "file": "styles-20.css",
+      "type": "stylesheet",
+      "mime": "text/css",
+      "sha256": "a09d5cd99fca3f79f1b663e52ab178c4e08c70ae3329426db54189239728baee",
+      "bytes": 1348,
+      "originalAttributes": "",
+      "index": 20
+    },
+    {
+      "file": "styles-21.css",
+      "type": "stylesheet",
+      "mime": "text/css",
+      "sha256": "f07852882f4084e4264386591154d93a84353ba82e2e5d7aa14cc33e2bbacb29",
+      "bytes": 3136,
+      "originalAttributes": "",
+      "index": 21
+    },
+    {
+      "file": "styles-22.css",
+      "type": "stylesheet",
+      "mime": "text/css",
+      "sha256": "78cdcded845e449e6ad12020023e1c9713b2adfeab9adf342254c7a583accc33",
+      "bytes": 3783,
+      "originalAttributes": " id=\"stActionInstructionStyle\"",
+      "index": 22
+    },
+    {
+      "file": "client/shell.js",
+      "type": "script",
+      "role": "client-shell",
+      "mime": "application/javascript",
+      "bytes": 35916,
+      "sha256": "d4ff9670755f178e51239f2825044ae427c9f4473b146307c555a13473938c29",
+      "originalScriptIndex": 1
+    },
+    {
+      "file": "client/loading-screen.js",
+      "type": "script",
+      "role": "client-loader",
+      "mime": "application/javascript",
+      "bytes": 446,
+      "sha256": "5a6fcc7044c0c38c02944e64cb447dac05447a79d10278f29a11c2976f61a195",
+      "originalScriptIndex": 3
+    },
+    {
+      "file": "client/story-presentation.js",
+      "type": "script",
+      "role": "story-presentation",
+      "mime": "application/javascript",
+      "bytes": 1567,
+      "sha256": "7a463ec524d588d4c251586a3e3615952e4b9c73f6525373457a04c1ff7341dd",
+      "functions": [
+        "cleanStoryHistoryHtml",
+        "artUnit",
+        "pbGrid",
+        "lorePunchHtml",
+        "loreCardHtml"
+      ]
+    }
+  ],
+  "policy": "Exact stylesheet bytes and cascade order. Root-level files preserve existing assets/ URL resolution. No runtime loader."
+}
