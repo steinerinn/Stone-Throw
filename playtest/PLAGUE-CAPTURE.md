@@ -1,0 +1,17 @@
+# Optional private LAN Plague capture
+
+Start `PLAYTEST-LAN.cmd` after closing the previous playtest server. The launcher verifies the build and prints the private capture folder. Capture defaults to OFF. Enable **Game Log** in the existing gear / Settings menu to opt this browser’s requests into beta metrics and bounded private Plague capture; turn it OFF to stop new capture. The preference persists locally and synchronizes across tabs. Each client controls its own requests; another client with Game Log ON can still produce server-side evidence. Existing saved evidence is not deleted. It still passes `playtestSnapshotOnly: true`; checkpoint journal replay/appending remains disabled.
+
+The folder is `plague-diagnostics` inside the build-specific private LAN state directory, outside the served candidate tree. Nothing in these diagnostics is sent to opponents or added to browser responses.
+
+- `plague-trace.jsonl` and `plague-trace.previous.jsonl`: room/epoch, command, turn, outbreak identity/owner/trigger/target, step, infected/frontier cells, local/whole-edge candidates with rejection reasons, branch count, authoritative impact events (chosen cells), containment/removal reason and RNG cursor.
+- `plague-state-before.json` / `plague-state-after.json`: full private authoritative hosts around the most recent Plague-related command, including pending resolution, RNG, history and placements. These are overwritten, not appended. They can be validated with the host deserializer and used for private reconstruction.
+- The normal sibling `checkpoint.json` remains the current server recovery snapshot; it is not replaced by the diagnostic files.
+
+Limits: two 2 MiB trace files; two 32 MiB state files; at most 4,096 progress rows per command (explicit dropped-row count). A larger state snapshot is omitted with an explicit `snapshot-size-limit` trace entry; normal snapshot recovery remains enabled. Capture failure is printed to the server console and cannot reject a gameplay command. No `checkpoint.journal` is created or appended by this capture. The trace is diagnostic only, not crash recovery.
+
+Outbreak identity is private and derived from room/epoch/owner/target and the observed scheduling root. If a worker starts observing an already-existing outbreak, its identity explicitly uses `observed-<root>`; full snapshots remain the source for reconstructing earlier creation. A containment trace can say `contained-inspect-frontier-rows` if the precise reason cannot be classified safely. Unclassified removal is explicitly `UNEXPLAINED-removal`, not silently called normal. There is no gameplay change.
+
+When the failure happens: stop taking shots, keep the room intact, and note the room code/player/turn. Do not Rematch/Leave or start another match before capture. Keep the printed private folder and its sibling `checkpoint.json`; give Codex the folder path. Enable Game Log before reproducing the failure. Do not publish these files: they contain hidden boards and private authoritative state. No manual console logging or environment setup is needed.
+
+Checks: `node tools/plague-capture-check.mjs` exercises real Group worker commands with capture disabled/enabled, exact host/history/RNG equality, frontier/impact output, five-step stop reason, valid before/after snapshots and trace rotation. `node tools/playtest-snapshot-check.mjs` checks repeated snapshot-only recovery and no journal growth. `node tools/verify.mjs` verifies the candidate manifest.

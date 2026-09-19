@@ -1,0 +1,2 @@
+# Private local playtest recovery data must never be committed.
+/playtest-state-*/

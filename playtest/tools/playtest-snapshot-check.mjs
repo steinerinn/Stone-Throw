@@ -1,0 +1,15 @@
+import fs from 'node:fs';import path from 'node:path';import assert from 'node:assert/strict';import {fileURLToPath} from 'node:url';
+import {openStore} from '../server/store.mjs';import {startServer} from '../server/main.mjs';
+const root=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'..'),base=fs.mkdtempSync(path.resolve(root,'../snapshot-containment-check-'));
+const dir=path.join(base,'unit');let store=openStore(dir,'test','production',{journalEnabled:false});
+for(let i=0;i<500;i++)store.write({counter:i,rooms:new Map([['room',{round:1,data:'x'.repeat(1000)}]])});store.release();assert.ok(!fs.existsSync(path.join(dir,'checkpoint.journal')));assert.ok(fs.statSync(path.join(dir,'checkpoint.json')).size<2000);
+fs.writeFileSync(path.join(dir,'checkpoint.journal'),'unusable old journal');
+for(let i=0;i<3;i++){store=openStore(dir,'test','production',{journalEnabled:false});assert.equal(store.value.counter,499);assert.ok(store.value.rooms instanceof Map);store.write(store.value);store.release();assert.equal(fs.readFileSync(path.join(dir,'checkpoint.journal'),'utf8'),'unusable old journal');}
+const normal=path.join(base,'normal');store=openStore(normal,'test','production');store.write({value:1});store.release();assert.ok(fs.existsSync(path.join(normal,'checkpoint.journal')));
+// Exercise real host serialization, LAN room persistence and repeated restart.
+const runtime=path.join(base,'runtime');let app;const options={port:0,seed:1427,lan:true,stateDir:runtime,playtestSnapshotOnly:true,logger:()=>{}};let cookie,host,code,token;
+const post=async(route,body={})=>{const r=await fetch(app.origin+'/api/'+route,{method:'POST',headers:{'Content-Type':'application/json',...(cookie?{Cookie:cookie}:{})},body:JSON.stringify(body)});if(r.headers.get('set-cookie'))cookie=r.headers.get('set-cookie').split(';')[0];const j=await r.json();assert.equal(r.status,200,JSON.stringify(j));return j;};
+try{app=await startServer(options);let u=(await post('open')).update;await post('command',{contract:u.snapshot.contract,battle:u.snapshot.battle,revision:u.snapshot.revision,intent:{kind:'random-placement'}});token=cookie.slice('st11sid='.length);host=JSON.parse(await app.checkpoint(token)).host;code=(await post('pvp/make',{name:'Snapshot test',seats:3,controllers:['human','human','human']})).lan?.code;assert.equal(app.pvp.rooms.size,1);await app.close();app=null;
+for(let i=0;i<3;i++){app=await startServer(options);assert.equal(app.pvp.rooms.size,1);assert.equal(JSON.parse(await app.checkpoint(token)).host,host);await app.close();app=null;}assert.ok(!fs.existsSync(path.join(runtime,'checkpoint.journal')));
+console.log(JSON.stringify({passed:true,writes:500,restartCycles:3,snapshotBytes:fs.statSync(path.join(dir,'checkpoint.json')).size,hostSnapshotBytes:fs.statSync(path.join(runtime,'checkpoint.json')).size,noJournalCreated:true,existingJournalUntouched:true,hostRngAndLanRoomRecovered:true,defaultJournalModeUnchanged:true},null,2));
+}finally{if(app)try{await app.close();app=null;}catch{}}

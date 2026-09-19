@@ -1,0 +1,2 @@
+# Accepted playtest artifacts are immutable byte-preserved releases.
+/playtest/** -text -filter -ident !working-tree-encoding

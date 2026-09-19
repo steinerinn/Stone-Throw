@@ -1,0 +1,2 @@
+// Observer-public data only. Raw unknowns remain unknown; no canonical state access.
+export function publicStrength(players){return players.map(p=>({seat:p.seat,name:p.name||'WAITING',controller:p.controller,eliminated:!!p.eliminated,samples:(p.strength||[]).map((s,index)=>({index,round:s.round,value:Number.isFinite(s.value)?s.value:null,known:Number.isFinite(s.value)}))})).sort((a,b)=>a.seat-b.seat);}

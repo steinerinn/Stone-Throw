@@ -1,0 +1,17 @@
+{
+  "checkpoint": "group-battle-batch1-v1",
+  "status": "accepted-payload-prepared-for-manual-commit",
+  "manifestSha256": "5926c47d888185fa2ba774be13568b8ecfd5d1c0c3e12b79fa50939c894ba1d6",
+  "manifestFilesVerified": 503,
+  "manifestByteIdentical": true,
+  "exactPayloadFileCount": 504,
+  "source": "C:\\Users\\Notandi\\Documents\\Codex\\2026-09-09\\continue-from-the-completed-stone-throw\\outputs\\group-battle-batch1\\candidate",
+  "payload": "playtest/",
+  "branchBase": "8f1297f3e13522b6012c12e127d2fbd1d0713f28",
+  "verification": "Working-tree file hashes and manifest bytes match accepted source; committed Git blobs not verified because commit is reserved for the user.",
+  "lineEndingProtection": "Copied unchanged from core-multiplayer-stabilization-v1: /playtest/** -text -filter -ident !working-tree-encoding",
+  "priorRefsUnchanged": true,
+  "priorTrackedFilesUnchanged": true,
+  "committed": false,
+  "published": false
+}

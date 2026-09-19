@@ -1,0 +1,159 @@
+{
+  "passed": true,
+  "routes": [
+    "result route 1:false",
+    "result route 2:false",
+    "result route 3:false",
+    "result route 4:false",
+    "result route 5:false",
+    "result route 6:false",
+    "result route 7:false",
+    "result route 8:false",
+    "result route 1:true",
+    "result route 2:true",
+    "result route 3:true",
+    "result route 4:true",
+    "result route 5:true",
+    "result route 6:true",
+    "result route 7:true",
+    "result route 8:true",
+    "showStoryBattle2Transition:false",
+    "showStoryBattle2Transition:true",
+    "showStoryBattle3Transition:false",
+    "showStoryBattle3Transition:true",
+    "showDwarfTransition:false",
+    "showDwarfTransition:true",
+    "showElfTransition:false",
+    "showElfTransition:true",
+    "showGoblinTransition:false",
+    "showGoblinTransition:true",
+    "showNecromancerTransition:false",
+    "showNecromancerTransition:true",
+    "showMonkTransition:false",
+    "showMonkTransition:true",
+    "showDragonTransition:false",
+    "showDragonTransition:true",
+    "showDemonTransition:false",
+    "showDemonTransition:true",
+    "showWizardTransition:false",
+    "showWizardTransition:true",
+    "showHeroTransition:false",
+    "showHeroTransition:true",
+    "border",
+    "phase2_equal",
+    "phase2_sync",
+    "phase4_complete",
+    "phase5_complete",
+    "phase6_final",
+    "story_complete",
+    "Cleric player battle 9",
+    "Cleric player battle 10",
+    "Cleric player battle 11",
+    "Cleric player battle 12",
+    "Cleric player battle 13",
+    "Cleric player battle 14",
+    "Cleric player battle 15",
+    "Cleric player battle 16",
+    "Cleric player battle 17",
+    "Cleric enemy battle 9",
+    "Cleric enemy battle 10",
+    "Cleric enemy battle 11",
+    "Cleric enemy battle 12",
+    "Cleric enemy battle 13",
+    "Cleric enemy battle 14",
+    "Cleric enemy battle 15",
+    "Cleric enemy battle 16",
+    "Cleric enemy battle 17"
+  ],
+  "approvedTextExact": 19,
+  "wavBytesAndHttpMappings": 19,
+  "realBrowserPlayback": true,
+  "browserDecoded": 19,
+  "remainingDurations": [
+    {
+      "chapter": 2,
+      "duration": 58.482
+    },
+    {
+      "chapter": 3,
+      "duration": 58.217333
+    },
+    {
+      "chapter": 4,
+      "duration": 56.516
+    },
+    {
+      "chapter": 5,
+      "duration": 79.629333
+    },
+    {
+      "chapter": 6,
+      "duration": 68.656667
+    },
+    {
+      "chapter": 7,
+      "duration": 103.654667
+    },
+    {
+      "chapter": 8,
+      "duration": 77.907333
+    },
+    {
+      "chapter": 9,
+      "duration": 98.078
+    },
+    {
+      "chapter": 10,
+      "duration": 158.844
+    },
+    {
+      "chapter": 11,
+      "duration": 84.03
+    },
+    {
+      "chapter": 12,
+      "duration": 68.119333
+    },
+    {
+      "chapter": 13,
+      "duration": 190.819333
+    },
+    {
+      "chapter": 14,
+      "duration": 177.422
+    },
+    {
+      "chapter": 15,
+      "duration": 97.553333
+    },
+    {
+      "chapter": 16,
+      "duration": 115.425333
+    },
+    {
+      "chapter": 17,
+      "duration": 75.886
+    },
+    {
+      "chapter": 18,
+      "duration": 132.572
+    },
+    {
+      "chapter": 19,
+      "duration": 160.366
+    }
+  ],
+  "demandLoaded": true,
+  "stopOnCloseAndAdvance": true,
+  "revealKeepsPlaying": true,
+  "sharedPersistentNarrationPreference": true,
+  "reenableDoesNotRestart": true,
+  "noOverlappingNarration": true,
+  "missingAudioFallback": true,
+  "realBattle1Deployment": true,
+  "phoneControlsReachable": true,
+  "existingSoundSwitchRespected": true,
+  "monkSetupUnnarrated": true,
+  "finalLossAndDrawNotFinished": true,
+  "ownershipAndContinuationParity": true
+}

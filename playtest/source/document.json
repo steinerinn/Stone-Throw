@@ -1,0 +1,15 @@
+{
+  "schemaVersion": 1,
+  "files": {
+    "prefix": "html/shell.html",
+    "between": "html/scaffold-overlays.html",
+    "suffix": "html/document-end.html",
+    "engine": "legacy/engine.js",
+    "story": "legacy/story.js"
+  },
+  "engineOpen": "<script>",
+  "engineClose": "</script>",
+  "storyOpen": "<script>",
+  "storyClose": "</script>",
+  "policy": "Static authoring fragments; legacy closures are reassembled inline at exact original parser positions. No runtime HTML fetch or game-state refactor."
+}

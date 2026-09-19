@@ -1,0 +1,7 @@
+node_modules/
+checkpoint.json
+checkpoint.json.tmp
+server.lock
+.state/
+*.log
+checkpoint.journal

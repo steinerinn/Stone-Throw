@@ -1,0 +1,24 @@
+import {cloneCombat} from '../canonical/compiled/archives.js';
+import {animationCue,impactSources} from '../canonical/compiled/local-host/animation-cue.js';
+import {normalExecution} from '../canonical/compiled/local-host/demon-entropy.js';
+import {refreshHost} from '../canonical/compiled/host/refresh.js';
+/** Synchronous observer capture; no timer or renderer callback enters the host.
+ * A reaction targeting either visible board must have a cue even when its owner is
+ * a third seat. The two-board cue adapter receives a constant public-side alias,
+ * never the hidden owner board, private geometry or a new gameplay identity.
+ * Flush complete animation groups in order; ordinary shot frames flush immediately.
+ */
+export function groupPresentation(project,target,onFrame){
+ const states=new WeakMap();
+ function begin(r){r.presentation=r.seats.map(()=>[]);const state={cursor:r.host.events.length,positions:[],groups:r.seats.map(()=>new Map()),projecting:true,pending:r.seats.map(()=>[])};states.set(r,state);state.positions=r.host.config.players.map(p=>r.host.state.match.knowledge[p.id].events.length);state.projecting=false;}
+ function capture(r,live){const state=states.get(r);if(!state)return;const delta=live.events.slice(state.cursor).map(r=>r.event);state.cursor=live.events.length;// No public event means the previous implementation emitted no frame. Avoid
+ // rebuilding and validating both complete observer histories for that step.
+ if(r.seats.every((seat,i)=>seat.controller!=='human'||live.state.match.knowledge[live.config.players[i].id].events.length<=state.positions[i]))return;
+ const old=r.host,match=live.state.match;
+ // Refresh mutates current derived fields/board clues, never the append-only journals.
+ // Clone the working board data once; retain read-only journal references for projection.
+ const stateView=cloneCombat(live.state);
+ r.host={...live,state:stateView};refreshHost(r.host);state.projecting=true;try{for(let i=0;i<r.seats.length;i++){if(r.seats[i].controller!=='human')continue;if(live.state.match.knowledge[live.config.players[i].id].events.length<=state.positions[i])continue;const update=project(r,i,state.positions[i]),position=update.snapshot.eventPosition;if(position<=state.positions[i])continue;const j=target(r,i);if(j<0)continue;const view={...r.host,config:{...r.host.config,players:[r.host.config.players[i],r.host.config.players[j]]}},animation=animationCue(view,delta.filter(e=>!e.meta||[view.config.players[0].boardId,view.config.players[1].boardId].includes(e.meta.targetBoardId)).map(e=>e.meta?{...e,meta:{...e.meta,ownerId:view.config.players.some(p=>p.id===e.meta.ownerId)?e.meta.ownerId:view.config.players[1].id}}:e),state.groups[i]);if(animation?.kind==='archer'){const impact=delta.find(e=>e.kind==='impact'&&e.meta?.source==='archer');if(impact&&!view.config.players.some(p=>p.id===impact.meta.ownerId)){delete animation.origin;animation.originMode='off-board-right';}}const frame={snapshot:update.snapshot,events:impactSources(update.events.filter(e=>e.position>state.positions[i]),delta,r.host.config.players[i].boardId,r.host.config.players[j].boardId),...(animation?{animation}:{})};r.presentation[i].push(frame);const pending=state.pending[i],previous=pending.find(f=>f.animation)?.animation;if(previous&&animation&&(previous.group!==animation.group||previous.kind!==animation.kind))flush(r,i,state);state.pending[i].push(frame);if(!animation&&!previous)flush(r,i,state);state.positions[i]=position;}}finally{state.projecting=false;r.host=old;}}
+ function flush(r,i,state){const frames=state.pending[i];if(!frames.length)return;state.pending[i]=[];const update={accepted:true,error:null,snapshot:frames.at(-1).snapshot,events:[],presentation:frames};onFrame?.(i,update);}
+ return {finish:r=>{const state=states.get(r);if(state)for(let i=0;i<r.seats.length;i++)flush(r,i,state);},begin,execution:r=>({...normalExecution(r.memory),observePresentationStep:h=>capture(r,h)}),decorate(r,i,update,after=0){if(states.get(r)?.projecting)return update;const frames=r.presentation?.[i]?.filter(f=>f.snapshot.eventPosition>after)||[];return frames.length?{...update,presentation:structuredClone(frames)}:update;}};
+}
