@@ -40,9 +40,7 @@ export function refreshPending(host) {
     }
     for (const observer of m.players) {
         const own = state.seats.find(p => p.playerId === observer.id), target = state.seats.find(p => p.playerId === own.reactionTarget.playerId), board = m.knowledge[observer.id].boards[target.playerId];
-        board.clues = [];
-        if (own.monkCandidates.length)
-            board.clues.push({ kind: 'monk-candidates', cells: own.monkCandidates.map(parseKey) });
+        board.clues = board.clues.filter(c => c.kind === 'monk-candidates');
         if (target.resurrection.searchActive)
             board.clues.push({ kind: 'resurrection-search', cells: target.resurrection.suspects.flatMap(uid => m.units.find(u => u.id === uid)?.cells || []) });
         if (own.scouted.length)

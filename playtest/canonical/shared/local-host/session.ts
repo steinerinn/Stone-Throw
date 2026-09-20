@@ -3,7 +3,7 @@ import {createHost} from '../host/initialization.js';
 import {deserializeHost,serializeHost} from '../host/serialization.js';
 import {refreshHost} from '../host/refresh.js';
 import {emptyNormalMemory} from './normal-policy.js';
-import type {HostConfiguration} from '../host/contracts.js';
+import type {HostConfiguration,HostState} from '../host/contracts.js';
 import type {ClientTransport,Request,PresentationFrame} from '../client-contract/public.js';
 
 /** Bootstrap-owned battle handoff. The renderer receives only client.
@@ -22,6 +22,7 @@ export function createLocalSession(config:HostConfiguration,checkpoint?:string,d
  return Object.freeze({...(development?{dev:Object.freeze({inspect:()=>ordered(()=>current.dev!.inspect()),takeover:(enabled:boolean)=>ordered(()=>current.dev!.takeover(enabled)),shoot:(cell:{x:number;y:number})=>ordered(()=>current.dev!.shoot(cell))})}:{}),client,
   dispatchWithProgress:(request:Request,notify:(frame:PresentationFrame)=>Promise<void>)=>ordered(()=>current.dispatchWithProgress(request,notify)),
   serializePrivate:()=>ordered(()=>current.serializePrivate()),
+  visitStatistics:<T>(visitor:(host:HostState,epoch:number,gaveUp:boolean)=>T)=>ordered(()=>current.visitStatistics(visitor)),
   configure:(next:HostConfiguration)=>ordered(async()=>{
    const previous=JSON.parse(current.serializePrivate()),old=deserializeHost(previous.host),host=createHost(next);
    host.rng=structuredClone(old.rng);host.initialRng=structuredClone(old.rng);

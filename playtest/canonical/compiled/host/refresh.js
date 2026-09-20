@@ -1,3 +1,4 @@
+import { updateMonkEvidence } from '../local-host/monk-deduction.js';
 import { mutableRows } from '../archives.js';
 import { refreshPending } from './pending-state.js';
 import { id } from '../model.js';
@@ -37,6 +38,14 @@ export function observeResurrectionFeedback(host, boardId, cell, found) { for (c
 export function observeRuleEvent(host, event) {
     (host.events = mutableRows(host.events)).push({ turnIndex: host.turnIndex, event: structuredClone(event) });
     const m = host.state.match, meta = event.meta;
+    // Public deflection/absence evidence; never copy private compatibility candidates.
+    if (event.kind === 'monk-clue' && meta?.origin) {
+        const board = m.knowledge[meta.ownerId]?.boards[meta.targetPlayerId];
+        if (board) {
+            const prior = board.clues.find(c => c.kind === 'monk-candidates')?.cells ?? [];
+            board.clues = [...board.clues.filter(c => c.kind !== 'monk-candidates'), { kind: 'monk-candidates', cells: updateMonkEvidence(host.config.size, prior, meta.origin, event.reason === 'positive') }];
+        }
+    }
     if (event.kind === 'resurrection-discovered' && meta && event.cells[0])
         observeResurrectionFeedback(host, meta.targetBoardId, event.cells[0], true);
     if (event.kind === 'attack-started') {

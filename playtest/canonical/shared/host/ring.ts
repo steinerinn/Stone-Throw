@@ -1,3 +1,4 @@
+import {mutableRows} from '../archives.js';
 import type {HostState} from './contracts.js';
 import type {CombatState} from '../combat/contracts.js';
 import type {PlayerId} from '../model.js';
@@ -17,6 +18,7 @@ export function survives(s:CombatState,id:PlayerId){return s.match.units.some(u=
 /** Called after the resolver has exhausted every frame and Human decision. */
 export function commitEliminations(h:HostState){const s=h.state,ring=s.ring;if(!ring)return false;if(h.pendingRoot)throw Error('Elimination inside root');
  const before=[...ring.order],dead=before.filter(id=>!survives(s,id));if(!dead.length)return false;
+ const last=h.events.at(-1);if(last){h.events=mutableRows(h.events);h.events[h.events.length-1]={...last,event:{...last.event,statistics:{...last.event.statistics,eliminationBoundary:{dead:[...dead],survivors:before.length-dead.length}}}};}
  ring.eliminated.push(...dead);ring.order=before.filter(id=>!dead.includes(id));
  for(const id of dead){const p=seat(s,id);p.ordinaryShots=0;p.nextShots=0;p.currentChainBonus=0;p.dwarfNow=0;p.catapultNow=0;p.catapultLater=0;p.elfNow=false;p.spyLater=0;p.clericNow=false;p.clericLater=false;p.releaseNow=false;}
  // Approved Plague rule: only elimination of the infected board cancels its outbreak.

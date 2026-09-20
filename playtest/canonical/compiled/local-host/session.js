@@ -21,6 +21,7 @@ export function createLocalSession(config, checkpoint, development = false) {
     return Object.freeze({ ...(development ? { dev: Object.freeze({ inspect: () => ordered(() => current.dev.inspect()), takeover: (enabled) => ordered(() => current.dev.takeover(enabled)), shoot: (cell) => ordered(() => current.dev.shoot(cell)) }) } : {}), client,
         dispatchWithProgress: (request, notify) => ordered(() => current.dispatchWithProgress(request, notify)),
         serializePrivate: () => ordered(() => current.serializePrivate()),
+        visitStatistics: (visitor) => ordered(() => current.visitStatistics(visitor)),
         configure: (next) => ordered(async () => {
             const previous = JSON.parse(current.serializePrivate()), old = deserializeHost(previous.host), host = createHost(next);
             host.rng = structuredClone(old.rng);

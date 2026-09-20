@@ -11,6 +11,7 @@ export function restoreRooms(saved,rooms,tokens,transfer=false){
  if(!Array.isArray(saved))throw Error('checkpoint-unavailable');
  for(const raw of saved){if(transfer||typeof raw.host!=='string')assertHost(raw.host);const r={...raw,host:transfer||typeof raw.host!=='string'?raw.host:deserializeHost(raw.host),queue:Promise.resolve(),epoch:randomInt(1,2**48),revision:raw.revision+1};
   if(!Number.isSafeInteger(r.epoch)||!Number.isSafeInteger(r.revision)||!Array.isArray(r.seats)||r.seats.length!==r.host.config.players.length)throw Error('checkpoint-unavailable');
+  if(!transfer&&r.matchStatistics)r.matchStatistics.epoch=r.epoch;
   r.handles=r.seats.map(()=>new Map());r.choices=r.seats.map(()=>new Map());rooms.set(r.code,r);
   r.seats.forEach((s,i)=>{if(s?.token){if(!Number.isFinite(s.seen))s.seen=0;tokens.set(s.token,{r,i});}});
  }

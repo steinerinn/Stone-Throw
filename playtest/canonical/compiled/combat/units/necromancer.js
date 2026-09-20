@@ -3,7 +3,7 @@ export function necromancers(ctx, ownerId) { return ctx.state.match.units.filter
 export function necroHits(ctx, ownerId) { return necromancers(ctx, ownerId).filter(u => u.cells.some(c => shot(ctx.state, ownerId, cellKey(c)))).length; }
 export function schedulePlague(ctx, ownerId, origin) {
     const owner = seat(ctx.state, ownerId), target = owner.reactionTarget;
-    const plague = { triggerPlayerId: ruleTurn(ctx), ownerId, targetPlayerId: target.playerId, targetBoardId: target.boardId, moveOnPlayerId: ownerId, origin: origin ? { ...origin } : null, outbreaks: [{ origin: origin ? { ...origin } : null, round: 0, frontier: [], infected: [] }], announced: false }; // Legacy resolvePlagueStep retains its local outbreak object if a cell replaces the global pending Plague.
+    const plague = { triggerPlayerId: ruleTurn(ctx), ownerId, targetPlayerId: target.playerId, targetBoardId: target.boardId, moveOnPlayerId: ownerId, origin: origin ? { ...origin } : null, outbreaks: [{ statisticsId: ctx.id + '-plague-' + ctx.events.length, origin: origin ? { ...origin } : null, round: 0, frontier: [], infected: [] }], announced: false }; // Legacy resolvePlagueStep retains its local outbreak object if a cell replaces the global pending Plague.
     const old = ctx.state.plagues.find(p => p.targetBoardId === target.boardId);
     if (old)
         for (const frame of ctx.frames) {

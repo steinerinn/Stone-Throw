@@ -1,3 +1,4 @@
+import {updateMonkEvidence} from '../local-host/monk-deduction.js';
 import {mutableRows} from '../archives.js';
 import {refreshPending} from './pending-state.js';
 import type {HostState} from './contracts.js';import type {InternalRuleEvent} from '../combat/contracts.js';import {id} from '../model.js';import {parseKey,cellKey,unitAt} from '../combat/access.js';import {neighbors8} from '../rules/coordinates.js';
@@ -8,6 +9,9 @@ export function refreshHost(host:HostState):void {const s=host.state,m=s.match;c
 }
 export function observeResurrectionFeedback(host:HostState,boardId:HostState['state']['seats'][number]['boardId'],cell:{x:number;y:number},found:boolean){for(const observer of host.state.match.players){const k=host.state.match.knowledge[observer.id]!;(k.events=mutableRows(k.events)).push({sequence:k.events.length+1,kind:found?'resurrection-found':'resurrection-rejected',boardId,cell:{...cell},unitType:null,contactId:null});}}
 export function observeRuleEvent(host:HostState,event:InternalRuleEvent):void {(host.events=mutableRows(host.events)).push({turnIndex:host.turnIndex,event:structuredClone(event)});const m=host.state.match,meta=event.meta;
+ // Public deflection/absence evidence; never copy private compatibility candidates.
+ if(event.kind==='monk-clue'&&meta?.origin){const board=m.knowledge[meta.ownerId]?.boards[meta.targetPlayerId];if(board){const prior=board.clues.find(c=>c.kind==='monk-candidates')?.cells??[];board.clues=[...board.clues.filter(c=>c.kind!=='monk-candidates'),{kind:'monk-candidates',cells:updateMonkEvidence(host.config.size,prior,meta.origin,event.reason==='positive')}];}}
+
  if(event.kind==='resurrection-discovered'&&meta&&event.cells[0])observeResurrectionFeedback(host,meta.targetBoardId,event.cells[0],true);
  if(event.kind==='attack-started'){const f=host.statisticsFrames.find(f=>f.frameId===event.workId);if(f)f.count++;}
  if((event.kind==='impact'||event.kind==='suspect-eliminated')&&meta&&!meta.source.startsWith('direct-')&&meta.source!=='plague'){let actor:typeof meta.actorId|null=meta.actorId;if(meta.source==='monk-deflect'){actor=null;for(const frame of [...(host.pendingRoot?.frames||[])].reverse()){if(frame.kind!=='attack')continue;const impact=frame.current.map(w=>w.operation).find(o=>o.kind==='impact');if(impact?.kind==='impact'&&impact.meta.source!=='monk-deflect'){actor=impact.meta.actorId;break;}}}const counter=host.counters.find(c=>c.playerId===actor);if(counter)counter.cellsAffected++;}

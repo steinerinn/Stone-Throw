@@ -1,3 +1,4 @@
+import {migrateStatistics,statisticsStore} from './statistics-store.mjs';
 import {DatabaseSync} from 'node:sqlite';
 import {randomBytes,randomInt,randomUUID,createHash,scrypt,timingSafeEqual} from 'node:crypto';
 import {promisify} from 'node:util';
@@ -16,10 +17,12 @@ export function openRegistry(directory,{now=Date.now}={}){
  fs.mkdirSync(directory,{recursive:true,mode:0o700});const file=path.join(directory,'registry.sqlite'),db=new DatabaseSync(file);try{fs.chmodSync(file,0o600);}catch{}
  db.exec(`PRAGMA busy_timeout=5000; PRAGMA journal_mode=WAL; PRAGMA synchronous=FULL; PRAGMA journal_size_limit=4194304; PRAGMA foreign_keys=ON;
  CREATE TABLE IF NOT EXISTS accounts(id TEXT PRIMARY KEY,username TEXT NOT NULL,username_key TEXT NOT NULL UNIQUE,display_name TEXT NOT NULL,display_key TEXT NOT NULL UNIQUE,password_hash TEXT NOT NULL,salt TEXT NOT NULL,email TEXT NOT NULL DEFAULT '',email_verified INTEGER NOT NULL DEFAULT 0,country TEXT NOT NULL,bio TEXT NOT NULL DEFAULT '',avatar_id TEXT NOT NULL DEFAULT 'registered-default',avatar_unlocked INTEGER NOT NULL DEFAULT 0,avatar_unlocks TEXT NOT NULL DEFAULT '[]',created_at INTEGER NOT NULL,last_login INTEGER NOT NULL,streak INTEGER NOT NULL DEFAULT 0,longest_streak INTEGER NOT NULL DEFAULT 0,last_day TEXT,name_changes INTEGER NOT NULL DEFAULT 0,next_name_at INTEGER NOT NULL DEFAULT 0,qualifying_games INTEGER NOT NULL DEFAULT 0,country_changes INTEGER NOT NULL DEFAULT 0,status TEXT NOT NULL DEFAULT 'active',moderation_role TEXT NOT NULL DEFAULT 'player');
+ CREATE TABLE IF NOT EXISTS story_progress(player_id TEXT PRIMARY KEY REFERENCES accounts(id) ON DELETE CASCADE,battle INTEGER NOT NULL,progress_json TEXT NOT NULL,updated_at INTEGER NOT NULL);
  CREATE TABLE IF NOT EXISTS sessions(token_hash TEXT PRIMARY KEY,player_id TEXT NOT NULL REFERENCES accounts(id),expires INTEGER NOT NULL);
  CREATE TABLE IF NOT EXISTS challenges(id TEXT PRIMARY KEY,browser_hash TEXT NOT NULL,answer_hash TEXT NOT NULL,expires INTEGER NOT NULL);
  CREATE TABLE IF NOT EXISTS limits(key TEXT PRIMARY KEY,count INTEGER NOT NULL,reset INTEGER NOT NULL);
- PRAGMA user_version=1;`);
+`);
+ let migrationBackup;try{migrationBackup=migrateStatistics(db,directory);}catch(error){db.close();throw error;}const statistics=statisticsStore(db);
  const q=(sql,...args)=>db.prepare(sql).get(...args),run=(sql,...args)=>db.prepare(sql).run(...args);
  const tx=fn=>{db.exec('BEGIN IMMEDIATE');try{const result=fn();db.exec('COMMIT');return result;}catch(e){db.exec('ROLLBACK');throw e;}};
  function rate(key,max,period){const t=now();run('DELETE FROM limits WHERE reset <= ?',t);const old=q('SELECT * FROM limits WHERE key=?',key);if(old?.count>=max)fail('Too many attempts. Please try again later.',429);run('INSERT INTO limits VALUES(?,?,?) ON CONFLICT(key) DO UPDATE SET count=count+1',key,1,t+period);}
@@ -28,8 +31,10 @@ export function openRegistry(directory,{now=Date.now}={}){
  function loginSession(id,previous){if(previous)run('DELETE FROM sessions WHERE token_hash=?',hash(previous));run('DELETE FROM sessions WHERE expires<=?',now());const token=randomBytes(32).toString('hex');run('INSERT INTO sessions VALUES(?,?,?)',hash(token),id,now()+30*86400000);run('UPDATE accounts SET last_login=? WHERE id=?',now(),id);return {token,...streak(id)};}
  let hashing=0;async function key(p,s){if(hashing>=2)fail('Please try again shortly.',429);hashing++;try{return await derive(p,s,64,{N:32768,r:8,p:3,maxmem:64*1024*1024});}finally{hashing--;}}
  const multiplayerIdentity=a=>a?{kind:'account',playerId:a.id,displayName:a.display_name,avatarId:a.avatar_id}:null;
- return {file,close:()=>db.close(),publicAccount,identity:token=>multiplayerIdentity(session(token)),identityById:id=>multiplayerIdentity(q('SELECT * FROM accounts WHERE id=? AND status=?',id,'active')),
+ const storyProgress=id=>{const row=q('SELECT progress_json FROM story_progress WHERE player_id=?',id);return row?JSON.parse(row.progress_json):null;};
+ return {file,statistics,migrationBackup,storyProgress,completeStory:(id,progress)=>tx(()=>{if(!q('SELECT id FROM accounts WHERE id=? AND status=?',id,'active'))return;run('INSERT INTO story_progress VALUES(?,?,?,?) ON CONFLICT(player_id) DO UPDATE SET battle=excluded.battle,progress_json=excluded.progress_json,updated_at=excluded.updated_at WHERE excluded.battle>=story_progress.battle',id,progress.battle,JSON.stringify(progress),now());}),close:()=>db.close(),publicAccount,identity:token=>multiplayerIdentity(session(token)),identityById:id=>multiplayerIdentity(q('SELECT * FROM accounts WHERE id=? AND status=?',id,'active')),
  async handle(action,b,{token,browser,ip}){
+  if(action==='story-progress'){if(Object.keys(b).length)fail('Invalid Story progress request.');const a=session(token);return {playerId:a?.id||null,progress:a?storyProgress(a.id):null};}
   if(action==='me'){const a=session(token);return a?streak(a.id):{account:null};}
   if(action==='logout'){if(token)run('DELETE FROM sessions WHERE token_hash=?',hash(token));return {account:null,clearCookie:true};}
   if(action==='challenge'){rate('challenge:'+ip,100,3600000);run('DELETE FROM challenges WHERE expires<=?',now());const a=randomInt(1,10),c=randomInt(1,10),id=randomBytes(24).toString('hex');run('INSERT INTO challenges VALUES(?,?,?,?)',id,hash(browser),hash(String(a+c)),now()+600000);return {id,question:`What is ${a} + ${c}?`};}

@@ -138,7 +138,7 @@ export function assertResolution(value) {
             ensure(units.has(u), 'Unknown legal unit');
     }
     ensure(ctx.decisions.filter(d => d.status === 'pending').length === (ctx.status === 'awaiting-decision' ? 1 : 0), 'Pending decision/status mismatch');
-    ctx.events.forEach((e, i) => { exact(e, ['sequence', 'rootId', 'workId', 'kind', 'meta', 'unitId', 'cells', 'amount', 'reason']); ensure(e.sequence === i + 1 && e.rootId === ctx.id, 'Invalid event sequence'); if (e.meta)
+    ctx.events.forEach((e, i) => { exact(e, ['sequence', 'rootId', 'workId', 'kind', 'meta', 'unitId', 'cells', 'amount', 'reason', ...(e.statistics ? ['statistics'] : [])]); ensure(e.sequence === i + 1 && e.rootId === ctx.id, 'Invalid event sequence'); if (e.meta)
         meta(e.meta); });
     const completed = ctx.events.filter(e => e.kind === 'resolution-completed');
     ensure(completed.length === (ctx.status === 'complete' ? 1 : 0), 'Invalid completion boundary');

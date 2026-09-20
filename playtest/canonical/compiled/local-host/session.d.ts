@@ -1,4 +1,4 @@
-import type { HostConfiguration } from '../host/contracts.js';
+import type { HostConfiguration, HostState } from '../host/contracts.js';
 import type { ClientTransport, Request, PresentationFrame } from '../client-contract/public.js';
 /** Bootstrap-owned battle handoff. The renderer receives only client.
  * Configuration is not a public intent or a writable global capability.
@@ -8,9 +8,10 @@ export declare function createLocalSession(config: HostConfiguration, checkpoint
     client: ClientTransport;
     dispatchWithProgress: (request: Request, notify: (frame: PresentationFrame) => Promise<void>) => Promise<import("../client-contract/public.js").Update>;
     serializePrivate: () => Promise<string>;
+    visitStatistics: <T>(visitor: (host: HostState, epoch: number, gaveUp: boolean) => T) => Promise<T>;
     configure: (next: HostConfiguration) => Promise<import("../client-contract/public.js").Update>;
     dev?: Readonly<{
-        inspect: () => Promise<import("../host/contracts.js").HostState>;
+        inspect: () => Promise<HostState>;
         takeover: (enabled: boolean) => Promise<import("../client-contract/public.js").Update>;
         shoot: (cell: {
             x: number;

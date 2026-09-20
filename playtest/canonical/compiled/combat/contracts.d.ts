@@ -65,6 +65,7 @@ export interface HeroQueueEntry {
     kind: 'first' | 'second' | 'third';
 }
 export interface Outbreak {
+    statisticsId?: string;
     origin: Cell | null;
     round: number;
     frontier: string[];
@@ -230,6 +231,7 @@ export interface PendingRuleDecision {
 export type EventKind = 'attack-started' | 'impact' | 'repeat-ignored' | 'unit-damaged' | 'unit-destroyed' | 'ability-spent' | 'reaction-generated' | 'benefit-scheduled' | 'plague-held' | 'plague-scheduled' | 'plague-contained' | 'hero-activated' | 'hero-moved' | 'hero-killed' | 'resurrection' | 'resurrection-discovered' | 'suspect-eliminated' | 'scouted' | 'monk-clue' | 'monk-duel' | 'decision-required' | 'decision-answered' | 'decision-cancelled' | 'work-started' | 'work-finished' | 'compatibility-truncation' | 'outcome' | 'resolution-completed';
 /** Internal/private facts only. Public projection is deliberately a later adapter. */
 export interface InternalRuleEvent {
+    statistics?: Record<string, unknown>;
     sequence: number;
     rootId: ResolutionId;
     workId: WorkId | null;

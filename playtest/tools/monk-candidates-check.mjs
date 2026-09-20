@@ -1,0 +1,35 @@
+import {publicMonkClues as priorClues} from '../../../registry-phase1/candidate/canonical/compiled/local-host/monk-disclosure.js';
+import assert from 'node:assert/strict';import fs from 'node:fs';
+import {createHost,place} from '../canonical/compiled/host/initialization.js';
+import {acceptCommand} from '../canonical/compiled/host/lifecycle.js';
+import {refreshHost,observeRuleEvent} from '../canonical/compiled/host/refresh.js';
+import {serializeHost,deserializeHost} from '../canonical/compiled/host/serialization.js';
+import {startResolution,stepResolution} from '../canonical/compiled/combat/resolver.js';
+import {answerDecision} from '../canonical/compiled/combat/decisions.js';
+import * as old from '../../../registry-phase1/candidate/canonical/compiled/combat/resolver.js';
+import {deduceMonkCandidates,updateMonkEvidence} from '../canonical/compiled/local-host/monk-deduction.js';
+import {emptyNormalMemory} from '../canonical/compiled/local-host/normal-policy.js';import {emptyStatistics} from '../canonical/compiled/local-host/public-statistics.js';
+import {projectSeat} from '../server/projection.mjs';
+export function fixture(x=5,n=2){const h=createHost({matchId:'monk-audit',rulesVersion:'stone-throw-v1.427',size:15,story:false,seed:42,players:Array.from({length:n},(_,i)=>({id:'p'+i,boardId:'b'+i,roster:{inf:1,monk:1,...(i===1?{dragon:1}:{})},decisionMode:'interactive'}))});for(let i=0;i<n;i++){place(h,{unitId:'inf'+i,ownerId:'p'+i,boardId:'b'+i,type:'inf',cells:[{x:14,y:14}]});place(h,{unitId:'monk'+i,ownerId:'p'+i,boardId:'b'+i,type:'monk',cells:[{x:i===1?x:10,y:i===1?5:10}]});}place(h,{unitId:'dragon1',ownerId:'p1',boardId:'b1',type:'dragon',cells:[{x:3,y:4}]});h.status='awaiting-command';h.activePlayerId='p0';h.round=1;h.turnIndex=1;h.turnStep='actions';h.state.seats[0].ordinaryShots=2;h.state.seats[0].scouted=['3,4'];if(n>2)h.state.ring.knowledge['p0:p1']={scouted:['3,4'],monkCandidates:[]};refreshHost(h);return h;}
+export function project(h){return projectSeat(h,emptyNormalMemory(),emptyStatistics(),1,h.events.length,new Map(h.state.match.units.map(u=>[u.id,u.id])),new Map());}
+const meta={actorId:'p0',ownerId:'p0',targetPlayerId:'p1',targetBoardId:'b1',sourceUnitId:null,source:'direct-human',origin:{x:5,y:4}};
+export function probe(h){const ctx=startResolution(h.state,'probe','probe-action','p0',[{kind:'host-direct-shot',meta,cell:{x:5,y:4}}],h.rng);while(ctx.status==='running')stepResolution(ctx);h.state=ctx.state;h.rng=ctx.rng;for(const e of ctx.events)observeRuleEvent(h,e);refreshHost(h);return h;}
+let checks=0;const has=(cells,x,y)=>cells.some(c=>c.x===x&&c.y===y);
+const a=probe(fixture(5)),b=probe(fixture(6));const sa=project(a).snapshot,sb=project(b).snapshot;assert.ok(has(priorClues(a),4,4),'historical marker wrongly permits a public no-touch conflict');const staleScout=structuredClone(a);staleScout.state.seats[0].scouted.push('5,3');assert.ok(has(priorClues(staleScout),5,3),'historical marker survives Scout EMPTY');assert.ok(!has(project(staleScout).snapshot.monkClues,5,3));checks+=2;
+assert.deepEqual(sa.monkClues,sb.monkClues);assert.ok(has(sa.monkClues,5,5)&&has(sa.monkClues,6,5));for(const y of [3,4,5])assert.ok(!has(sa.monkClues,4,y));assert.ok(!has(sa.monkClues,5,4));checks++;
+// The helper cannot inspect private units, compatibility candidates, RNG or AI.
+const poison=structuredClone(a);poison.state.seats[0].monkCandidates=['0,0'];assert.deepEqual(project(poison).snapshot.monkClues,sa.monkClues);checks++;
+const evidence=updateMonkEvidence(15,[],{x:5,y:4},true);assert.ok(!has(deduceMonkCandidates(15,evidence,[{cell:{x:5,y:3},observation:'empty',kind:null}]),5,3));assert.ok(!has(deduceMonkCandidates(15,evidence,[{cell:{x:5,y:3},observation:'occupied',kind:'inf'}]),6,3));assert.ok(!has(deduceMonkCandidates(15,evidence,[{cell:{x:5,y:3},observation:'miss',kind:null}]),5,3));assert.deepEqual(deduceMonkCandidates(15,evidence,[{cell:{x:5,y:5},observation:'occupied',kind:'monk'}]),[]);assert.ok(has(deduceMonkCandidates(15,evidence,[{cell:{x:4,y:3},observation:'occupied',kind:'hero'}]),5,3));checks+=5;
+// Actual Scout decision lifecycle, not a viewer-side class removal.
+const scouting=structuredClone(a),ctx=startResolution(scouting.state,'scout','scout-action','p0',[{kind:'turn-scout',ownerId:'p0',count:2}],scouting.rng);while(ctx.status==='running')stepResolution(ctx);scouting.pendingRoot=ctx;scouting.status='awaiting-decision';scouting.state=ctx.state;refreshHost(scouting);let cursor=0;
+for(const cell of [{x:5,y:3},{x:5,y:5}]){const d=ctx.decisions.find(d=>d.status==='pending');answerDecision(ctx,{actorId:'p0',decisionId:d.id,cell,unitId:null});while(ctx.status==='running')stepResolution(ctx);scouting.state=ctx.state;for(;cursor<ctx.events.length;cursor++)observeRuleEvent(scouting,ctx.events[cursor]);refreshHost(scouting);const s=project(scouting).snapshot;assert.ok(!has(s.monkClues,cell.x,cell.y));if(cell.y===3)assert.ok(s.opponent.some(c=>c.cell.x===5&&c.cell.y===3&&c.observation==='empty'));else assert.deepEqual(s.monkClues,[]);checks++;}
+// A real ordinary miss updates candidates immediately; a hit identifies Monk.
+for(const cell of [{x:5,y:3},{x:5,y:5}]){const h=probe(fixture());const next=acceptCommand(h,{id:'legal-shot',kind:'shoot',actorId:'p0',boardId:'b1',cell});const snap=project(next).snapshot;assert.ok(!has(snap.monkClues,cell.x,cell.y));if(cell.y===5)assert.deepEqual(snap.monkClues,[]);checks++;}
+// Reject all out-of-turn candidate shots before any mutation, in both worlds.
+for(const h of [a,b]){h.activePlayerId='p1';refreshHost(h);const before=serializeHost(h);for(const cell of sa.monkClues){assert.throws(()=>acceptCommand(h,{id:'wrong-turn',kind:'shoot',actorId:'p0',boardId:'b1',cell}),/Wrong actor/);assert.equal(serializeHost(h),before);}assert.deepEqual(project(deserializeHost(before)).snapshot.monkClues,sa.monkClues);}checks++;
+// Same actual Monk rules/RNG across direct, Archer, Goblin and deflection sources.
+for(const source of ['direct-human','archer','goblin','monk-deflect']){const h=fixture(),op=source==='direct-human'?{kind:'host-direct-shot',meta,cell:{x:5,y:4}}:{kind:'impact',meta:{...meta,source},cell:{x:5,y:4},deferReactions:false};const run=api=>{const c=api.startResolution(h.state,'parity','parity-action','p0',[op],h.rng,'comparison-only');while(c.status==='running')api.stepResolution(c);return c;},prior=run(old),next=run({startResolution,stepResolution});assert.deepEqual(next.state,prior.state);assert.deepEqual(next.rng,prior.rng);const normalize=c=>c.events.map(e=>{const x=structuredClone(e);delete x.statistics;if(x.kind==='monk-clue')x.meta.origin=null;return x;});assert.deepEqual(normalize(next),normalize(prior));checks++;}
+// Explicit Group observer/target pairing and persistence.
+const group=probe(fixture(5,3));group.state.seats[0].scouted=['3,4'];assert.deepEqual(project(group).snapshot.monkClues,sa.monkClues);assert.deepEqual(project(deserializeHost(serializeHost(group))).snapshot.monkClues,sa.monkClues);checks++;
+console.log(JSON.stringify({passed:true,checks,pairedHiddenMonks:true,realScout:true,outOfTurnDenied:true,exactCombatAndRng:true}));
+

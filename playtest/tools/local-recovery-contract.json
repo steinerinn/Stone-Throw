@@ -1,0 +1,11 @@
+{
+  "scope": "Registry Phase 2 local playtest recovery only",
+  "engineDigest": "8a6d20797174f8cd00c473f3316dc92ba52d5529a370c3d39939c2ec849ac9f3",
+  "predecessors": [
+    "9af6d8d3f9df1406d139db139f72d64e78dcb4eaa543a9d3f596973aafa50e0f",
+    "db1cba2debb0ddce90c6c5aad1d8a0f2d569fb21cfddaf617ba24e7bc5a9efb3",
+    "bb00a88403a17540708152742b37f26019a9f6a51d55519599780acea4dc4527",
+    "d27fc6e54168ddce5e52692c68800baa48cd66a8765a725fe0c18c06e0307b30",
+    "210f45bb7d3fb0639420bed2014c6f20e5cea998367ee5dc496505f142c0b5eb"
+  ]
+}

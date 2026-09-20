@@ -27,7 +27,7 @@ export function checkTerminal(ctx, reason) { if (ctx.state.ring)
     return false; const dead = ctx.state.seats.filter(p => !living(ctx, p.playerId)).map(p => p.playerId); if (!dead.length)
     return false; ctx.state.match.outcome = dead.length === ctx.state.seats.length ? { kind: 'draw' } : { kind: 'win', winnerIds: ctx.state.seats.filter(p => !dead.includes(p.playerId)).map(p => p.playerId), eliminatedIds: dead }; emit(ctx, 'outcome', null, null, [], null, ctx.state.match.outcome.kind); terminalTruncate(ctx, reason); return true; }
 function attack(ctx, entry) {
-    emit(ctx, 'attack-started', entry.meta, entry.meta.sourceUnitId, [], null, entry.kind);
+    const announcement = emit(ctx, 'attack-started', entry.meta, entry.meta.sourceUnitId, [], null, entry.kind);
     const { meta } = entry, size = boardSize(ctx.state, meta.targetBoardId);
     if (!meta.origin)
         throw Error('Attack requires origin');
@@ -68,6 +68,8 @@ function attack(ctx, entry) {
         if (cells.length)
             layers = [[parseKey(cells[Math.floor(random(ctx.rng, 'monk-target') * cells.length)])]];
     }
+    if (announcement.statistics)
+        announcement.statistics.plannedCells = layers.flat().map(c => ({ ...c }));
     const ops = [];
     for (const layer of layers) {
         for (const cell of layer)

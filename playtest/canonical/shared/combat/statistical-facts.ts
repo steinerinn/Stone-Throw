@@ -1,0 +1,10 @@
+import type {ResolutionContext,InternalRuleEvent} from './contracts.js';
+/** Private statistical facts only: no randomness, clocks, writes to combat state or public projection. */
+export function statisticalFacts(ctx:ResolutionContext,event:InternalRuleEvent):Record<string,unknown>{
+ const frame=ctx.frames.at(-1),work=frame?.current[Math.max(0,frame.cursor-1)],u=ctx.state.match.units.find(u=>u.id===event.unitId),d=ctx.decisions.find(d=>d.kind==='scout'&&d.status==='pending');
+ const scout=event.kind==='scouted'&&d?{actorId:d.actorId,boardId:d.boardId,targetId:ctx.state.match.boards.find(b=>b.id===d.boardId)?.ownerId||null,cells:event.cells.map(c=>{const occupied=ctx.state.seats.find(s=>s.boardId===d.boardId)?.occupied.includes(c.x+','+c.y);const found=occupied?ctx.state.match.units.find(u=>u.boardId===d.boardId&&u.cells.some(k=>k.x===c.x&&k.y===c.y)):null;return {cell:c,unitId:found?.id||null,unitType:found?.type||null};})}:null;
+ const p=event.meta?.source==='plague'?(ctx.frames.find(f=>f.detachedPlague?.targetBoardId===event.meta!.targetBoardId)?.detachedPlague||ctx.state.plagues.find(p=>p.targetBoardId===event.meta!.targetBoardId)):null;
+ const outbreak=p?.outbreaks.find(o=>event.cells.some(c=>o.infected.includes(c.x+','+c.y)));
+ const root=ctx.frames[0]?.current[0]?.operation;const rootActor=root?.kind==='plague-step'?(ctx.state.plagues.find(p=>p.targetBoardId===root.targetBoardId)?.ownerId||ctx.activePlayerId):root&&'meta'in root?root.meta.ownerId:ctx.activePlayerId;
+ return {version:1,actionId:ctx.acceptedActionId,rootActorId:rootActor,workId:work?.id||null,parentWorkId:work?.parentId||null,operation:work?.operation.kind||null,unitType:u?.type||null,unitOwner:u?.ownerId||null,unitLifecycle:u?.lifecycle||null,resurrectionCount:u?.resurrectionCount||0,scout,scheduledPlague:event.kind==='plague-scheduled'?structuredClone(ctx.state.plagues.at(-1)||null):null,plague:p&&outbreak?{id:outbreak.statisticsId||null,owner:p.ownerId,target:p.targetPlayerId,board:p.targetBoardId,origin:outbreak.origin,step:outbreak.round+1,index:p.outbreaks.indexOf(outbreak)}:null};
+}

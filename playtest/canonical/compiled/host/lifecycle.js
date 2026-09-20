@@ -1,3 +1,4 @@
+import { processedChainCells } from '../combat/chain-statistics.js';
 import { cloneHost } from '../archives.js';
 import { normalTarget, commitEliminations, syncRing } from './ring.js';
 import { startResolution, stepResolution, checkTerminal } from '../combat/resolver.js';
@@ -8,20 +9,32 @@ import { place } from './initialization.js';
 import { observeResurrectionFeedback, observeRuleEvent, refreshHost } from './refresh.js';
 function root(h, ops, purpose) { if (!h.activePlayerId || h.pendingRoot)
     throw Error('Root boundary violation'); h.pendingRoot = startResolution(h.state, 'match-root-' + (++h.rootSerial), 'host-root-' + h.rootSerial, h.activePlayerId, ops, h.rng); h.rootEventCursor = 0; h.rootPurpose = purpose; h.status = 'running'; }
-function collect(h) { const r = h.pendingRoot; if (!r)
-    return; h.state = r.state; h.rng = r.rng; for (let i = 0; i < r.frames.length; i++) {
-    const f = r.frames[i];
-    if ((f.kind !== 'wave' && f.kind !== 'interrupt') || h.statisticsFrames.some(s => s.frameId === f.id))
-        continue;
-    const parent = r.frames[i - 1];
-    h.statisticsFrames.push({ frameId: f.id, actorId: f.compatibilityTurnId, count: 0, startCells: h.counters.reduce((n, c) => n + c.cellsAffected, 0), biggest: f.kind === 'wave' && h.rootPurpose === 'shot' && parent?.kind === 'root' });
-} while (h.rootEventCursor < r.events.length)
-    observeRuleEvent(h, r.events[h.rootEventCursor++]); for (const f of h.statisticsFrames.filter(f => !r.frames.some(frame => frame.id === f.frameId))) {
-    const counter = h.counters.find(c => c.playerId === f.actorId);
-    counter.longestChain = Math.max(counter.longestChain, f.count);
-    if (f.biggest)
-        counter.biggestAttack = Math.max(counter.biggestAttack, 1 + h.counters.reduce((n, c) => n + c.cellsAffected, 0) - f.startCells);
-} h.statisticsFrames = h.statisticsFrames.filter(f => r.frames.some(frame => frame.id === f.frameId)); }
+function collect(h) {
+    const r = h.pendingRoot;
+    if (!r)
+        return;
+    h.state = r.state;
+    h.rng = r.rng;
+    for (let i = 0; i < r.frames.length; i++) {
+        const f = r.frames[i];
+        if ((f.kind !== 'wave' && f.kind !== 'interrupt') || h.statisticsFrames.some(s => s.frameId === f.id))
+            continue;
+        const parent = r.frames[i - 1];
+        h.statisticsFrames.push({ frameId: f.id, actorId: f.compatibilityTurnId, count: 0, startCells: h.counters.reduce((n, c) => n + c.cellsAffected, 0), biggest: f.kind === 'wave' && h.rootPurpose === 'shot' && parent?.kind === 'root' });
+    }
+    while (h.rootEventCursor < r.events.length)
+        observeRuleEvent(h, r.events[h.rootEventCursor++]);
+    h.statisticsFrames = h.statisticsFrames.filter(f => r.frames.some(frame => frame.id === f.frameId));
+    // One settled causal root includes all nested waves/interrupts, regardless of
+    // reaction owner. Count processed cells once, never attack announcements.
+    if (r.status === 'complete') {
+        const cells = r.events.reduce((n, e) => n + processedChainCells(e), 0), actor = r.events.find(e => e.statistics?.rootActorId)?.statistics?.rootActorId ?? r.activePlayerId, counter = h.counters.find(c => c.playerId === actor);
+        if (counter) {
+            counter.biggestAttack = Math.max(counter.biggestAttack, cells);
+            counter.longestChain = Math.max(counter.longestChain, cells);
+        }
+    }
+}
 function terminal(h, execution) { h.status = 'complete'; h.turnStep = 'finish'; h.pendingPolicyCells = []; execution?.normalTerminalMessage?.(h); refreshHost(h); }
 function nextTurn(h) { const order = h.state.ring?.order || h.config.players.map(p => p.id), next = order[(order.indexOf(h.activePlayerId) + 1) % order.length]; if (next === h.starterId)
     h.round++; h.activePlayerId = next; h.turnIndex++; h.turnStep = 'enter'; h.guards.turnActions = 0; h.status = 'awaiting-turn'; h.lastProbeSkippedPlague = false; }

@@ -7,7 +7,7 @@ export function monkProximity(ctx, meta, k) {
     if (active && mk !== k && near.includes(mk)) {
         const possible = near.filter(c => !target.shots.includes(c));
         observer.monkCandidates = observer.monkCandidates.length ? observer.monkCandidates.filter(c => possible.includes(c)) : possible;
-        emit(ctx, 'monk-clue', meta, monk.id, observer.monkCandidates.map(parseKey), null, 'positive');
+        emit(ctx, 'monk-clue', { ...meta, origin: parseKey(k) }, monk.id, observer.monkCandidates.map(parseKey), null, 'positive');
         return { kind: 'monk-deflect', meta: reactionMeta(ctx.state, monk, 'monk-deflect', monk.cells[0]) };
     }
     if (mk && mk !== k && observer.monkCandidates.length) {
@@ -15,7 +15,7 @@ export function monkProximity(ctx, meta, k) {
         observer.monkCandidates = before.filter(c => !impossible.includes(c) && !target.shots.includes(c));
         if (before.length > 1 && observer.monkCandidates.length === 1)
             observer.monkCandidates = before;
-        emit(ctx, 'monk-clue', meta, null, observer.monkCandidates.map(parseKey), null, 'negative');
+        emit(ctx, 'monk-clue', { ...meta, origin: parseKey(k) }, null, observer.monkCandidates.map(parseKey), null, 'negative');
     }
     return null;
 }

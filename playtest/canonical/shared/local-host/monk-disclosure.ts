@@ -1,8 +1,9 @@
 import type {HostState} from '../host/contracts.js';
-import {parseKey} from '../combat/access.js';
-/** These are the player's existing public question markers, not the Monk's
- * location or the opponent's private targeting clues. Keep the rule's retained
- * negative-clue quirk intact; presentation does not recompute candidates. */
-export function publicMonkClues(h:HostState){
- return h.state.seats[0]!.monkCandidates.map(parseKey);
+import type {SeenCell} from '../client-contract/public.js';
+import {deduceMonkCandidates} from './monk-deduction.js';
+/** Public deduction is independent of combat/AI compatibility candidates. */
+export function publicMonkClues(h:HostState,seen:readonly SeenCell[]){
+ const [self,target]=h.config.players;
+ const evidence=h.state.match.knowledge[self!.id]!.boards[target!.id]?.clues.find(c=>c.kind==='monk-candidates')?.cells??[];
+ return deduceMonkCandidates(h.config.size,evidence,seen);
 }

@@ -1,3 +1,4 @@
+import {statisticalFacts} from './statistical-facts.js';
 import type {PlayerId,BoardId,UnitId,Cell,Unit} from '../model.js';
 import type {CombatState,ResolutionContext,SourceMetadata,InternalRuleEvent,EventKind} from './contracts.js';
 import {key,parseKey} from '../rules/coordinates.js';
@@ -10,7 +11,7 @@ export function unitAt(state:CombatState,boardId:BoardId,k:string):Unit|null {if
 export function shot(state:CombatState,ownerId:PlayerId,k:string){return seat(state,ownerId).shots.includes(k);}
 export function addUnique<T>(list:T[],v:T){if(!list.includes(v))list.push(v);}
 export function emit(ctx:ResolutionContext,kind:EventKind,meta:SourceMetadata|null=null,unitId:UnitId|null=null,cells:Cell[]=[],amount:number|null=null,reason:string|null=null):InternalRuleEvent {
- const event:InternalRuleEvent={sequence:ctx.events.length+1,rootId:ctx.id,workId:ctx.frames.at(-1)?.id||null,kind,meta,unitId,cells:cells.map(c=>({...c})),amount,reason};ctx.events.push(event);return event;
+ const event:InternalRuleEvent={sequence:ctx.events.length+1,rootId:ctx.id,workId:ctx.frames.at(-1)?.id||null,kind,meta,unitId,cells:cells.map(c=>({...c})),amount,reason};if(['impact','suspect-eliminated','repeat-ignored','unit-destroyed','unit-damaged','hero-killed','resurrection','scouted','attack-started','plague-scheduled','work-started'].includes(kind))event.statistics=statisticalFacts(ctx,event);ctx.events.push(event);return event;
 }
 export function destroyed(state:CombatState,u:Unit):boolean {return u.cells.length>0&&u.cells.every(c=>shot(state,u.ownerId,cellKey(c)));}
 export function syncDamage(state:CombatState,u:Unit){u.damage.cells=u.cells.filter(c=>shot(state,u.ownerId,cellKey(c))).map(c=>({...c}));u.lifecycle=u.hero?(u.hero.currentCell?'present':'destroyed'):destroyed(state,u)?'destroyed':'present';}

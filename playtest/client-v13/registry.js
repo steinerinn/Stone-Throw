@@ -1,5 +1,6 @@
+import {setStoryAccount} from './story-account.js';
 // Registry is an optional account layer. It never supplies match commands or seat credentials.
-const SKIP='chainSiege.registry.guestSkip.v1';let account=null,pending=null,ready=false,bypass=false,streakMessage='';
+const SKIP='chainSiege.registry.guestSkip.v1';let statisticsEnabled=false;let account=null,pending=null,ready=false,bypass=false,streakMessage='';
 const css=document.createElement('link');css.rel='stylesheet';css.href='/styles-registry.css';document.head.append(css);
 const bar=document.createElement('div');bar.id='csAccountBar';bar.className='cs-account-bar';document.querySelector('#stMainMenu .st-menu-frame').append(bar);
 const dialog=document.createElement('dialog');dialog.id='csRegistryDialog';dialog.setAttribute('aria-label','Chain Siege account');document.body.append(dialog);
@@ -7,7 +8,7 @@ const el=(tag,text,attrs={})=>{const n=document.createElement(tag);if(text)n.tex
 const button=(text,fn,id)=>{const b=el('button',text,{type:'button'});if(id)b.id=id;b.onclick=fn;return b;};
 let countries=[];const countryCodes='AD AE AF AG AI AL AM AO AQ AR AS AT AU AW AX AZ BA BB BD BE BF BG BH BI BJ BL BM BN BO BQ BR BS BT BV BW BY BZ CA CC CD CF CG CH CI CK CL CM CN CO CR CU CV CW CX CY CZ DE DJ DK DM DO DZ EC EE EG EH ER ES ET FI FJ FK FM FO FR GA GB GD GE GF GG GH GI GL GM GN GP GQ GR GS GT GU GW GY HK HM HN HR HT HU ID IE IL IM IN IO IQ IR IS IT JE JM JO JP KE KG KH KI KM KN KP KR KW KY KZ LA LB LC LI LK LR LS LT LU LV LY MA MC MD ME MF MG MH MK ML MM MN MO MP MQ MR MS MT MU MV MW MX MY MZ NA NC NE NF NG NI NL NO NP NR NU NZ OM PA PE PF PG PH PK PL PM PN PR PS PT PW PY QA RE RO RS RU RW SA SB SC SD SE SG SH SI SJ SK SL SM SN SO SR SS ST SV SX SY SZ TC TD TF TG TH TJ TK TL TM TN TO TR TT TV TW TZ UA UG UM US UY UZ VA VC VE VG VI VN VU WF WS YE YT ZA ZM ZW'.split(' '),regionNames=new Intl.DisplayNames(['en'],{type:'region'});countries=countryCodes.map(code=>[code,regionNames.of(code)]).sort((a,b)=>a[1].localeCompare(b[1]));
 async function api(action,body={}){const r=await fetch('/api/registry/'+action,{method:'POST',credentials:'same-origin',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)}),value=await r.json();if(!r.ok){if(r.status===401){account=null;streakMessage='';paint();}throw Object.assign(Error(value.error||'Account request failed.'),{status:r.status});}return value;}
-function paint(){bar.replaceChildren();if(account){bar.append(el('span',account.displayName),button('PROFILE',()=>show('profile'),'csProfile'),button('LOGOUT',async()=>{try{await api('logout');account=null;streakMessage='';paint();}catch(e){showError(e.message);}},'csLogout'));if(streakMessage)bar.append(el('span',streakMessage));}else bar.append(button('REGISTER',()=>show('register'),'csRegister'),button('LOGIN',()=>show('login'),'csLogin'));}
+function paint(){void setStoryAccount(account).catch(error=>{document.getElementById('status').textContent=error.message;});bar.replaceChildren();if(account){bar.append(el('span',account.displayName),button('PROFILE',()=>show('profile'),'csProfile'),button('LOGOUT',async()=>{try{await api('logout');account=null;streakMessage='';paint();}catch(e){showError(e.message);}},'csLogout'));if(streakMessage)bar.append(el('span',streakMessage));}else bar.append(button('REGISTER',()=>show('register'),'csRegister'),button('LOGIN',()=>show('login'),'csLogin'));if(statisticsEnabled)bar.append(button('TEST STATISTICS',showStatistics,'csStatistics'));}
 function close(){dialog.close();dialog.replaceChildren();}
 function resume(){const target=pending;pending=null;close();if(target){bypass=true;try{target.click();}finally{bypass=false;}}}
 function showError(text){show('message',text);}
@@ -27,6 +28,11 @@ function show(mode,message){dialog.replaceChildren();const title=el('h2',mode===
  }
  if(!dialog.open)dialog.showModal();}
 function skipped(){try{return localStorage.getItem(SKIP)==='1';}catch{return false;}}
-const loaded=api('me').then(r=>{account=r.account;if(r.newDay&&account)streakMessage=`You have a ${account.currentStreak}-day streak! Your record is ${account.longestStreak} days.`;}).catch(()=>{account=null;}).finally(()=>{ready=true;paint();});paint();
+const loaded=api('me').then(r=>{statisticsEnabled=!!r.statisticsInspector;account=r.account;if(r.newDay&&account)streakMessage=`You have a ${account.currentStreak}-day streak! Your record is ${account.longestStreak} days.`;}).catch(()=>{account=null;}).finally(()=>{ready=true;paint();});paint();
 window.addEventListener('click',e=>{const target=e.target.closest?.('#stMenuFull,#stMenuOnline');if(!target||bypass)return;if(ready&&(account||skipped()))return;e.preventDefault();e.stopImmediatePropagation();pending=target;loaded.then(()=>{if(account||skipped())resume();else show('guest');});},true);
 dialog.addEventListener('cancel',()=>{pending=null;});
+
+async function showStatistics(){
+ dialog.replaceChildren(el('h2','Playtest statistics — read only'));const body=el('div');dialog.append(body,button('REFRESH',refresh),button('CLOSE',close));if(!dialog.open)dialog.showModal();await refresh();
+ async function refresh(){body.replaceChildren(el('p','Loading…'));try{const data=await api('statistics');body.replaceChildren(el('p','Finalized matches only. AI has no career or global Human credit. Scores are not calculated.'),el('h3','Global counters'),el('pre',JSON.stringify(data.global,null,2)));if(!data.modes.length)body.append(el('p','No finalized registered matches yet. Guests contribute global counters only.'));for(const mode of data.modes){const details=el('details'),title=el('summary',mode.mode);details.append(title,el('pre',JSON.stringify(mode,null,2)));body.append(details);}}catch(e){body.replaceChildren(el('p',e.message));}}
+}

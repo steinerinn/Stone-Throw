@@ -19,3 +19,6 @@
 .st-mp-newsflash .st-sales-title{font:900 var(--st-sales-title-size) Georgia,serif;color:var(--st-gold);line-height:1.1;letter-spacing:.035em;text-shadow:0 2px 3px #000}.st-mp-newsflash .st-sales-line{font:700 var(--st-sales-line-size) Georgia,serif;color:var(--st-text);line-height:1.3;margin-top:10px}
 /* Newsflashes are transient free-floating battlefield text, never popup frames. */
 .st-mp-newsflash{background:none;border:0;box-shadow:none;pointer-events:none;animation:st-mp-newsflash-in-out 4s both;top:32%;padding:0}.st-mp-newsflash .st-sales-title{text-shadow:0 3px 2px #000,0 0 14px #000}.st-mp-newsflash .st-sales-line{text-shadow:0 2px 3px #000,0 0 12px #000}@keyframes st-mp-newsflash-in-out{0%{opacity:0;transform:translate(-75%,-15px) scale(.9)}12%,75%{opacity:1;transform:translate(-50%,0) scale(1)}100%{opacity:0;transform:translate(-30%,8px) scale(1.04)}}#stDisconnectDialog .st-mp-dialog{position:relative;padding-top:40px}#stDisconnectDismiss{position:absolute;right:8px;top:8px;margin:0}.st-takeover-helper{font-size:12px;text-align:center;font-style:italic;color:var(--st-muted)}
+
+/* Leave clearance for the existing 11px outer battlefield frame. */
+.st-group-board-name{margin:4px 0 16px;text-align:center;color:#f3d786;font-weight:bold;line-height:1.35;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%;padding-inline:12px;}

@@ -8,6 +8,7 @@ export declare function createLocalAuthority(config: HostConfiguration, checkpoi
         dispatch: (raw: Request, onPlayerFrame?: (frame: PresentationFrame) => Promise<void>) => Promise<Update>;
     }>;
     serializePrivate: () => string;
+    visitStatistics: <T>(visitor: (host: HostState, epoch: number, gaveUp: boolean) => T) => T;
     dispatchWithProgress: (request: Request, notify: (frame: PresentationFrame) => Promise<void>) => Promise<Update>;
     dev?: Readonly<{
         inspect: () => Promise<HostState>;

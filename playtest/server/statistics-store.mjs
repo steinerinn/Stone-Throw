@@ -1,0 +1,38 @@
+import fs from 'node:fs';import path from 'node:path';import {DatabaseSync} from 'node:sqlite';import {randomUUID} from 'node:crypto';
+import {aggregate,summarizeMatch} from './statistics-metrics.mjs';
+export function migrateStatistics(db,directory){
+ const version=Number(db.prepare('PRAGMA user_version').get().user_version);if(version>2)throw Error('Unsupported Registry schema');if(version===2)return null;
+ const backups=path.join(directory,'backups');fs.mkdirSync(backups,{recursive:true,mode:0o700});const file=path.join(backups,'registry-before-v2-'+randomUUID()+'.sqlite');
+ // VACUUM INTO takes a consistent snapshot including committed WAL pages; copying a live .sqlite file does not.
+ db.prepare('VACUUM INTO ?').run(file);const backup=new DatabaseSync(file,{readOnly:true});try{if(backup.prepare('PRAGMA integrity_check').get().integrity_check!=='ok')throw Error('Registry backup integrity failed');if(backup.prepare('SELECT count(*) n FROM accounts').get().n!==db.prepare('SELECT count(*) n FROM accounts').get().n)throw Error('Registry backup count failed');}finally{backup.close();}try{fs.chmodSync(file,0o600);}catch{}
+ db.exec('BEGIN IMMEDIATE');try{db.exec(`
+ CREATE TABLE IF NOT EXISTS stat_matches(id TEXT PRIMARY KEY,mode TEXT NOT NULL,player_count INTEGER NOT NULL,rules_version TEXT NOT NULL,build TEXT NOT NULL,started_at INTEGER NOT NULL,ended_at INTEGER,descriptor TEXT NOT NULL,event_cursor INTEGER NOT NULL DEFAULT 0,command_cursor INTEGER NOT NULL DEFAULT 0,finalized INTEGER NOT NULL DEFAULT 0);
+ CREATE TABLE IF NOT EXISTS stat_facts(match_id TEXT NOT NULL REFERENCES stat_matches(id),kind TEXT NOT NULL,sequence INTEGER NOT NULL,payload TEXT NOT NULL,PRIMARY KEY(match_id,kind,sequence));
+ CREATE TABLE IF NOT EXISTS stat_event_links(match_id TEXT NOT NULL,root_id TEXT NOT NULL,work_id TEXT NOT NULL,event_id TEXT NOT NULL,PRIMARY KEY(match_id,root_id,work_id));
+ CREATE TABLE IF NOT EXISTS stat_participants(match_id TEXT NOT NULL REFERENCES stat_matches(id),actor TEXT NOT NULL,player_id TEXT REFERENCES accounts(id),kind TEXT NOT NULL,seat INTEGER NOT NULL,outcome TEXT,reliability TEXT,placement INTEGER,summary TEXT,match_score REAL,score_formula_version TEXT,PRIMARY KEY(match_id,actor),CHECK((match_score IS NULL AND score_formula_version IS NULL) OR (match_score IS NOT NULL AND score_formula_version IS NOT NULL)));
+ CREATE INDEX IF NOT EXISTS stat_player_matches ON stat_participants(player_id,match_id);
+ CREATE TABLE IF NOT EXISTS stat_career(player_id TEXT NOT NULL REFERENCES accounts(id),mode TEXT NOT NULL,value TEXT NOT NULL,PRIMARY KEY(player_id,mode));
+ CREATE INDEX IF NOT EXISTS stat_career_mode ON stat_career(mode,player_id);
+ CREATE TABLE IF NOT EXISTS stat_global(id INTEGER PRIMARY KEY CHECK(id=1),shots INTEGER NOT NULL DEFAULT 0,cells INTEGER NOT NULL DEFAULT 0,plague INTEGER NOT NULL DEFAULT 0,scouted INTEGER NOT NULL DEFAULT 0);
+ INSERT OR IGNORE INTO stat_global(id) VALUES(1);
+ CREATE TABLE IF NOT EXISTS stat_migrations(version INTEGER PRIMARY KEY,backup TEXT NOT NULL,applied_at INTEGER NOT NULL);
+ PRAGMA user_version=2;`);db.prepare('INSERT OR IGNORE INTO stat_migrations VALUES(2,?,?)').run(file,Date.now());db.exec('COMMIT');}catch(e){db.exec('ROLLBACK');throw e;}return file;
+}
+export function statisticsStore(db){
+ const q=(sql,...a)=>db.prepare(sql).get(...a),all=(sql,...a)=>db.prepare(sql).all(...a),run=(sql,...a)=>db.prepare(sql).run(...a),tx=fn=>{db.exec('BEGIN IMMEDIATE');try{const r=fn();db.exec('COMMIT');return r;}catch(e){db.exec('ROLLBACK');throw e;}};
+ function capture(d,h){if(!d||d.mode==='Story')return;const old=q('SELECT event_cursor,command_cursor,finalized,descriptor FROM stat_matches WHERE id=?',d.id),json=JSON.stringify(d);if(old?.finalized)return;if(old&&old.event_cursor===h.events.length&&old.command_cursor===h.history.length&&old.descriptor===json)return;
+  tx(()=>{run('INSERT OR IGNORE INTO stat_matches(id,mode,player_count,rules_version,build,started_at,descriptor) VALUES(?,?,?,?,?,?,?)',d.id,d.mode,d.participants.length,h.config.rulesVersion,d.build,d.startedAt,json);
+   const insert=db.prepare('INSERT OR IGNORE INTO stat_facts VALUES(?,?,?,?)');for(let i=old?.event_cursor||0;i<h.events.length;i++){const row=h.events[i],e=row.event,s=e.statistics,eventId=d.id+':event:'+i,parent=s?.parentWorkId?q('SELECT event_id FROM stat_event_links WHERE match_id=? AND root_id=? AND work_id=?',d.id,e.rootId,s.parentWorkId)?.event_id:null;const fact={index:i,eventId,chainId:d.id+':'+e.rootId,originAction:s?.actionId||null,originActor:s?.rootActorId||null,parentEventId:parent||null,plagueOutbreakId:s?.plague?.id?d.id+':'+s.plague.id:null,...row};insert.run(d.id,'event',i,JSON.stringify(fact));if(e.kind==='work-started'){for(const work of [e.workId,s?.workId].filter(Boolean))run('INSERT OR IGNORE INTO stat_event_links VALUES(?,?,?,?)',d.id,e.rootId,work,eventId);}}
+   for(let i=old?.command_cursor||0;i<h.history.length;i++)insert.run(d.id,'command',i,JSON.stringify(h.history[i]));
+   run('UPDATE stat_matches SET descriptor=?,event_cursor=?,command_cursor=? WHERE id=?',json,h.events.length,h.history.length,d.id);
+   if(!d.endedAt)return;
+   const facts=all("SELECT payload FROM stat_facts WHERE match_id=? AND kind='event' ORDER BY sequence",d.id).map(r=>JSON.parse(r.payload)),summary=summarizeMatch(d,facts);
+   for(const p of d.participants){const s=summary[p.actor];run('INSERT INTO stat_participants(match_id,actor,player_id,kind,seat,outcome,reliability,placement,summary) VALUES(?,?,?,?,?,?,?,?,?)',d.id,p.actor,p.playerId||null,p.kind,p.seat,s.outcome||null,s.reliability||null,s.placement,JSON.stringify(s));if(p.kind==='ai')continue;
+    run('UPDATE stat_global SET shots=shots+?,cells=cells+?,plague=plague+?,scouted=scouted+? WHERE id=1',s.shots,s.destructiveCells,s.plagueCells,s.scoutFound);
+    if(p.kind==='account'&&p.playerId){for(const mode of [d.mode,'All']){const prev=q('SELECT value FROM stat_career WHERE player_id=? AND mode=?',p.playerId,mode);run('INSERT INTO stat_career VALUES(?,?,?) ON CONFLICT(player_id,mode) DO UPDATE SET value=excluded.value',p.playerId,mode,JSON.stringify(aggregate(prev?JSON.parse(prev.value):null,s,d.id)));}if(s.reliability==='Full')run('UPDATE accounts SET qualifying_games=qualifying_games+1 WHERE id=?',p.playerId);}
+   }
+   run('UPDATE stat_matches SET ended_at=?,finalized=1 WHERE id=?',d.endedAt,d.id);
+  });
+ }
+ return {capture,leaderboard(mode){if(!['Duel','3 Players','4 Players'].includes(mode))throw Error('Unsupported ranking mode');const rows=all("SELECT c.player_id,c.value FROM stat_career c JOIN accounts a ON a.id=c.player_id WHERE c.mode=? AND a.status='active'",mode).map(r=>({playerId:r.player_id,...JSON.parse(r.value)}));const categories={'Siege Champion':['wins',-1],'The Underdog':['losses',-1],'Highest Win Ratio':['winRatio',-1],'Highest Loss Ratio':['lossRatio',-1],'Game Master':['full',-1],'Stormtrooper Award':['accuracy',1]};return Object.fromEntries(Object.entries(categories).map(([name,[key,direction]])=>[name,rows.map(r=>({playerId:r.playerId,value:key==='full'?r.reliability.Full:r[key]})).filter(r=>r.value!==null).sort((a,b)=>direction*(a.value-b.value)||a.playerId.localeCompare(b.playerId))]));},inspect(playerId){const modes=playerId?all('SELECT mode,value FROM stat_career WHERE player_id=?',playerId).map(r=>({mode:r.mode,...JSON.parse(r.value)})):[];return {modes,global:q('SELECT shots AS playerShots,cells AS cellsHit,plague AS plagueCells,scouted AS scoutedCells FROM stat_global WHERE id=1'),scoreStatus:'Uncomputed; formula not supplied'};}};
+}

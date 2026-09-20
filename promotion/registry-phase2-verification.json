@@ -1,0 +1,15 @@
+{
+  "checkpoint": "registry-phase2-v1",
+  "status": "physically-accepted-working-tree-prepared",
+  "parentCommit": "922258094cd44d3c1c5cd189f7c04fbfcb1ddedc",
+  "manifestSha256": "a4c2d46d53d0cd8332a56866351569dfedc4ee256728e580827398effb8ca2a7",
+  "manifestFilesVerified": 554,
+  "payloadFilesIncludingManifest": 555,
+  "exactAcceptedSource": "C:\\Users\\Notandi\\Documents\\Codex\\2026-09-09\\continue-from-the-completed-stone-throw\\outputs\\registry-phase2\\candidate",
+  "privateRuntimeDataCopied": false,
+  "protectedFilesAndPriorRefsUnchanged": true,
+  "verification": "554 manifest-listed files and manifest are byte-identical to accepted candidate. Git metadata permissions prevented staging/commit; no committed-blob verification claimed.",
+  "staged": false,
+  "committed": false,
+  "commitBlocker": "Permission denied creating .git/index.lock despite requested repository and Git-metadata permissions"
+}

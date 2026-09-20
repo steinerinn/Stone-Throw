@@ -1,3 +1,4 @@
+import { statisticalFacts } from './statistical-facts.js';
 import { key, parseKey } from '../rules/coordinates.js';
 export { key, parseKey };
 export const cellKey = (cell) => key(cell.x, cell.y);
@@ -14,6 +15,8 @@ export function addUnique(list, v) { if (!list.includes(v))
     list.push(v); }
 export function emit(ctx, kind, meta = null, unitId = null, cells = [], amount = null, reason = null) {
     const event = { sequence: ctx.events.length + 1, rootId: ctx.id, workId: ctx.frames.at(-1)?.id || null, kind, meta, unitId, cells: cells.map(c => ({ ...c })), amount, reason };
+    if (['impact', 'suspect-eliminated', 'repeat-ignored', 'unit-destroyed', 'unit-damaged', 'hero-killed', 'resurrection', 'scouted', 'attack-started', 'plague-scheduled', 'work-started'].includes(kind))
+        event.statistics = statisticalFacts(ctx, event);
     ctx.events.push(event);
     return event;
 }

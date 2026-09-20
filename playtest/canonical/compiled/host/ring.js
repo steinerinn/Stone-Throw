@@ -1,3 +1,4 @@
+import { mutableRows } from '../archives.js';
 import { seat, destroyed } from '../combat/access.js';
 export function normalTarget(s, owner) {
     const order = s.ring?.order;
@@ -29,6 +30,11 @@ export function commitEliminations(h) {
     const before = [...ring.order], dead = before.filter(id => !survives(s, id));
     if (!dead.length)
         return false;
+    const last = h.events.at(-1);
+    if (last) {
+        h.events = mutableRows(h.events);
+        h.events[h.events.length - 1] = { ...last, event: { ...last.event, statistics: { ...last.event.statistics, eliminationBoundary: { dead: [...dead], survivors: before.length - dead.length } } } };
+    }
     ring.eliminated.push(...dead);
     ring.order = before.filter(id => !dead.includes(id));
     for (const id of dead) {

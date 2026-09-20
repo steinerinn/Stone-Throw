@@ -22,7 +22,7 @@ export interface CombatSeat {
  plagueExcluded:string[];
 }
 export interface HeroQueueEntry {unitId:UnitId;kind:'first'|'second'|'third'}
-export interface Outbreak {origin:Cell|null;round:number;frontier:string[];infected:string[]}
+export interface Outbreak {statisticsId?:string;origin:Cell|null;round:number;frontier:string[];infected:string[]}
 export interface CompatPlague {triggerPlayerId:PlayerId;ownerId:PlayerId;targetPlayerId:PlayerId;targetBoardId:BoardId;moveOnPlayerId:PlayerId;origin:Cell|null;outbreaks:Outbreak[];announced:boolean}
 export interface CombatState {
  ring?:{order:PlayerId[];eliminated:PlayerId[];knowledge:Record<string,{scouted:string[];monkCandidates:string[]}>};match:MatchState;seats:CombatSeat[];heroQueue:HeroQueueEntry[];plagues:CompatPlague[];monkDuelActive:boolean;monkDuelHasHappened:boolean;storyMode:boolean;storyPlagueTargets:PlayerId[]}
@@ -54,7 +54,7 @@ export interface AttackFrame {detachedPlague:CompatPlague|null;compatibilityTurn
 export interface PendingRuleDecision {id:RuleDecisionId;rootId:ResolutionId;workId:WorkId;actorId:PlayerId;boardId:BoardId;unitId:UnitId|null;kind:'hero-relocation'|'resurrection'|'catapult-target'|'catapult-roll'|'scout'|'policy-target';legalCells:Cell[];legalUnitIds:UnitId[];remaining:number;status:'pending'|'answered'|'cancelled';answer:{cell:Cell|null;unitId:UnitId|null}|null}
 export type EventKind='attack-started'|'impact'|'repeat-ignored'|'unit-damaged'|'unit-destroyed'|'ability-spent'|'reaction-generated'|'benefit-scheduled'|'plague-held'|'plague-scheduled'|'plague-contained'|'hero-activated'|'hero-moved'|'hero-killed'|'resurrection'|'resurrection-discovered'|'suspect-eliminated'|'scouted'|'monk-clue'|'monk-duel'|'decision-required'|'decision-answered'|'decision-cancelled'|'work-started'|'work-finished'|'compatibility-truncation'|'outcome'|'resolution-completed';
 /** Internal/private facts only. Public projection is deliberately a later adapter. */
-export interface InternalRuleEvent {sequence:number;rootId:ResolutionId;workId:WorkId|null;kind:EventKind;meta:SourceMetadata|null;unitId:UnitId|null;cells:Cell[];amount:number|null;reason:string|null}
+export interface InternalRuleEvent {statistics?:Record<string,unknown>;sequence:number;rootId:ResolutionId;workId:WorkId|null;kind:EventKind;meta:SourceMetadata|null;unitId:UnitId|null;cells:Cell[];amount:number|null;reason:string|null}
 export interface ResolutionContext {
  contract:'stone-throw-resolution-v1';scope:'accepted-action'|'boundary-comparison';id:ResolutionId;acceptedActionId:string;activePlayerId:PlayerId;
  compatibility:'golden-v1.427';status:'running'|'awaiting-decision'|'complete';
