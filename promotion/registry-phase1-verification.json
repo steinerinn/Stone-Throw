@@ -1,0 +1,18 @@
+{
+  "checkpoint": "registry-phase1-v1",
+  "status": "physically-accepted-prepared-for-manual-commit",
+  "parentCommit": "5c40e7b68e8f96d3a20d95d01250b77507317588",
+  "parentBranch": "group-battle-batch1-v1",
+  "branchBaseMatchesDeclaredParent": true,
+  "manifestSha256": "2e571c1e98ca1d2be95eb9235ebf425a5fb7e9533430e65e91c2761c36b65fdf",
+  "manifestFilesVerified": 512,
+  "payloadFilesIncludingManifest": 513,
+  "exactAcceptedSource": "C:\\Users\\Notandi\\Documents\\Codex\\2026-09-09\\continue-from-the-completed-stone-throw\\outputs\\registry-phase1\\candidate",
+  "privateRuntimeDataCopied": false,
+  "protectedFilesAndRefsUnchanged": true,
+  "verification": "Working-tree payload and manifest byte-identical to accepted candidate. Index/commit unchanged; commit reserved for user.",
+  "staged": false,
+  "committed": false,
+  "published": false,
+  "phase2Started": false
+}

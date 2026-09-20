@@ -5,3 +5,8 @@ server.lock
 .state/
 *.log
 checkpoint.journal
+
+# Private account database is external to builds; never commit local copies.
+*.sqlite
+*.sqlite-wal
+*.sqlite-shm

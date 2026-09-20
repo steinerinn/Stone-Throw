@@ -1,20 +1,21 @@
-# Accepted checkpoint: group-battle-batch1-v1
+# Accepted Registry Phase 1 — registry-phase1-v1
 
-The user accepted physical testing and the final closeout. This working tree is prepared for a manual local commit; no commit or publication was performed by this promotion task.
+Physically accepted by the user, including the multiplayer identity follow-up. Exact payload prepared for manual GitHub Desktop commit on 2026-09-20.
 
-- Branch: group-battle-batch1-v1
-- Payload: playtest/ (503 manifest-listed files plus original manifest)
-- Manifest SHA-256: 5926c47d888185fa2ba774be13568b8ecfd5d1c0c3e12b79fa50939c894ba1d6
-- Exact source: C:/Users/Notandi/Documents/Codex/2026-09-09/continue-from-the-completed-stone-throw/outputs/group-battle-batch1/candidate
-- Branch base: 8f1297f3e13522b6012c12e127d2fbd1d0713f28
-- Payload parent: core-multiplayer-stabilization-v1
-- Closeout, changed files and regression evidence: playtest/BATCH-CLOSE.md
-- Promotion verification: promotion/group-battle-batch1-verification.json
+- Current branch: registry-phase1-v1
+- Correct parent/base: 5c40e7b68e8f96d3a20d95d01250b77507317588 (group-battle-batch1-v1)
+- Branch creation reflog: Created from group-battle-batch1-v1
+- Payload: playtest/ — 512 manifest-listed files plus unchanged build-manifest.json
+- Manifest SHA-256: 2e571c1e98ca1d2be95eb9235ebf425a5fb7e9533430e65e91c2761c36b65fdf
+- Exact accepted source: C:/Users/Notandi/Documents/Codex/2026-09-09/continue-from-the-completed-stone-throw/outputs/registry-phase1/candidate
+- Phase 1 report: playtest/REGISTRY-PHASE1.md
+- Identity follow-up: playtest/REGISTRY-MULTIPLAYER-IDENTITY.md
+- Preparation evidence: promotion/registry-phase1-verification.json
 
-The source payload, including its historical complete-unpromoted label, remains byte-identical. This acceptance record supersedes that status only. No gameplay, networking, presentation or policy changes were made. Earlier accepted branches/checkpoints and golden/audit files remain protected.
+The accepted payload's historical candidate/unaccepted labels are retained byte-for-byte; this user acceptance record supersedes only that status. No gameplay, presentation, account or networking changes were made during preparation. Existing byte-preservation .gitattributes and private-state .gitignore remain unchanged. Previous promotion evidence is retained as historical documentation.
 
-Run playtest/PLAYTEST.cmd or playtest/PLAYTEST-LAN.cmd. Verify with node playtest/tools/verify.mjs. Game Log defaults OFF; bounded capture remains available in Settings. Playtest checkpoint.journal remains disabled; snapshot recovery stays enabled.
+Private Registry database remains at %LOCALAPPDATA%/ChainSiege/Registry/registry.sqlite, outside Git/builds. No database, WAL/SHM, sessions, credentials, saves or runtime-private captures are copied. Game Log defaults OFF; playtest checkpoint.journal remains disabled.
 
-Preserved Plague contract: Hero dies on contact while the outbreak continues; source elimination does not cancel it; target-board elimination clears it; existing five-step/frontier rules remain.
+Run playtest/PLAYTEST-LAN.cmd. Verify with node playtest/tools/verify.mjs. All prior accepted branches/checkpoints, golden prototype and audit remain unchanged. Nothing was staged, committed, pushed or deployed by this preparation.
 
-No push, deployment, branch switch, staging or commit was performed. Player Registry has not begun and requires separate authorization. This accepted checkpoint is the protected starting point for future work after the user's manual commit.
+Phase 2 remains blocked until registry-phase1-v1 is committed, published and verified at its exact accepted commit on origin. Preserve the additional future score requirement: Match ID + immutable Player ID + uncalculated/null matchScore and formula/version identifier, retained raw authoritative facts, no invented formula or public ranking. No Phase 2 implementation is included.

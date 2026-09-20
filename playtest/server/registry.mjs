@@ -1,0 +1,54 @@
+import {DatabaseSync} from 'node:sqlite';
+import {randomBytes,randomInt,randomUUID,createHash,scrypt,timingSafeEqual} from 'node:crypto';
+import {promisify} from 'node:util';
+import fs from 'node:fs';import path from 'node:path';import os from 'node:os';
+const derive=promisify(scrypt),hash=x=>createHash('sha256').update(x).digest('hex');
+export const registryDirectory=()=>path.resolve(process.env.ST_REGISTRY_DIR||path.join(process.env.LOCALAPPDATA||path.join(os.homedir(),'.local','share'),'ChainSiege','Registry'));
+export const countries='AD AE AF AG AI AL AM AO AQ AR AS AT AU AW AX AZ BA BB BD BE BF BG BH BI BJ BL BM BN BO BQ BR BS BT BV BW BY BZ CA CC CD CF CG CH CI CK CL CM CN CO CR CU CV CW CX CY CZ DE DJ DK DM DO DZ EC EE EG EH ER ES ET FI FJ FK FM FO FR GA GB GD GE GF GG GH GI GL GM GN GP GQ GR GS GT GU GW GY HK HM HN HR HT HU ID IE IL IM IN IO IQ IR IS IT JE JM JO JP KE KG KH KI KM KN KP KR KW KY KZ LA LB LC LI LK LR LS LT LU LV LY MA MC MD ME MF MG MH MK ML MM MN MO MP MQ MR MS MT MU MV MW MX MY MZ NA NC NE NF NG NI NL NO NP NR NU NZ OM PA PE PF PG PH PK PL PM PN PR PS PT PW PY QA RE RO RS RU RW SA SB SC SD SE SG SH SI SJ SK SL SM SN SO SR SS ST SV SX SY SZ TC TD TF TG TH TJ TK TL TM TN TO TR TT TV TW TZ UA UG UM US UY UZ VA VC VE VG VI VN VU WF WS YE YT ZA ZM ZW'.split(' ');
+const fail=(message,status=400)=>{throw Object.assign(Error(message),{status});};
+export function nameKey(value){if(typeof value!=='string'||value!==value.trim())fail('Use 3–14 letters or numbers, without surrounding spaces.');const n=value.normalize('NFC');if([...n].length<3||[...n].length>14||!/^\p{L}[\p{L}\p{M}\p{N}]*$|^\p{N}[\p{L}\p{M}\p{N}]*$/u.test(n))fail('Use 3–14 letters or numbers.');return [n,n.toUpperCase().toLowerCase().normalize('NFC')];}
+function password(p){if(typeof p!=='string'||[...p].length<8||p.length>256||!/[\p{Lu}]/u.test(p)||!/[\p{Ll}]/u.test(p)||!/[\p{N}]/u.test(p))fail('Password needs 8+ characters, uppercase, lowercase and a number (maximum 256).');}
+function email(e){if(e===undefined||e==='')return '';if(typeof e!=='string'||e.length>254||!/^\S+@[^\s@]+\.[^\s@]+$/.test(e))fail('Enter a valid optional email.');return e;}
+function country(c){if(!countries.includes(c))fail('Select a country.');return c;}
+const publicAccount=a=>({playerId:a.id,username:a.username,displayName:a.display_name,country:a.country,bio:a.bio,avatarId:a.avatar_id});
+const ownAccount=a=>({...publicAccount(a),email:a.email,emailVerified:!!a.email_verified,createdAt:a.created_at,lastLogin:a.last_login,currentStreak:a.streak,longestStreak:a.longest_streak,lastLoginDay:a.last_day,displayNameChanges:a.name_changes,gamesUntilNameChange:a.name_changes===0?0:Math.max(0,a.next_name_at-a.qualifying_games),countryChanges:a.country_changes,avatarUnlockRule:'Finish Story OR win 5 games',avatarUnlocked:!!a.avatar_unlocked});
+export function openRegistry(directory,{now=Date.now}={}){
+ fs.mkdirSync(directory,{recursive:true,mode:0o700});const file=path.join(directory,'registry.sqlite'),db=new DatabaseSync(file);try{fs.chmodSync(file,0o600);}catch{}
+ db.exec(`PRAGMA busy_timeout=5000; PRAGMA journal_mode=WAL; PRAGMA synchronous=FULL; PRAGMA journal_size_limit=4194304; PRAGMA foreign_keys=ON;
+ CREATE TABLE IF NOT EXISTS accounts(id TEXT PRIMARY KEY,username TEXT NOT NULL,username_key TEXT NOT NULL UNIQUE,display_name TEXT NOT NULL,display_key TEXT NOT NULL UNIQUE,password_hash TEXT NOT NULL,salt TEXT NOT NULL,email TEXT NOT NULL DEFAULT '',email_verified INTEGER NOT NULL DEFAULT 0,country TEXT NOT NULL,bio TEXT NOT NULL DEFAULT '',avatar_id TEXT NOT NULL DEFAULT 'registered-default',avatar_unlocked INTEGER NOT NULL DEFAULT 0,avatar_unlocks TEXT NOT NULL DEFAULT '[]',created_at INTEGER NOT NULL,last_login INTEGER NOT NULL,streak INTEGER NOT NULL DEFAULT 0,longest_streak INTEGER NOT NULL DEFAULT 0,last_day TEXT,name_changes INTEGER NOT NULL DEFAULT 0,next_name_at INTEGER NOT NULL DEFAULT 0,qualifying_games INTEGER NOT NULL DEFAULT 0,country_changes INTEGER NOT NULL DEFAULT 0,status TEXT NOT NULL DEFAULT 'active',moderation_role TEXT NOT NULL DEFAULT 'player');
+ CREATE TABLE IF NOT EXISTS sessions(token_hash TEXT PRIMARY KEY,player_id TEXT NOT NULL REFERENCES accounts(id),expires INTEGER NOT NULL);
+ CREATE TABLE IF NOT EXISTS challenges(id TEXT PRIMARY KEY,browser_hash TEXT NOT NULL,answer_hash TEXT NOT NULL,expires INTEGER NOT NULL);
+ CREATE TABLE IF NOT EXISTS limits(key TEXT PRIMARY KEY,count INTEGER NOT NULL,reset INTEGER NOT NULL);
+ PRAGMA user_version=1;`);
+ const q=(sql,...args)=>db.prepare(sql).get(...args),run=(sql,...args)=>db.prepare(sql).run(...args);
+ const tx=fn=>{db.exec('BEGIN IMMEDIATE');try{const result=fn();db.exec('COMMIT');return result;}catch(e){db.exec('ROLLBACK');throw e;}};
+ function rate(key,max,period){const t=now();run('DELETE FROM limits WHERE reset <= ?',t);const old=q('SELECT * FROM limits WHERE key=?',key);if(old?.count>=max)fail('Too many attempts. Please try again later.',429);run('INSERT INTO limits VALUES(?,?,?) ON CONFLICT(key) DO UPDATE SET count=count+1',key,1,t+period);}
+ function streak(id){const a=q('SELECT * FROM accounts WHERE id=?',id),day=new Date(now()).toISOString().slice(0,10);let changed=false;if(!a.last_day||day>a.last_day){const yesterday=new Date(now()-86400000).toISOString().slice(0,10),count=a.last_day===yesterday?a.streak+1:1;run('UPDATE accounts SET streak=?,longest_streak=?,last_day=?,last_login=? WHERE id=?',count,Math.max(count,a.longest_streak),day,now(),id);changed=true;}return {account:ownAccount(q('SELECT * FROM accounts WHERE id=?',id)),newDay:changed};}
+ function session(token){if(typeof token!=='string'||!/^[a-f0-9]{64}$/.test(token))return null;const a=q('SELECT a.* FROM sessions s JOIN accounts a ON a.id=s.player_id WHERE s.token_hash=? AND s.expires>? AND a.status=?',hash(token),now(),'active');return a||null;}
+ function loginSession(id,previous){if(previous)run('DELETE FROM sessions WHERE token_hash=?',hash(previous));run('DELETE FROM sessions WHERE expires<=?',now());const token=randomBytes(32).toString('hex');run('INSERT INTO sessions VALUES(?,?,?)',hash(token),id,now()+30*86400000);run('UPDATE accounts SET last_login=? WHERE id=?',now(),id);return {token,...streak(id)};}
+ let hashing=0;async function key(p,s){if(hashing>=2)fail('Please try again shortly.',429);hashing++;try{return await derive(p,s,64,{N:32768,r:8,p:3,maxmem:64*1024*1024});}finally{hashing--;}}
+ const multiplayerIdentity=a=>a?{kind:'account',playerId:a.id,displayName:a.display_name,avatarId:a.avatar_id}:null;
+ return {file,close:()=>db.close(),publicAccount,identity:token=>multiplayerIdentity(session(token)),identityById:id=>multiplayerIdentity(q('SELECT * FROM accounts WHERE id=? AND status=?',id,'active')),
+ async handle(action,b,{token,browser,ip}){
+  if(action==='me'){const a=session(token);return a?streak(a.id):{account:null};}
+  if(action==='logout'){if(token)run('DELETE FROM sessions WHERE token_hash=?',hash(token));return {account:null,clearCookie:true};}
+  if(action==='challenge'){rate('challenge:'+ip,100,3600000);run('DELETE FROM challenges WHERE expires<=?',now());const a=randomInt(1,10),c=randomInt(1,10),id=randomBytes(24).toString('hex');run('INSERT INTO challenges VALUES(?,?,?,?)',id,hash(browser),hash(String(a+c)),now()+600000);return {id,question:`What is ${a} + ${c}?`};}
+  if(action==='register'){
+   rate('register:'+ip,20,3600000);const ch=q('SELECT * FROM challenges WHERE id=?',String(b.challengeId||''));run('DELETE FROM challenges WHERE id=?',String(b.challengeId||''));if(b.website||!ch||ch.expires<=now()||ch.browser_hash!==hash(browser)||ch.answer_hash!==hash(String(b.answer||'')))fail('Human check failed. Please try a new question.');
+   const [username,k]=nameKey(b.username);password(b.password);if(b.password!==b.confirmPassword)fail('Passwords do not match.');const em=email(b.email),co=country(b.country),salt=randomBytes(16).toString('hex'),derived=(await key(b.password,salt)).toString('hex');
+   return tx(()=>{if(q('SELECT id FROM accounts WHERE username_key=?',k))fail('Username is already taken.');if(q('SELECT id FROM accounts WHERE display_key=?',k))fail('Display name is already taken.');const id=randomUUID();run('INSERT INTO accounts(id,username,username_key,display_name,display_key,password_hash,salt,email,country,created_at,last_login) VALUES(?,?,?,?,?,?,?,?,?,?,?)',id,username,k,username,k,derived,salt,em,co,now(),now());return loginSession(id,token);});
+  }
+  if(action==='login'){
+   rate('login-ip:'+ip,80,900000);let k;try{k=nameKey(b.username)[1];}catch{fail('Incorrect username or password.',401);}rate('login-name:'+k,20,900000);if(typeof b.password!=='string'||b.password.length>256)fail('Incorrect username or password.',401);const a=q('SELECT * FROM accounts WHERE username_key=?',k),derived=await key(b.password,a?.salt||'00000000000000000000000000000000');if(!a||!timingSafeEqual(derived,Buffer.from(a.password_hash,'hex'))||a.status!=='active')fail('Incorrect username or password.',401);return tx(()=>loginSession(a.id,token));
+  }
+  const a=session(token);if(!a)fail('Please log in again.',401);
+  if(action==='profile')return tx(()=>{const current=q('SELECT * FROM accounts WHERE id=?',a.id);if(Object.keys(b).some(k=>!['displayName','country','confirmCountryChange','bio','email'].includes(k)))fail('Unsupported profile field.');
+   if(b.displayName!==undefined&&b.displayName!==current.display_name){const [n,k]=nameKey(b.displayName);if(current.name_changes>0&&current.qualifying_games<current.next_name_at)fail(`You need to fully play ${current.next_name_at-current.qualifying_games} more games to change your name.`);if(q('SELECT id FROM accounts WHERE display_key=? AND id<>?',k,a.id))fail('Display name is already taken.');run('UPDATE accounts SET display_name=?,display_key=?,name_changes=name_changes+1,next_name_at=qualifying_games+100 WHERE id=?',n,k,a.id);}
+   if(b.country!==undefined&&b.country!==current.country){country(b.country);if(current.country_changes>=1)fail('Nationality can only be changed once.');if(b.confirmCountryChange!==true)fail('Confirm that nationality cannot be changed again.');run('UPDATE accounts SET country=?,country_changes=country_changes+1 WHERE id=?',b.country,a.id);}
+   if(b.bio!==undefined){if(typeof b.bio!=='string'||[...b.bio].length>280||/[<>\u0000-\u0008\u000b\u000c\u000e-\u001f]/.test(b.bio))fail('Bio must be plain text, up to 280 characters.');run('UPDATE accounts SET bio=? WHERE id=?',b.bio,a.id);}
+   if(b.email!==undefined){const em=email(b.email);if(em!==current.email)run('UPDATE accounts SET email=?,email_verified=0 WHERE id=?',em,a.id);}
+   return {account:ownAccount(q('SELECT * FROM accounts WHERE id=?',a.id))};
+  });
+  fail('Not found.',404);
+ }};
+}
