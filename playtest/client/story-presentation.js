@@ -278,32 +278,28 @@ const chapters={
   }
 };
 const preferenceKey='stoneThrow.storyNarration.enabled.v1';
-let current=null,enabled=true;try{enabled=localStorage.getItem(preferenceKey)!=='0';}catch{}
+let current=null,enabled=window.chainSiegeAudio?.get().narrator.on??true;
 const controls=[],storyControls=[];
 function syncControls(){for(const button of controls){button.textContent=(storyControls.includes(button)?'Narration: ':'')+(enabled?'ON':'OFF');button.classList.toggle('on',enabled);button.setAttribute('aria-pressed',String(enabled));}}
-function setEnabled(value){enabled=!!value;try{localStorage.setItem(preferenceKey,enabled?'1':'0');}catch{}if(!enabled)stop(false);syncControls();}
+function setEnabled(value){window.chainSiegeAudio.set('narrator',{on:!!value});}
 function makeControl(id,story){const button=document.createElement('button');button.id=id;button.type='button';button.className=story?'st-toggle st-narration-toggle':'st-toggle';button.setAttribute('aria-label','Narration');button.addEventListener('click',()=>setEnabled(!enabled));controls.push(button);if(story){button.hidden=true;storyControls.push(button);}return button;}
-const settings=document.getElementById('stSettings');if(settings){const row=document.createElement('div');row.className='st-setting-row st-toggle-row';const label=document.createElement('span');label.textContent='Narration';row.append(label,makeControl('stNarrationSetting',false));settings.querySelector('.st-settings-title')?.after(row);}
 document.getElementById('stMenuDialogTitle')?.before(makeControl('stDialogNarration',true));
 document.getElementById('stStoryAftermathCard')?.prepend(makeControl('stTransitionNarration',true));
 syncControls();
-window.addEventListener('storage',event=>{if(event.key===preferenceKey||event.key===null){try{enabled=localStorage.getItem(preferenceKey)!=='0';}catch{}if(!enabled)stop(false);syncControls();}});
+window.chainSiegeAudio.subscribe(()=>{enabled=window.chainSiegeAudio.get().narrator.on;syncControls();});
 const html=scene=>chapters[scene].paragraphs.map(p=>'<p>'+p.replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;')+'</p>').join('');
-function stop(hide=true){document.documentElement.dataset.musicNarrating='false';if(hide)delete document.documentElement.dataset.musicStoryScene;if(hide)for(const button of storyControls)button.hidden=true;const previous=current;current=null;if(previous){previous.onerror=null;previous.pause();previous.removeAttribute('src');previous.load();}}
+function stop(hide=true){document.documentElement.dataset.musicNarrating='false';if(hide)delete document.documentElement.dataset.musicStoryScene;if(hide)for(const button of storyControls)button.hidden=true;const previous=current;current=null;if(previous){window.chainSiegeAudio.releaseNarrator(previous);previous.onerror=null;previous.pause();previous.removeAttribute('src');previous.load();}}
 function play(scene){
- stop();const chapter=chapters[scene];if(!chapter)return;document.documentElement.dataset.musicStoryScene=scene;for(const button of storyControls)button.hidden=false;if(!enabled)return;
+ stop();const chapter=chapters[scene];if(!chapter)return;document.documentElement.dataset.musicStoryScene=scene;for(const button of storyControls)button.hidden=false;
  try{
   const audio=new Audio();current=audio;audio.preload='none';
   for(const event of ['playing','pause','ended','error'])audio.addEventListener(event,()=>{if(current===audio)document.documentElement.dataset.musicNarrating=String(event==='playing');});
-  audio.muted=!!document.getElementById('soundBtn')?.textContent.includes('OFF');
+  window.chainSiegeAudio.narrator(audio);
   audio.onerror=()=>{if(current===audio)console.warn('Story narration unavailable:',chapter.chapter,chapter.wav,audio.error?.code);};
   audio.src=chapter.wav;
   const started=audio.play();started?.catch(error=>{if(current===audio)console.warn('Story narration could not play:',chapter.chapter,chapter.wav,error.name);});
  }catch(error){console.warn('Story narration unavailable:',chapter.chapter,chapter.wav,error.message);}
 }
-// Reuse the existing sound switch; no new setting or authoritative bridge.
-const sound=document.getElementById('soundBtn');
-if(sound)new MutationObserver(()=>{if(current)current.muted=sound.textContent.includes('OFF');}).observe(sound,{childList:true,subtree:true,characterData:true});
 window.addEventListener('pagehide',stop);
 return Object.freeze({chapters,html,play,stop});
 

@@ -1,0 +1,48 @@
+{
+  "status": "unaccepted-unpromoted",
+  "baseCommit": "c901711908036e0ccc7180a65fd2acdd555d8070",
+  "suites": [
+    {
+      "test": "outputs/registry-hof-phase3/hof-check.mjs",
+      "passed": true
+    },
+    {
+      "test": "outputs/registry-hof-phase3/public-qualification-check.mjs",
+      "passed": true
+    },
+    {
+      "test": "outputs/registry-hof-phase3/browser-check.mjs",
+      "passed": true
+    },
+    {
+      "test": "outputs/registry-hof-phase3/live-check.mjs",
+      "passed": true
+    },
+    {
+      "test": "outputs/registry-hof-phase3/routing-check.mjs",
+      "passed": true
+    },
+    {
+      "test": "outputs/post-phase2-batch2/overnight-rematch-check.mjs",
+      "passed": true
+    },
+    {
+      "test": "playtest/tools/music-check.mjs",
+      "passed": true
+    },
+    {
+      "test": "playtest/tools/statistics-reliability-check.mjs",
+      "passed": true
+    }
+  ],
+  "browserWidths": [
+    1440,
+    390
+  ],
+  "hofFixtureAccounts": 22,
+  "realMusicRoutingFlows": 8,
+  "musicControllerChecks": 7,
+  "reliabilityChecks": 8,
+  "physicalListeningPending": true,
+  "realRegistryUntouched": true
+}

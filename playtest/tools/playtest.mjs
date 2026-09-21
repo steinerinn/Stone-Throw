@@ -20,7 +20,7 @@ export function playtestStateDirectory(lan=false){
 }
 export async function startPlaytest({lan=false,stateDir=playtestStateDirectory(lan),open=openBrowser}={}){
  if(lan){process.env.ST_PLAGUE_CAPTURE_DIR=path.join(stateDir,'plague-diagnostics');console.log('Game Log private capture folder (Settings OFF by default): '+process.env.ST_PLAGUE_CAPTURE_DIR+' (bounded; checkpoint journal disabled)');}
- const options={statisticsInspector:true,recoverLocalSession:localRecovery(root,stateDir),playtestSnapshotOnly:true,betaGameLog:lan,development:false,lan,bind:lan?'0.0.0.0':'127.0.0.1',stateDir,publicOrigin:undefined,secureCookies:false};
+ const options={hofPlaytest:true,statisticsInspector:true,recoverLocalSession:localRecovery(root,stateDir),playtestSnapshotOnly:true,betaGameLog:lan,development:false,lan,bind:lan?'0.0.0.0':'127.0.0.1',stateDir,publicOrigin:undefined,secureCookies:false};
  let app;try{app=await startServer({...options,port:3212});}catch(e){if(!['EADDRINUSE','EACCES'].includes(e.code))throw e;console.log('Port 3212 is unavailable ('+e.code+'); selecting an available local port.');app=await startServer({...options,port:0});}
  console.log('Chain Siege private Registry: '+registryDirectory());
  console.log('Chain Siege playtest: '+app.origin+' — keep this window open. Press Ctrl+C to stop.');
