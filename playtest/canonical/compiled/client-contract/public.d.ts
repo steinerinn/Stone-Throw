@@ -98,6 +98,7 @@ export interface PublicStatistics {
     strength: StrengthSample[];
 }
 export interface Snapshot {
+    plagueActive?: boolean;
     heroPresentation?: {
         side: Side;
         cell: Cell;

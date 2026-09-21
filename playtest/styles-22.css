@@ -85,3 +85,6 @@
 @media(max-width:800px){
   .st-sales-blast{padding:5%}
 }
+
+/* Supplied title artwork, unchanged bytes and aspect ratio. */
+.st-chain-siege-banner{display:block;width:100%;height:auto;object-fit:contain;margin:0 auto;}

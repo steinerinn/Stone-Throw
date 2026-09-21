@@ -1,3 +1,4 @@
+import {firstHeroRelocation} from '../canonical/compiled/policy/first-hero-relocation.js';
 import {acceptCommand,pumpHost} from '../canonical/compiled/host/lifecycle.js';
 import {heroRelocation,heroLocalEscape} from '../canonical/compiled/policy/special-decisions.js';
 import {parseKey,cellKey} from '../canonical/compiled/combat/access.js';
@@ -17,7 +18,7 @@ import {neighbors8} from '../canonical/compiled/rules/coordinates.js';
   if(!d){const k=policy.target(h.state.plagues.some(p=>p.targetPlayerId===h.config.players[j].id));if(k)cmd(r,{kind:'shoot',actorId:owner.id,boardId:h.config.players[j].boardId,cell:parseKey(k)});else{h.turnStep='plague';h.status='running';pumpHost(h,100000,execution);}return;}
   let cell=null,unitId=null;
   if(d.kind==='resurrection')unitId=d.legalUnitIds[Math.floor(random(h.rng,'resurrection')*d.legalUnitIds.length)];
-  else if(d.kind==='hero-relocation'){const local=h.state.match.units.find(u=>u.id===d.unitId)?.hero?.hitsTaken===2,k=local?heroLocalEscape(h,owner.id,d.legalCells.map(cellKey)):heroRelocation(h,owner.id);cell=k?parseKey(k):null;}
+  else if(d.kind==='hero-relocation'){const local=h.state.match.units.find(u=>u.id===d.unitId)?.hero?.hitsTaken===2,k=local?heroLocalEscape(h,owner.id,d.legalCells.map(cellKey)):firstHeroRelocation(h,owner.id,d.legalCells.map(cellKey));cell=k?parseKey(k):null;}
   else if(d.kind==='scout'){if(!memory.scoutQueue.length)memory.scoutQueue=policy.scout(d.remaining);const k=memory.scoutQueue.shift();cell=k?parseKey(k):null;}
   else if(d.kind==='catapult-target'){const k=normalCatapultChoice(v,memory);cell=k?parseKey(k):null;}
   else if(d.kind==='catapult-roll'){const k=policy.roll(d.legalCells.map(cellKey),true);cell=k?parseKey(k):null;}

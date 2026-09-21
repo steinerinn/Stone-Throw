@@ -1,3 +1,6 @@
+import {publicPlagueActive} from '../canonical/compiled/local-host/plague-presentation.js';
+import {firstHeroRelocation} from '../canonical/compiled/policy/first-hero-relocation.js';
+import {publicScoutOnlyCells} from '../canonical/compiled/local-host/scout-visuals.js';
 import {beginPlagueCapture,observePlagueCapture,finishPlagueCapture} from './plague-capture.mjs';
 import {archiveEncoder,archiveDecoder} from './archive-wire.mjs';
 import {cloneHost,isArchive} from '../canonical/compiled/archives.js';
@@ -6,6 +9,7 @@ import {DISCONNECT_GRACE_MS,HEARTBEAT_TIMEOUT_MS,presence} from './disconnect-po
 import {metricsContext,metric,measuredAsync} from './beta-metrics.mjs';
 import {Worker} from 'node:worker_threads';
 import {isDeepStrictEqual} from 'node:util';
+import {createGroupNarrative} from './group-narrative.mjs';
 import {groupPresentation} from './group-presentation.mjs';
 import {exportRooms,restoreRooms} from './room-recovery.mjs';
 import {randomBytes,randomInt} from 'node:crypto';
@@ -26,7 +30,7 @@ import {projectSeat} from './projection.mjs';
 import {neighbors8} from '../canonical/compiled/rules/coordinates.js';
 
 export function createRingService(roster,{seed,onFailure,now=Date.now,workers=true,onFrame}={}){
- const rooms=new Map(),tokens=new Map();const presentation=groupPresentation((r,i,after)=>readBase(r,i,after),target,onFrame);const workerPool=new Map(),workerIdle=new WeakMap();const running=new Map(),cached=new Map(),readCache=new WeakMap();
+ const narrative=createGroupNarrative();const rooms=new Map(),tokens=new Map();const presentation=groupPresentation((r,i,after)=>readBase(r,i,after),target,onFrame);const workerPool=new Map(),workerIdle=new WeakMap();const running=new Map(),cached=new Map(),readCache=new WeakMap();
  const execution=r=>{const base=presentation.execution(r);return {...base,observePresentationStep:h=>{captureGroupCredits(r,h);base.observePresentationStep(h);observePlagueCapture(r,h);}};};
  const configuration={size:15,story:false,battle:0,player:{size:15,...roster},enemy:{size:15,...roster}};
  const label=v=>{if(typeof v!=='string'||!v.trim()||v.trim().length>24)throw Error('invalid-name');return v.trim();};
@@ -66,7 +70,7 @@ export function createRingService(roster,{seed,onFailure,now=Date.now,workers=tr
   if(!d){const plagueAware=h.state.plagues.some(p=>p.targetPlayerId===h.config.players[j].id),k=policy.target(plagueAware);if(plagueAware&&metricsContext.getStore()){const rows=r.betaAiPlagueDiagnostics??=[];rows.push({round:h.round,actor:owner.id,target:h.config.players[j].id,...policy.plagueDiagnostic(k)});if(rows.length>64)rows.shift();}if(k)cmd(r,{kind:'shoot',actorId:owner.id,boardId:h.config.players[j].boardId,cell:parseKey(k)});else{h.turnStep='plague';h.status='running';pumpHost(h,100000,execution(r));}return;}
   let cell=null,unitId=null;
   if(d.kind==='resurrection')unitId=d.legalUnitIds[Math.floor(random(h.rng,'resurrection')*d.legalUnitIds.length)];
-  else if(d.kind==='hero-relocation'){const local=h.state.match.units.find(u=>u.id===d.unitId)?.hero?.hitsTaken===2,k=local?heroLocalEscape(h,owner.id,d.legalCells.map(cellKey)):heroRelocation(h,owner.id);cell=k?parseKey(k):null;}
+  else if(d.kind==='hero-relocation'){const local=h.state.match.units.find(u=>u.id===d.unitId)?.hero?.hitsTaken===2,k=local?heroLocalEscape(h,owner.id,d.legalCells.map(cellKey)):firstHeroRelocation(h,owner.id,d.legalCells.map(cellKey));cell=k?parseKey(k):null;}
   else if(d.kind==='scout'){if(!memory.scoutQueue.length)memory.scoutQueue=policy.scout(d.remaining);const k=memory.scoutQueue.shift();cell=k?parseKey(k):null;}
   else if(d.kind==='catapult-target'){const k=normalCatapultChoice(v,memory);cell=k?parseKey(k):null;}
   else if(d.kind==='catapult-roll'){const k=policy.roll(d.legalCells.map(cellKey),true);cell=k?parseKey(k):null;}
@@ -88,10 +92,10 @@ export function createRingService(roster,{seed,onFailure,now=Date.now,workers=tr
   v.state={...v.state,match:{...h.state.match,history:[],knowledge:Object.fromEntries(Object.entries(h.state.match.knowledge).map(([id,k])=>[id,{...k,events:id===p.id?events:[]}]))}};v.events=h.events.filter(e=>!e.event.meta||boards.has(e.event.meta.targetBoardId));
   const memory={...r.memory,resultMessage:null,demonRunes:(r.memory.demonRunes||[]).filter(b=>boards.has(b.boardId))};
   const update=projectSeat(v,memory,r.statistics[i][focus],r.epoch,r.revision,r.handles[i],r.choices[i],0,true);update.snapshot.eventPosition=ownKnowledge.events.length;update.events=update.events.map(e=>({...e,position:visibleEvents[e.position-1].sequence})).filter(e=>e.position>after);update.snapshot.groupRoom='room-'+r.epoch;
-  const s=update.snapshot;s.scoutFootprints=[];
-  // Publish only the coordinates of completed Scout observations on visible boards.
-  for(const [side,index,visible]of [['self',i,visibleSelf],['opponent',focus,visibleTarget]])if(visible){const targetId=h.config.players[index].id,cells=new Set();for(const actor of h.config.players)for(const k of h.state.ring.knowledge[actor.id+':'+targetId]?.scouted||[])cells.add(k);for(const k of cells)s.scoutFootprints.push({side,cell:parseKey(k)});}
-  s.stats.group=groupStatistics(r,i,view,active);for(const [side,seatIndex]of [['player',i],['enemy',focus]]){s.stats[side+'UnitsDestroyed']=s.stats.group.players[seatIndex].units;s.stats[side+'CoreDestroyed']=s.stats.group.players[seatIndex].core;}s.groupLog=ownKnowledge.events.slice(-120).map(e=>({sequence:e.sequence,text:(r.seats[h.config.players.findIndex(p=>p.boardId===e.boardId)]?.name||'Battle')+': '+e.kind+(e.unitType?' '+e.unitType:'')}));s.lossReveal=[];s.battle+=`-focus-${focus}`;if(h.status==='placement')for(const row of Object.values(s.strips.opponent))Object.assign(row,{placed:0,destroyed:0,heroHits:0});
+  const s=update.snapshot;s.plagueActive=publicPlagueActive(h,boards);s.scoutFootprints=[];
+  // Scout observations belong to this observer + target pair, never to the board globally.
+  for(const [side,index,visible]of [['self',i,visibleSelf],['opponent',focus,visibleTarget]])if(visible){const targetId=h.config.players[index].id,cells=new Set(h.state.ring.knowledge[p.id+':'+targetId]?.scouted||[]);for(const k of publicScoutOnlyCells(h,h.config.players[index].boardId,cells))s.scoutFootprints.push({side,cell:parseKey(k)});}
+  s.stats.group=groupStatistics(r,i,view,active);for(const [side,seatIndex]of [['player',i],['enemy',focus]]){s.stats[side+'UnitsDestroyed']=s.stats.group.players[seatIndex].units;s.stats[side+'CoreDestroyed']=s.stats.group.players[seatIndex].core;}s.groupNarrative=narrative(r,i);s.groupLog=[];s.lossReveal=[];s.battle+=`-focus-${focus}`;if(h.status==='placement')for(const row of Object.values(s.strips.opponent))Object.assign(row,{placed:0,destroyed:0,heroHits:0});
   if(!visibleSelf){s.heroPresentation=null;s.plagueCells=[];s.storyPlagueTargets=[];s.demonRunes=[];s.owned=[];s.ownImpacts=[];s.choice=null;s.shotsLeft=0;s.rosters.self={};s.strips.self={};s.phase='finished';s.outcome=h.state.match.outcome.kind==='draw'?'draw':'loss';}
   if(!visibleTarget){s.opponent=[];s.rosters.opponent={};s.strips.opponent={};s.monkClues=[];s.aimAssistCells=[];s.enemyResurrection={active:false,cells:[]};}
   update.lan={group:true,rematchSource:r.rematchSource||null,joined:r.seats.map(s=>!!s.token&&!s.left),hostSeat:r.hostSeat,quickStart:r.quick,recoveryBattle:'room-'+r.epoch,presence:presence(r,now()),news:r.news||[],graceMs:DISCONNECT_GRACE_MS,current:h.activePlayerId?h.config.players.findIndex(p=>p.id===h.activePlayerId):null,rematchCommitted:r.rematchOrder||[],code:r.code,self:i,names:r.seats.map(s=>s.name),ready:[...r.ready],rematch:[...r.rematch],connected:presence(r,now()).map(s=>s.connected),closed:r.closed,waiting:!!h.pendingRoot?.decisions.some(d=>d.status==='pending'&&d.actorId!==p.id),controllers:r.seats.map(s=>s.controller),ring:h.status==='placement'?[]:order(r).map(id=>h.config.players.findIndex(p=>p.id===id)),eliminated:h.state.ring.eliminated.map(id=>h.config.players.findIndex(p=>p.id===id)),target:h.status!=='placement'&&visibleTarget?focus:null,complete:h.status==='complete',ownBoardVisible:visibleSelf,targetBoardVisible:visibleTarget};return update;

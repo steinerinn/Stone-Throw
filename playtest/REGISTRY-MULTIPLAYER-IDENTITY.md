@@ -1,3 +1,17 @@
+# Latest Batch 2 identity binding correction — UNACCEPTED / UNPROMOTED
+
+Root cause: the Online click handler first tries to resume an existing multiplayer seat. If that call returns unknown-seat (e.g. an expired seat credential after an old session/build), its error branch opened the setup panel without calling syncIdentity. The normal branch did call it. Thus a valid authenticated account could appear in the Main Menu while the setup field stayed empty and identityReady stayed false. The server still returned the correct current Display Name from pvp/identity. This was reproduced with real registered-account requests and an invalid old seat credential; fresh account-only entry already worked. The physical client's exact cookie/error was not captured, but this reproduces the reported blank/blocked panel.
+
+Fix: client-v13/lan.js now uses one showSetup helper for normal entry, restored menu and non-REJOIN error entry. It fetches the existing authoritative account/Guest identity before enabling Create/Join. No hard-coded name, client account cache or display-string identity. Server validation/errors remain; rejoin-required and seat-handed-to-ai still follow their original handling. No server/Registry/music code changes.
+
+Verification: desktop 1440 and phone-sized 390, both Duel and 3-seat Group with two Humans/one AI. Registered test account changed Display Name through the existing profile rules, entered Online, re-entered after refresh, reproduced the stale-seat error, saw the correct read-only name, created via the actual button, placed/Ready/started and explicitly left/REJOINed. Same room/seat/playerId and Display Name verified. Guest opponent joined normally. Logout before creating a room retained Guest###, playerId null, stable temporary guest identity and Goblin fallback. All four flows plus Guest test PASS. Isolated test Registry only; no real account/career data touched.
+
+Before/after diagnosis: workspace outputs/post-phase2-batch2/name-repro.mjs and name-stale-repro.mjs. Focused browser test/evidence: name-check.mjs and name-results.json. Only runtime file changed is client-v13/lan.js; accompanying metadata: this report, tools/local-recovery-contract.json (previous compatible manifest c4c3148e2f97bde6211784ac2649ed440ab4f047ae3a90f152412e13c24bf46b), build-manifest.json and root CURRENT-STATE.md/HANDOFF.md. Full music controller, assets, canonical gameplay, statistics, Registry server and REJOIN modules verified unchanged by hashes against the previous manifest. Final normal verification follows metadata update.
+
+Stop for physical retest using current PLAYTEST-LAN.cmd: logged in → Online → Display Name → Create Duel/Group. No commit, push, promotion or deployment; no mixer/settings work.
+
+---
+
 # Registry Phase 1 — multiplayer identity follow-up
 
 Physical Registry Phase 1 testing passed before this follow-up. This candidate now adds server-owned Online identity. It remains unpromoted; no Phase 2 or career collection has started.

@@ -1,0 +1,94 @@
+{
+  "sourceFolder": "C:/Users/Notandi/OneDrive - Tækniskólinn/_Battlesheep/Music",
+  "encoder": "ffmpeg version 7.1-essentials_build-www.gyan.dev Copyright (c) 2000-2024 the FFmpeg developers\r",
+  "tracks": [
+    {
+      "id": "menu",
+      "source": "Exploration.wav",
+      "sourceBytes": 62055332,
+      "sourceSha256": "99d939b476ebf84a989c1f13f5268d4e0ee0ea9558d9685b459d46c695547a5f",
+      "file": "assets/audio/music/exploration.mp3",
+      "mime": "audio/mpeg",
+      "bytes": 5634939,
+      "sha256": "7e59d9c26363a3be3e9376fa94a5375cdb0ce7efb4ca07862daa2808dc140423",
+      "conversion": "FFmpeg libmp3lame VBR quality 2; original sample rate/channels; no gain/filter/normalization"
+    },
+    {
+      "id": "story",
+      "source": "Rising_Moon.mp3",
+      "sourceBytes": 5397782,
+      "sourceSha256": "0e56e864d19ea50cf78851baa2edbeab319fc75527140c7be7ade6ecb4c8f4d2",
+      "file": "assets/audio/music/rising-moon.mp3",
+      "mime": "audio/mpeg",
+      "bytes": 5397782,
+      "sha256": "0e56e864d19ea50cf78851baa2edbeab319fc75527140c7be7ade6ecb4c8f4d2",
+      "conversion": "byte-exact MP3 copy"
+    },
+    {
+      "id": "battle",
+      "source": "Eye of the Storm.wav",
+      "sourceBytes": 31218400,
+      "sourceSha256": "241b43a53573889bc8fc8743cb862edd006f5baa671c447c8970ec5d2fa5c966",
+      "file": "assets/audio/music/eye-of-the-storm.mp3",
+      "mime": "audio/mpeg",
+      "bytes": 2550009,
+      "sha256": "88367882f02a2c9438369e1abae26d6970cd25294a7a4602f24b1b786af1ce2d",
+      "conversion": "FFmpeg libmp3lame VBR quality 2; original sample rate/channels; no gain/filter/normalization"
+    },
+    {
+      "id": "epilogue",
+      "source": "Aftermath.wav",
+      "sourceBytes": 32726464,
+      "sourceSha256": "9bad3b9c07ffc1c72c2d2daa1ed628960a04ba8e30b7f8eb10b39fac97799139",
+      "file": "assets/audio/music/aftermath.mp3",
+      "mime": "audio/mpeg",
+      "bytes": 2869673,
+      "sha256": "a77d18b63336fa814c5076a97dc483926b1dcac0fd1648c131a0463fa8a6043b",
+      "conversion": "FFmpeg libmp3lame VBR quality 2; original sample rate/channels; no gain/filter/normalization"
+    },
+    {
+      "id": "victory",
+      "source": "victory.wav",
+      "sourceBytes": 11444098,
+      "sourceSha256": "91f35879d31091cdeb38721fb4d985a0e7363c0caa97d738ec879bf96e8538f4",
+      "file": "assets/audio/music/victory.mp3",
+      "mime": "audio/mpeg",
+      "bytes": 722575,
+      "sha256": "f617ec17c20e5b9b80c6829b93e5c3648fe6df3e9a335bf925433bc117a9548e",
+      "conversion": "FFmpeg libmp3lame VBR quality 2; original sample rate/channels; no gain/filter/normalization"
+    },
+    {
+      "id": "defeat",
+      "source": "defeat.wav",
+      "sourceBytes": 11934230,
+      "sourceSha256": "832a9062921000cde7044f18838d11682c578067db0c60a124d95473bb122fc8",
+      "file": "assets/audio/music/defeat.mp3",
+      "mime": "audio/mpeg",
+      "bytes": 1091238,
+      "sha256": "ce2e397c8c83d85ed24c109a1efb6247f56d7b6f0b368221cf9de4fd3e0bc768",
+      "conversion": "FFmpeg libmp3lame VBR quality 2; original sample rate/channels; no gain/filter/normalization"
+    },
+    {
+      "id": "plague",
+      "source": "shut_up_ghost-eerie-ambiance-168470.mp3",
+      "sourceBytes": 17301838,
+      "sourceSha256": "44ba5450d11985b361a26db0bee5750a19c8c41024d9e66b6b8ff0902b248fac",
+      "file": "assets/audio/music/plague-eerie.mp3",
+      "mime": "audio/mpeg",
+      "bytes": 17301838,
+      "sha256": "44ba5450d11985b361a26db0bee5750a19c8c41024d9e66b6b8ff0902b248fac",
+      "conversion": "byte-exact MP3 copy"
+    },
+    {
+      "id": "intensity",
+      "source": "alesiadavina-dark-demonic-atmosphere-gloomy-horror-drone-sfx-541955.mp3",
+      "sourceBytes": 2745991,
+      "sourceSha256": "b3f04f42cb3a6b3905127c852005e53566e1ad073f84bc0755d92e33f0d3b1bc",
+      "file": "assets/audio/music/plague-dark.mp3",
+      "mime": "audio/mpeg",
+      "bytes": 2745991,
+      "sha256": "b3f04f42cb3a6b3905127c852005e53566e1ad073f84bc0755d92e33f0d3b1bc",
+      "conversion": "byte-exact MP3 copy"
+    }
+  ]
+}

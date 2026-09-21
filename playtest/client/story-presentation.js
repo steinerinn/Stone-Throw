@@ -289,11 +289,12 @@ document.getElementById('stStoryAftermathCard')?.prepend(makeControl('stTransiti
 syncControls();
 window.addEventListener('storage',event=>{if(event.key===preferenceKey||event.key===null){try{enabled=localStorage.getItem(preferenceKey)!=='0';}catch{}if(!enabled)stop(false);syncControls();}});
 const html=scene=>chapters[scene].paragraphs.map(p=>'<p>'+p.replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;')+'</p>').join('');
-function stop(hide=true){if(hide)for(const button of storyControls)button.hidden=true;const previous=current;current=null;if(previous){previous.onerror=null;previous.pause();previous.removeAttribute('src');previous.load();}}
+function stop(hide=true){document.documentElement.dataset.musicNarrating='false';if(hide)delete document.documentElement.dataset.musicStoryScene;if(hide)for(const button of storyControls)button.hidden=true;const previous=current;current=null;if(previous){previous.onerror=null;previous.pause();previous.removeAttribute('src');previous.load();}}
 function play(scene){
- stop();const chapter=chapters[scene];if(!chapter)return;for(const button of storyControls)button.hidden=false;if(!enabled)return;
+ stop();const chapter=chapters[scene];if(!chapter)return;document.documentElement.dataset.musicStoryScene=scene;for(const button of storyControls)button.hidden=false;if(!enabled)return;
  try{
   const audio=new Audio();current=audio;audio.preload='none';
+  for(const event of ['playing','pause','ended','error'])audio.addEventListener(event,()=>{if(current===audio)document.documentElement.dataset.musicNarrating=String(event==='playing');});
   audio.muted=!!document.getElementById('soundBtn')?.textContent.includes('OFF');
   audio.onerror=()=>{if(current===audio)console.warn('Story narration unavailable:',chapter.chapter,chapter.wav,audio.error?.code);};
   audio.src=chapter.wav;

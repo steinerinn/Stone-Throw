@@ -1,15 +1,10 @@
 import type {HostState} from '../host/contracts.js';
 import {cellKey} from '../combat/access.js';
-/** Legacy markScoutedShot is called by direct/Archer paths only. Generic
- * chains and Plague deliberately retain the ring. This is presentation history,
- * not a new scouting rule or a recomputation of authoritative knowledge. */
-export function publicEnemyScoutVisuals(h:HostState):Set<string>{
- const self=h.config.players[0]!.id,enemy=h.config.players[1]!.id,lastScout=new Map<string,number>();
- for(const k of h.state.seats[0]!.scouted)lastScout.set(k,-1);
- for(const r of h.history)if(r.command.kind==='answer'&&r.command.answer.actorId===self){
-  for(let i=r.eventStart;i<r.eventEnd;i++){const e=h.events[i]?.event;if(e?.kind==='scouted')for(const c of e.cells)lastScout.set(cellKey(c),i);}
- }
- const visible=new Set(lastScout.keys());
- for(let i=0;i<h.events.length;i++){const e=h.events[i]!.event;if(e.kind==='impact'&&e.meta?.targetPlayerId===enemy&&['direct-human','direct-ai','archer'].includes(e.meta.source))for(const c of e.cells){const k=cellKey(c);if(i>(lastScout.get(k)??Infinity))visible.delete(k);}}
+// Scouting alone owns the marker. Any public resolved contact permanently
+// supersedes it, regardless of attack source. Coordinates are board-scoped.
+export function publicScoutOnlyCells(h:HostState,board:string,scouted:Iterable<string>):Set<string>{
+ const visible=new Set(scouted);
+ for(const {event:e} of h.events)if(e.meta?.targetBoardId===board&&['impact','suspect-eliminated','repeat-ignored'].includes(e.kind))for(const c of e.cells)visible.delete(cellKey(c));
  return visible;
 }
+export function publicEnemyScoutVisuals(h:HostState):Set<string>{return publicScoutOnlyCells(h,h.config.players[1]!.boardId,h.state.seats[0]!.scouted);}

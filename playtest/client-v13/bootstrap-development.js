@@ -1,4 +1,4 @@
-import './registry.js';
+import './startup.js';
 import './strength-renderer.js';
 import {resolveReturn} from './rejoin.js';
 import {installLan} from './lan.js';

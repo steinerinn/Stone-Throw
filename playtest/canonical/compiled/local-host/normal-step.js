@@ -1,3 +1,4 @@
+import { firstHeroRelocation } from '../policy/first-hero-relocation.js';
 import { normalExecution } from './demon-entropy.js';
 import { normalCatapultChoice } from './normal-catapult.js';
 import { acceptCommand, pumpHost } from '../host/lifecycle.js';
@@ -72,7 +73,10 @@ export function normalEnemyStep(input, m, observePresentationStep) {
             throw Error('Normal AI cannot answer human decision');
         const policy = normalPolicy(h, m);
         let k = null;
-        if (d.kind === 'scout') {
+        if (d.kind === 'hero-relocation' && h.state.match.units.find(u => u.id === d.unitId)?.hero?.hitsTaken === 1) {
+            k = firstHeroRelocation(h, enemy.id, d.legalCells.map(cellKey));
+        }
+        else if (d.kind === 'scout') {
             if (!m.scoutQueue.length)
                 m.scoutQueue = policy.scout(d.remaining || 0);
             k = m.scoutQueue.shift() || null;
@@ -84,7 +88,7 @@ export function normalEnemyStep(input, m, observePresentationStep) {
             k = policy.roll(d.legalCells.map(cellKey), true);
         else
             return autoStep(h, { ...normalExecution(m), settleRootBeforeTerminal: true, ...(observePresentationStep ? { observePresentationStep } : {}) });
-        return acceptCommand(h, { id: commandId, kind: 'answer', answer: { actorId: enemy.id, decisionId: d.id, cell: k ? parseKey(k) : null, unitId: null } }, { ...normalExecution(m), settleRootBeforeTerminal: true, ...(observePresentationStep ? { observePresentationStep } : {}) });
+        return acceptCommand(h, { id: d.kind === 'hero-relocation' ? 'auto-' + (h.history.length + 1) : commandId, kind: 'answer', answer: { actorId: enemy.id, decisionId: d.id, cell: k ? parseKey(k) : null, unitId: null } }, { ...normalExecution(m), settleRootBeforeTerminal: true, ...(observePresentationStep ? { observePresentationStep } : {}) });
     }
     return h;
 }

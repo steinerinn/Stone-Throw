@@ -2213,6 +2213,16 @@
         "width": 400,
         "height": 400
       }
+    },
+    {
+      "logicalId": "ui/chain-siege-banner",
+      "file": "assets/ui/chain-siege-banner.png",
+      "mime": "image/png",
+      "sha256": "a67720ab7f49b37451302074d268c83361a37cbeed1ccfcccdfea1069d9b03c0",
+      "byteLength": 1939043,
+      "width": 2508,
+      "height": 627,
+      "role": "Supplied main menu title banner, original bytes"
     }
   ],
   "retainedEmbedded": [

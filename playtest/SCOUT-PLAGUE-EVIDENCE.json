@@ -1,0 +1,314 @@
+{
+  "status": "UNACCEPTED / UNPROMOTED",
+  "priorManifest": "2ce908695eee35a0a3fbe4aef902c874f083d8b8549c9d9f292848bde81d5a7a",
+  "scout": {
+    "passed": true,
+    "realScoutChoices": 5,
+    "observer": 3,
+    "target": 0,
+    "newObserver": 2,
+    "realEliminationTargetSwitch": true,
+    "legitimateKnowledgeRetained": true,
+    "noForeignFootprintOrScoutVisual": true,
+    "projectionDoesNotMutateHostOrRng": true
+  },
+  "lifetime": {
+    "passed": true,
+    "rows": [
+      {
+        "step": 1,
+        "active": true,
+        "historicalContacts": 1
+      },
+      {
+        "step": 2,
+        "active": true,
+        "historicalContacts": 2
+      },
+      {
+        "step": 3,
+        "active": true,
+        "historicalContacts": 4
+      },
+      {
+        "step": 4,
+        "active": true,
+        "historicalContacts": 6
+      },
+      {
+        "step": 5,
+        "active": false,
+        "historicalContacts": 10
+      }
+    ],
+    "historyDoesNotKeepAmbienceAlive": true,
+    "visibleBoardOnly": true,
+    "blockedFrontier": false,
+    "multipleOutbreaks": true,
+    "detachedActiveFrame": true,
+    "terminalSilent": true,
+    "existingGainsAndFade": true
+  },
+  "browser": {
+    "passed": true,
+    "results": [
+      {
+        "width": 1440,
+        "discovererDomVisible": true,
+        "otherObserverTargetSwitchNoScoutDom": true,
+        "historicalPlagueCellsRemainWithoutAmbience": true,
+        "bothLayersStop": true,
+        "battleMusicContinues": true
+      },
+      {
+        "width": 390,
+        "discovererDomVisible": true,
+        "otherObserverTargetSwitchNoScoutDom": true,
+        "historicalPlagueCellsRemainWithoutAmbience": true,
+        "bothLayersStop": true,
+        "battleMusicContinues": true
+      }
+    ]
+  },
+  "plagueRegression": {
+    "passed": true,
+    "cases": 22,
+    "results": [
+      {
+        "type": "inf",
+        "counts": [
+          1,
+          1,
+          2,
+          2,
+          4
+        ],
+        "resumeParity": true
+      },
+      {
+        "type": "cav",
+        "counts": [
+          1,
+          1,
+          2,
+          2,
+          4
+        ],
+        "resumeParity": true
+      },
+      {
+        "type": "castle",
+        "counts": [
+          1,
+          1,
+          2,
+          2,
+          4
+        ],
+        "resumeParity": true
+      },
+      {
+        "type": "archer",
+        "counts": [
+          1,
+          1,
+          2,
+          2,
+          4
+        ],
+        "resumeParity": true
+      },
+      {
+        "type": "monk",
+        "counts": [
+          1,
+          1,
+          2,
+          2,
+          4
+        ],
+        "resumeParity": true
+      },
+      {
+        "type": "dwarf",
+        "counts": [
+          1,
+          1,
+          2,
+          2,
+          4
+        ],
+        "resumeParity": true
+      },
+      {
+        "type": "elf",
+        "counts": [
+          1,
+          1,
+          2,
+          2,
+          4
+        ],
+        "resumeParity": true
+      },
+      {
+        "type": "catapult",
+        "counts": [
+          1,
+          1,
+          2,
+          2,
+          4
+        ],
+        "resumeParity": true
+      },
+      {
+        "type": "wizard",
+        "counts": [
+          1,
+          1,
+          2,
+          2,
+          4
+        ],
+        "resumeParity": true
+      },
+      {
+        "type": "goblin",
+        "counts": [
+          1,
+          1,
+          2,
+          2,
+          4
+        ],
+        "resumeParity": true
+      },
+      {
+        "type": "cleric",
+        "counts": [
+          1,
+          1,
+          2,
+          2,
+          4
+        ],
+        "resumeParity": true
+      },
+      {
+        "type": "necro",
+        "counts": [
+          1,
+          1,
+          2,
+          2,
+          4
+        ],
+        "resumeParity": true
+      },
+      {
+        "type": "dragon",
+        "counts": [
+          1,
+          1,
+          2,
+          2,
+          4
+        ],
+        "resumeParity": true
+      },
+      {
+        "type": "demon",
+        "counts": [
+          1,
+          1,
+          2,
+          2,
+          4
+        ],
+        "resumeParity": true
+      },
+      {
+        "type": "hero",
+        "counts": [
+          1,
+          1,
+          2,
+          2,
+          4
+        ],
+        "resumeParity": true
+      },
+      {
+        "type": "hero",
+        "seats": 2,
+        "target": 0,
+        "counts": [
+          1,
+          1,
+          2,
+          2,
+          4
+        ]
+      },
+      {
+        "type": "hero",
+        "seats": 2,
+        "target": 1,
+        "counts": [
+          1,
+          1,
+          2,
+          2,
+          4
+        ]
+      },
+      {
+        "type": "hero",
+        "seats": 4,
+        "target": 0,
+        "counts": [
+          1,
+          1,
+          2,
+          2,
+          4
+        ]
+      },
+      {
+        "type": "hero",
+        "seats": 4,
+        "target": 1,
+        "counts": [
+          1,
+          1,
+          2,
+          2,
+          4
+        ]
+      },
+      {
+        "type": "genuinely-blocked",
+        "contained": true
+      },
+      {
+        "type": "source-eliminated-host-recovery",
+        "rounds": [
+          1,
+          2,
+          3,
+          4,
+          5
+        ]
+      },
+      {
+        "type": "infected-board-eliminated",
+        "contained": true
+      }
+    ]
+  },
+  "existingMusicChecks": 7,
+  "batch2RulesChecks": 23,
+  "typescript": "PASS",
+  "combatRngAssets": "unchanged"
+}

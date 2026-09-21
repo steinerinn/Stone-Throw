@@ -1,6 +1,6 @@
 import {processedChainCells} from '../canonical/compiled/combat/chain-statistics.js';
 // Private, pure accounting. Inputs are authoritative facts, never browser totals.
-export const METRICS=['shots','hits','misses','unitsKilled','coreKills','heroHits','heroReceived','plagueCells','scoutInspected','scoutFound','destructiveCells','castleCatapultHits','elvesKilled','dragonsActivated','perfectVolleys','monkDeflections','resurrections','dwarfHits','wizardHits','wizardAttackHits','goblinBombs','demonKills','oneHitWonder','survivor'];
+export const METRICS=['shots','hits','misses','unitsKilled','coreKills','heroHits','heroReceived','plagueCells','scoutInspected','scoutFound','destructiveCells','unitCellsHit','castleCatapultHits','elvesKilled','dragonsActivated','perfectVolleys','monkDeflections','resurrections','dwarfHits','wizardHits','wizardAttackHits','goblinBombs','demonKills','oneHitWonder','survivor'];
 export function emptyMetrics(){return {...Object.fromEntries(METRICS.map(k=>[k,0])),bestHitStreak:0,bestMissStreak:0,biggestChain:0};}
 export function summarizeMatch(descriptor,facts){
  const result=Object.fromEntries(descriptor.participants.map(p=>[p.actor,{...emptyMetrics(),actor:p.actor,playerId:p.playerId,kind:p.kind,awards:[]} ])),streak={},last={},dead=new Set(),chains={},volleys={},roots={};
@@ -13,11 +13,11 @@ export function summarizeMatch(descriptor,facts){
   }
   if(e.kind==='impact'){
    if(e.unitId)last[e.unitId]={owner,index:f.index,root:chain,type,source:m?.source};
-   if(credit){if(m.source==='plague')credit.plagueCells+=e.cells.length;else credit.destructiveCells+=e.cells.length;
+   if(credit){if(m.source==='plague')credit.plagueCells+=e.cells.length;else {credit.destructiveCells+=e.cells.length;if(e.unitId)credit.unitCellsHit+=e.cells.length;}
 
     if(type==='hero')credit.heroHits++;if(type==='dwarf')credit.dwarfHits++;if(type==='castle'&&m.source==='catapult-shot')credit.castleCatapultHits++;if(type==='wizard')credit.wizardHits++;if(m.source==='wizard'&&e.unitId)credit.wizardAttackHits++;
    }
-   if(type==='hero'&&result[s.unitOwner])result[s.unitOwner].heroReceived++;
+   if(type==='hero'){const recipient=human(s.unitOwner,f.index);if(recipient)recipient.heroReceived++;}
    if(m.source==='archer'){const v=volleys[key]??={actor:owner,index:f.index,shots:0,hits:0};v.shots+=e.cells.length;if(e.unitId)v.hits+=e.cells.length;}
   }
   if(e.kind==='attack-started'){if(e.reason==='goblin'&&credit)credit.goblinBombs+=s.plannedCells?.length||0;if(e.reason==='dragon'&&credit)credit.dragonsActivated++;if(e.reason==='monk-deflect'&&credit)credit.monkDeflections++;}
@@ -40,7 +40,7 @@ export function reliabilityAccounting(previous,classification,matchId){
  else if(classification==='Full'){r.cleanStreak=Math.min(10,r.cleanStreak+1);if(r.cleanStreak===10){if(r.AFK>r.forgiven){r.forgiven++;r.forgiveness.push({matchId,count:1});}r.cleanStreak=0;}}
  const total=r.Full+r.Quit+r.Disconnect+r.Kick+r.AFK;r.effectiveFull=r.Full+r.forgiven;r.activeAFK=r.AFK-r.forgiven;r.total=total;r.consistency=total?r.effectiveFull/total:null;return r;
 }
-export function aggregate(previous,summary,matchId){const a=structuredClone(previous||{...emptyMetrics(),games:0,wins:0,losses:0,draws:0,awards:{}});a.games++;for(const k of METRICS)a[k]+=summary[k]||0;for(const k of ['bestHitStreak','bestMissStreak','biggestChain'])a[k]=Math.max(a[k],summary[k]||0);a[({Win:'wins',Loss:'losses',Draw:'draws'})[summary.outcome]]++;for(const award of summary.awards)a.awards[award]=(a.awards[award]||0)+1;a.reliability=reliabilityAccounting(a.reliability,summary.reliability,matchId);a.accuracy=a.shots?a.hits/a.shots:null;a.winRatio=a.wins/a.games;a.lossRatio=a.losses/a.games;a.cellBlaster={numerator:a.destructiveCells,denominator:a.games};return a;}
+export function aggregate(previous,summary,matchId){const a=structuredClone(previous||{...emptyMetrics(),games:0,wins:0,losses:0,draws:0,awards:{}});a.games++;for(const k of METRICS)a[k]=(a[k]||0)+(summary[k]||0);for(const k of ['bestHitStreak','bestMissStreak','biggestChain'])a[k]=Math.max(a[k],summary[k]||0);a[({Win:'wins',Loss:'losses',Draw:'draws'})[summary.outcome]]++;for(const award of summary.awards)a.awards[award]=(a.awards[award]||0)+1;a.reliability=reliabilityAccounting(a.reliability,summary.reliability,matchId);a.accuracy=a.shots?a.hits/a.shots:null;a.winRatio=a.wins/a.games;a.lossRatio=a.losses/a.games;a.cellBlaster={numerator:a.destructiveCells,denominator:a.games};return a;}
 // Future public Hall of Fame policy only. Inactive during Registry/statistics development.
 export const FUTURE_HALL_OF_FAME_FULL_GAMES=10;
 export const futureHallOfFameEligible=aggregate=>!!aggregate&&aggregate.reliability.Full>=FUTURE_HALL_OF_FAME_FULL_GAMES;

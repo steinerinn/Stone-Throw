@@ -1,0 +1,52 @@
+[
+  {
+    "file": "outputs/post-phase2-batch2/overnight-rematch-check.mjs",
+    "passed": true,
+    "stdout": "{ rematchApplyDisabled: false }\nPASS rematch configure once -> Random/Ready/start; original statistics unchanged; no reload\n"
+  },
+  {
+    "file": "outputs/post-phase2-batch2/overnight-account-check.mjs",
+    "passed": true,
+    "stdout": "{\n  passed: true,\n  dir: 'C:\\\\Users\\\\Notandi\\\\Documents\\\\Codex\\\\2026-09-09\\\\continue-from-the-completed-stone-throw\\\\outputs\\\\post-phase2-batch2\\\\overnight-private-HQo3aG',\n  evidence: [\n    {\n      seats: 2,\n      finalized: true,\n      liveExcluded: true,\n      sharedGlobal: true,\n      sameDocumentRematch: true,\n      rematchStartedAndFinalizedOnce: true,\n      joinedHumanProtected: false\n    },\n    {\n      seats: 3,\n      finalized: true,\n      liveExcluded: true,\n      sharedGlobal: true,\n      sameDocumentRematch: true,\n      rematchStartedAndFinalizedOnce: true,\n      joinedHumanProtected: true\n    },\n    {\n      seats: 4,\n      finalized: true,\n      liveExcluded: true,\n      sharedGlobal: true,\n      sameDocumentRematch: false,\n      rematchStartedAndFinalizedOnce: false,\n      joinedHumanProtected: false\n    }\n  ],\n  crossDeviceSameAccount: true,\n  storyWinExcluded: true,\n  liveRejoinPreservesStateAndAccounting: true,\n  logoutAndSwitch: true,\n  additiveMaxAwardsRatios: true,\n  guestGlobalOnly: true,\n  noDuplicateFinalization: true\n}\n"
+  },
+  {
+    "file": "outputs/post-phase2-batch2/overnight-metrics-check.mjs",
+    "passed": true,
+    "stdout": "{\"passed\":true,\"checks\":12,\"dir\":\"C:\\\\Users\\\\Notandi\\\\Documents\\\\Codex\\\\2026-09-09\\\\continue-from-the-completed-stone-throw\\\\statistics-check-6OhRmI\",\"migrationPopulated\":true,\"backup\":true,\"idempotentRestarts\":3,\"liveDuelGroup\":true}\n"
+  },
+  {
+    "file": "outputs/post-phase2-batch2/overnight-cutoff-check.mjs",
+    "passed": true,
+    "stdout": "{\"heroReceived\":1,\"expected\":1,\"heroHits\":2}\n"
+  },
+  {
+    "file": "outputs/post-phase2-batch2/overnight-statistics-browser-check.mjs",
+    "passed": true,
+    "stdout": "{\"passed\":true,\"checks\":6,\"dir\":\"C:\\\\Users\\\\Notandi\\\\Documents\\\\Codex\\\\2026-09-09\\\\continue-from-the-completed-stone-throw\\\\statistics-browser-w7ztlB\",\"singleAndDuel\":true,\"desktopPhone\":true,\"restartIdempotent\":true,\"noIdleFacts\":true,\"productionInspectorDenied\":true}\n"
+  },
+  {
+    "file": "outputs/post-phase2-batch2/overnight-statistics-parity-check.mjs",
+    "passed": true,
+    "stdout": "{\"passed\":true,\"cases\":47,\"allUnitTypes\":true,\"exactCombatAndRngParity\":true,\"pendingDecisionResume\":true,\"realScout\":true,\"twoCellResurrectionOneUnit\":true}\n"
+  },
+  {
+    "file": "C:/Users/Notandi/Documents/GitHub/Stone-Throw/playtest/tools/statistics-reliability-check.mjs",
+    "passed": true,
+    "stdout": "{\"passed\":true,\"checks\":8,\"disconnectRejoinFull\":true,\"waitNegative\":true,\"autoDisconnect\":true,\"manualKick\":true,\"surrenderQuit\":true,\"takeoverExcludesAI\":true,\"recoveryMatchIdentity\":true}\n"
+  },
+  {
+    "file": "C:/Users/Notandi/Documents/GitHub/Stone-Throw/playtest/tools/statistics-seat-check.mjs",
+    "passed": true,
+    "stdout": "{\"passed\":true,\"checks\":4,\"immutableAccountSeatRejection\":true,\"guestSeatsAllowed\":true,\"originalSeatPreserved\":true}\n"
+  },
+  {
+    "file": "C:/Users/Notandi/Documents/GitHub/Stone-Throw/playtest/tools/registry-rematch-check.mjs",
+    "passed": true,
+    "stdout": "{\"passed\":true,\"rematchFreshName\":true,\"playerIdAndGuestPreserved\":true,\"publicResponseShapePreserved\":true}\n"
+  },
+  {
+    "file": "C:/Users/Notandi/Documents/GitHub/Stone-Throw/playtest/tools/music-check.mjs",
+    "passed": true,
+    "stdout": "{\"passed\":true,\"checks\":7,\"autoplayRetry\":true,\"oneInstancePerTrack\":true,\"menuContinuity\":true,\"drawSilent\":true,\"ducking\":true,\"publicOnly\":true}\n"
+  }
+]

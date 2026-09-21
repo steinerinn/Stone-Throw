@@ -1,0 +1,282 @@
+{
+  "status": "unaccepted-unpromoted",
+  "startup": {
+    "passed": true,
+    "results": [
+      {
+        "width": 1440,
+        "group": false,
+        "registeredWelcome": true,
+        "guestWelcome": true,
+        "keyboard": true,
+        "touch": false,
+        "createJoinSameDocument": true,
+        "rejoinSameIdentity": true,
+        "resultReturnSameDocument": true,
+        "groupThirdDisconnectReturn": false,
+        "coldRefreshGate": true
+      },
+      {
+        "width": 1440,
+        "group": true,
+        "registeredWelcome": true,
+        "guestWelcome": true,
+        "keyboard": true,
+        "touch": false,
+        "createJoinSameDocument": true,
+        "rejoinSameIdentity": true,
+        "resultReturnSameDocument": false,
+        "groupThirdDisconnectReturn": true,
+        "coldRefreshGate": true
+      },
+      {
+        "width": 390,
+        "group": false,
+        "registeredWelcome": true,
+        "guestWelcome": true,
+        "keyboard": false,
+        "touch": true,
+        "createJoinSameDocument": true,
+        "rejoinSameIdentity": true,
+        "resultReturnSameDocument": true,
+        "groupThirdDisconnectReturn": false,
+        "coldRefreshGate": true
+      },
+      {
+        "width": 390,
+        "group": true,
+        "registeredWelcome": true,
+        "guestWelcome": true,
+        "keyboard": false,
+        "touch": true,
+        "createJoinSameDocument": true,
+        "rejoinSameIdentity": true,
+        "resultReturnSameDocument": false,
+        "groupThirdDisconnectReturn": true,
+        "coldRefreshGate": true
+      },
+      {
+        "mode": "single",
+        "internalReturnNoGate": true
+      },
+      {
+        "mode": "story",
+        "internalReturnNoGate": true
+      }
+    ]
+  },
+  "routing": [
+    {
+      "width": 1440,
+      "mode": "single",
+      "firstMenuInteraction": true,
+      "deploymentBattle": true,
+      "noMenuBlip": true,
+      "continuous": true,
+      "soundNoDuplicates": true,
+      "before": {
+        "index": 1,
+        "time": 1.613787,
+        "battlePlays": 1,
+        "menuPlays": 1
+      },
+      "after": {
+        "index": 1,
+        "time": 2.493243,
+        "battlePlays": 1,
+        "menuPlays": 1
+      }
+    },
+    {
+      "width": 1440,
+      "mode": "story",
+      "firstMenuInteraction": true,
+      "deploymentBattle": true,
+      "noMenuBlip": true,
+      "continuous": true,
+      "soundNoDuplicates": true,
+      "before": {
+        "index": 3,
+        "time": 1.388233,
+        "battlePlays": 1,
+        "menuPlays": 1
+      },
+      "after": {
+        "index": 3,
+        "time": 1.919518,
+        "battlePlays": 1,
+        "menuPlays": 1
+      }
+    },
+    {
+      "width": 1440,
+      "mode": "duel",
+      "firstMenuInteraction": true,
+      "deploymentBattle": true,
+      "noMenuBlip": true,
+      "continuous": true,
+      "soundNoDuplicates": true,
+      "before": {
+        "index": 1,
+        "time": 2.472908,
+        "battlePlays": 1,
+        "menuPlays": 1
+      },
+      "after": {
+        "index": 1,
+        "time": 3.489586,
+        "battlePlays": 1,
+        "menuPlays": 1
+      }
+    },
+    {
+      "width": 1440,
+      "mode": "group",
+      "firstMenuInteraction": true,
+      "deploymentBattle": true,
+      "noMenuBlip": true,
+      "continuous": true,
+      "soundNoDuplicates": true,
+      "before": {
+        "index": 1,
+        "time": 3.63102,
+        "battlePlays": 1,
+        "menuPlays": 1
+      },
+      "after": {
+        "index": 1,
+        "time": 5.122902,
+        "battlePlays": 1,
+        "menuPlays": 1
+      }
+    },
+    {
+      "width": 390,
+      "mode": "single",
+      "firstMenuInteraction": true,
+      "deploymentBattle": true,
+      "noMenuBlip": true,
+      "continuous": true,
+      "soundNoDuplicates": true,
+      "before": {
+        "index": 1,
+        "time": 1.369977,
+        "battlePlays": 1,
+        "menuPlays": 1
+      },
+      "after": {
+        "index": 1,
+        "time": 1.930159,
+        "battlePlays": 1,
+        "menuPlays": 1
+      }
+    },
+    {
+      "width": 390,
+      "mode": "story",
+      "firstMenuInteraction": true,
+      "deploymentBattle": true,
+      "noMenuBlip": true,
+      "continuous": true,
+      "soundNoDuplicates": true,
+      "before": {
+        "index": 3,
+        "time": 1.401905,
+        "battlePlays": 1,
+        "menuPlays": 1
+      },
+      "after": {
+        "index": 3,
+        "time": 2.130431,
+        "battlePlays": 1,
+        "menuPlays": 1
+      }
+    },
+    {
+      "width": 390,
+      "mode": "duel",
+      "firstMenuInteraction": true,
+      "deploymentBattle": true,
+      "noMenuBlip": true,
+      "continuous": true,
+      "soundNoDuplicates": true,
+      "before": {
+        "index": 1,
+        "time": 2.452608,
+        "battlePlays": 1,
+        "menuPlays": 1
+      },
+      "after": {
+        "index": 1,
+        "time": 3.093954,
+        "battlePlays": 1,
+        "menuPlays": 1
+      }
+    },
+    {
+      "width": 390,
+      "mode": "group",
+      "firstMenuInteraction": true,
+      "deploymentBattle": true,
+      "noMenuBlip": true,
+      "continuous": true,
+      "soundNoDuplicates": true,
+      "before": {
+        "index": 1,
+        "time": 3.720998,
+        "battlePlays": 1,
+        "menuPlays": 1
+      },
+      "after": {
+        "index": 1,
+        "time": 5.661087,
+        "battlePlays": 1,
+        "menuPlays": 1
+      }
+    }
+  ],
+  "identity": {
+    "results": [
+      {
+        "width": 1440,
+        "seats": 2,
+        "staleSeatReproduced": true,
+        "currentDisplayName": true,
+        "readonly": true,
+        "createReadyStart": true,
+        "rejoinSamePlayerId": true
+      },
+      {
+        "width": 1440,
+        "seats": 3,
+        "staleSeatReproduced": true,
+        "currentDisplayName": true,
+        "readonly": true,
+        "createReadyStart": true,
+        "rejoinSamePlayerId": true
+      },
+      {
+        "width": 390,
+        "seats": 2,
+        "staleSeatReproduced": true,
+        "currentDisplayName": true,
+        "readonly": true,
+        "createReadyStart": true,
+        "rejoinSamePlayerId": true
+      },
+      {
+        "width": 390,
+        "seats": 3,
+        "staleSeatReproduced": true,
+        "currentDisplayName": true,
+        "readonly": true,
+        "createReadyStart": true,
+        "rejoinSamePlayerId": true
+      }
+    ],
+    "logoutGuest": true
+  },
+  "controllerChecks": 7,
+  "protectedCanonicalAssetsAndServerLogic": "unchanged from immediately preceding 579-file candidate",
+  "priorManifest": "9ab9eda7be7f6c819a9e5d136fe0992c718a3e40300ff2280397c1fda4d0b7ef"
+}
