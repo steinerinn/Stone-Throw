@@ -1,0 +1,84 @@
+{
+  "status": "accepted",
+  "registry": {
+    "passed": true,
+    "assets": 63,
+    "atomicRegistration": true,
+    "forgedDenied": 12,
+    "unlimitedChanges": 15,
+    "fiveFinalizedWinsAcrossModes": true,
+    "fourWinsLocked": true,
+    "storyCompletion": true,
+    "guestAiUnfinishedDuplicateExcluded": true,
+    "multiSessionRestart": true,
+    "fallback": true,
+    "specialA": true
+  },
+  "browser": {
+    "passed": true,
+    "results": [
+      {
+        "width": 1440,
+        "registration": true,
+        "profileImmediateSave": true,
+        "refresh": true,
+        "accountSwitch": true,
+        "fiveColumns": true,
+        "lockedAndUnlocked": true
+      },
+      {
+        "width": 390,
+        "registration": true,
+        "profileImmediateSave": true,
+        "refresh": true,
+        "accountSwitch": true,
+        "fiveColumns": true,
+        "lockedAndUnlocked": true
+      }
+    ],
+    "guestRejoinRestart": true,
+    "guestAccountSeparation": true,
+    "journalDisabled": true
+  },
+  "regressions": [
+    {
+      "suite": "outputs/registry-hof-phase3/hof-check.mjs",
+      "passed": true
+    },
+    {
+      "suite": "C:/Users/Notandi/Documents/GitHub/Stone-Throw/playtest/tools/music-check.mjs",
+      "passed": true
+    },
+    {
+      "suite": "C:/Users/Notandi/Documents/GitHub/Stone-Throw/playtest/tools/statistics-reliability-check.mjs",
+      "passed": true
+    },
+    {
+      "suite": "outputs/registry-hof-phase3/live-check.mjs",
+      "passed": true
+    },
+    {
+      "suite": "outputs/registry-hof-phase3/browser-check.mjs",
+      "passed": true
+    }
+  ],
+  "protectedBase": "b7ca2917303e91610c9512c68438e25b72c628e2",
+  "sourceAssets": "63 SHA-256 source/candidate byte comparisons passed; no image processing",
+  "legacyGuestPlaceholderUpgrade": "PASS; guestId and room-seat identity preserved",
+  "recoveryWarning": {
+    "passed": true,
+    "staleStartupNoticeAbsent": true,
+    "explicitResumeErrorVisible": true,
+    "onlineCreate": true,
+    "exactSavedHost": true,
+    "originalCheckpointUntouched": true,
+    "restartReferenceRetained": true,
+    "journalDisabled": true
+  },
+  "avatarRerun": "Server and 1440/390 browser checks PASS",
+  "physicalAcceptance": {
+    "avatarProfile": true,
+    "recoveryWarningCleanup": true,
+    "existingHofStatisticsRematchAudio": true
+  }
+}

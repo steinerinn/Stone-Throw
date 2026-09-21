@@ -1,3 +1,110 @@
+# ACCEPTED — Avatar / Profile Phase 1 + Recovery Cleanup
+
+Git publication BLOCKED: git add cannot create .git/index.lock (Permission denied) despite explicit repository and Git metadata grants. Nothing staged/committed/pushed by this acceptance operation. HEAD remains the accepted parent b7ca2917303e91610c9512c68438e25b72c628e2. The verified 78-file acceptance payload is prepared for manual commit.
+
+Physical acceptance recorded. Branch avatar-profile-phase1; direct accepted Phase 3 parent b7ca2917303e91610c9512c68438e25b72c628e2. Manifest 0a867707abf000bacd3f2d2a3827da624c86e7ce9f45e916feafe055cc3b063b; 919 files. User PASS: registration, Profile, unlimited avatar changes, persistence, Hero unlocks, Guest identity, reserved special AI mappings and stale recovery-warning cleanup. Actionable recovery errors preserved. No regressions observed in HOF/statistics/rematch/audio. Runtime unchanged during acceptance. Git records commit/publication status. No merge, deployment or next-phase work.
+
+Report: playtest/AVATAR-PROFILE-REPORT.md. Evidence: playtest/AVATAR-PROFILE-EVIDENCE.json. Final verification: normal 919-file manifest check. Original 63 avatar PNG bytes preserved. Private Registry/runtime databases, test accounts, browser screenshots/profiles, source archives and workspace harnesses excluded. Earlier candidate headings below are historical and superseded.
+
+Exact checkpoint file inventory (78 changed/new files):
+
+- CURRENT-STATE.md
+- HANDOFF.md
+- playtest/build-manifest.json
+- playtest/client-v13/bootstrap-production.js
+- playtest/client-v13/registry.js
+- playtest/server/main.mjs
+- playtest/server/registry.mjs
+- playtest/server/statistics-store.mjs
+- playtest/tools/local-recovery-contract.json
+- playtest/AVATAR-PROFILE-EVIDENCE.json
+- playtest/AVATAR-PROFILE-REPORT.md
+- playtest/assets/avatars/basic_female_01.png
+- playtest/assets/avatars/basic_female_02.png
+- playtest/assets/avatars/basic_female_03.png
+- playtest/assets/avatars/basic_female_04.png
+- playtest/assets/avatars/basic_female_05.png
+- playtest/assets/avatars/basic_male_01.png
+- playtest/assets/avatars/basic_male_02.png
+- playtest/assets/avatars/basic_male_03.png
+- playtest/assets/avatars/basic_male_04.png
+- playtest/assets/avatars/basic_male_05.png
+- playtest/assets/avatars/catalog.mjs
+- playtest/assets/avatars/cruns_a.png
+- playtest/assets/avatars/dwarf_female_01.png
+- playtest/assets/avatars/dwarf_female_02.png
+- playtest/assets/avatars/dwarf_female_03.png
+- playtest/assets/avatars/dwarf_female_04.png
+- playtest/assets/avatars/dwarf_female_05.png
+- playtest/assets/avatars/dwarf_male_01.png
+- playtest/assets/avatars/dwarf_male_02.png
+- playtest/assets/avatars/dwarf_male_03.png
+- playtest/assets/avatars/dwarf_male_04.png
+- playtest/assets/avatars/dwarf_male_05.png
+- playtest/assets/avatars/elf_female_01.png
+- playtest/assets/avatars/elf_female_02.png
+- playtest/assets/avatars/elf_female_03.png
+- playtest/assets/avatars/elf_female_04.png
+- playtest/assets/avatars/elf_female_05.png
+- playtest/assets/avatars/elf_male_01.png
+- playtest/assets/avatars/elf_male_02.png
+- playtest/assets/avatars/elf_male_03.png
+- playtest/assets/avatars/elf_male_04.png
+- playtest/assets/avatars/elf_male_05.png
+- playtest/assets/avatars/goblin_01.png
+- playtest/assets/avatars/goblin_02.png
+- playtest/assets/avatars/goblin_03.png
+- playtest/assets/avatars/goblin_04.png
+- playtest/assets/avatars/goblin_05.png
+- playtest/assets/avatars/goblin_06.png
+- playtest/assets/avatars/goblin_07.png
+- playtest/assets/avatars/goblin_08.png
+- playtest/assets/avatars/goblin_09.png
+- playtest/assets/avatars/goblin_10.png
+- playtest/assets/avatars/human_female_01.png
+- playtest/assets/avatars/human_female_02.png
+- playtest/assets/avatars/human_female_03.png
+- playtest/assets/avatars/human_female_04.png
+- playtest/assets/avatars/human_female_05.png
+- playtest/assets/avatars/human_female_06.png
+- playtest/assets/avatars/human_female_07.png
+- playtest/assets/avatars/human_female_08.png
+- playtest/assets/avatars/human_female_09.png
+- playtest/assets/avatars/human_female_10.png
+- playtest/assets/avatars/human_male_01.png
+- playtest/assets/avatars/human_male_02.png
+- playtest/assets/avatars/human_male_03.png
+- playtest/assets/avatars/human_male_04.png
+- playtest/assets/avatars/human_male_05.png
+- playtest/assets/avatars/human_male_06.png
+- playtest/assets/avatars/human_male_07.png
+- playtest/assets/avatars/human_male_08.png
+- playtest/assets/avatars/human_male_09.png
+- playtest/assets/avatars/human_male_10.png
+- playtest/assets/avatars/rackler_a.png
+- playtest/assets/avatars/snurk_a.png
+- playtest/client-v13/avatar-picker.js
+- playtest/styles-avatars.css
+- playtest/tools/avatar-check.mjs
+
+---
+
+# Avatar/Profile Phase 1 — recovery notice presentation correction
+
+UNACCEPTED / UNPROMOTED. Stale/default startup recovery notice removed from normal Main Menu; actionable and explicit resume failures retain feedback. Local recovery, saved hosts, Single Player/Story fallback and Online/Rejoin unchanged. Focused recovery regression and Avatar server/desktop/phone checks PASS. Manifest bf151a6844b75dabf03907953b09f3b70b9bb6f3ea8e236177bbb3d4a2f72e6c; 919 files. No commit/push/promotion. See playtest/AVATAR-PROFILE-REPORT.md. Supersedes the earlier candidate digest below.
+
+---
+
+# DEVELOPMENT CANDIDATE — Avatar / Profile Phase 1
+
+UNACCEPTED / UNPROMOTED, 2026-09-21. Branch avatar-profile-phase1 remains directly at accepted Phase 3 parent b7ca2917303e91610c9512c68438e25b72c628e2. No Git metadata, commit, push, merge or deployment. Candidate: playtest/. Manifest: 20cdf6574955e21af91c2a6d3bc7e19d16782a6075333b6d1b160eea7e9bdc36; 919 files.
+
+Report: playtest/AVATAR-PROFILE-REPORT.md. Evidence: playtest/AVATAR-PROFILE-EVIDENCE.json. Avatar storage/server suite and desktop/phone browser suite PASS; five inherited HOF/audio/live rematch/statistics suites PASS. 63 supplied PNGs copied byte-identically. No private/test databases included. Physical avatar testing pending.
+
+Uses existing Registry avatar fields, immediate unlimited Profile selection, permanent Story/five-finalized-win unlocks, Guest Goblin identity and reserved Cruns/Snurk/Rackler A mappings. Picker only in Registration/Profile. HOF appearance, original assets, gameplay engine, music, SFX and Narrator unchanged. HOF polish and Multiplayer UI avatar placements deferred. Earlier accepted checkpoints remain protected.
+
+---
+
 # ACCEPTED — Registry / Hall of Fame Phase 3 + Audio Options
 
 Publication status: BLOCKED by Git metadata permissions. git add cannot create .git/index.lock (Permission denied), including after explicit repository and .git grants. Nothing staged; no acceptance commit or push performed. Prepared physical acceptance remains valid. HEAD stays c901711908036e0ccc7180a65fd2acdd555d8070.
