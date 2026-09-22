@@ -1,0 +1,117 @@
+{
+  "status": "UNACCEPTED / UNPROMOTED",
+  "base": "c008851de246968eda21ae37e50484e3e2ffb7f7",
+  "branch": "result-screen-ui-phase1",
+  "logicScenarioGroups": 9,
+  "browserChecks": 18,
+  "browserWidths": [
+    1440,
+    390
+  ],
+  "acceptedBaseHostRngPlacementEquality": "PASS",
+  "lastHumanSurrenderAccountingAndClosure": "PASS",
+  "liveRematchSameDocumentNpcAndMusicContinuity": "PASS",
+  "liveMainMenuNewRoomNoDuplicateFinalization": "PASS",
+  "fullRegression": [
+    {
+      "suite": "hof-check.mjs",
+      "passed": true
+    },
+    {
+      "suite": "public-qualification-check.mjs",
+      "passed": true
+    },
+    {
+      "suite": "browser-check.mjs",
+      "passed": true
+    },
+    {
+      "suite": "live-regression.mjs",
+      "passed": true
+    },
+    {
+      "suite": "routing-check.mjs",
+      "passed": true
+    },
+    {
+      "suite": "result-screen-live-check.mjs",
+      "passed": true
+    },
+    {
+      "suite": "music-check.mjs",
+      "passed": true
+    },
+    {
+      "suite": "statistics-reliability-check.mjs",
+      "passed": true
+    }
+  ],
+  "additionalRegression": [
+    "final overview 2/3/4",
+    "Scout privacy/owner visibility",
+    "dual Plague 15 checks"
+  ],
+  "visualAcceptance": "pending user screenshot/physical review",
+  "missingArtwork": [
+    "small curious rat on compressed fourth platform"
+  ],
+  "screenshots": {
+    "live-3-human-npc.png": "b09dbd3169a6ec969a72980b181edf42eeedac5edf4b3feb1338bf7d625dfb8a",
+    "normal-3-1440.png": "49a0a6efcef7714d069871baa9d8e05f045b8b758f0f731e88832eab8d686013",
+    "normal-3-390.png": "3c62e91df3a28500b5eb119540cb09c867d322b870fa1d5fbe7bda30c977e299",
+    "normal-4-1440.png": "a1671990dca102e205e8f776af5caacb2694c28c8294fb2474d3d37750a3d8c9",
+    "normal-4-390.png": "1087c57824bab4dd2b7da7befee0a26dfe62c7e2ad5effaa725f9810d5242f5b",
+    "tie-1123-1440.png": "3a63291a94da32c91923d0a36b36e10ea2f9794df74f20b6b5424724885f160c",
+    "tie-1123-390.png": "e6fa9af9d56ab95e892ef6e2711fd07b1a7cd2883fbfef00964f590fb24993a5"
+  },
+  "visualPass2": {
+    "status": "UNACCEPTED / UNPROMOTED",
+    "logicScenarioGroups": 9,
+    "browserChecks": 20,
+    "browserWidths": [
+      1440,
+      390
+    ],
+    "liveRematch": "PASS",
+    "liveMainMenu": "PASS",
+    "identitySecondLine": "explicit controller-derived ai; (AI) or Human flag",
+    "priorEvidence": "Top-level first-pass checks retained as historical; broader suites not rerun",
+    "screenshots": {
+      "live-3-human-npc.png": "c24ff56b81986b5a15d186346a5deabb6bbca90048234698561a852d09a8ea69",
+      "normal-3-1440.png": "004d560a77087b0a93748feb8ccfd8afc13a5c4dac88c8ef20bed0318393744a",
+      "normal-3-390.png": "35f6418be07827249aac98ea2f9ee1653ae057cfd8c2fc7314906f09cff9bf6e",
+      "normal-4-1440.png": "b2300607de15fa74e4dc84f7d52eabe1b5620f015771edf49309e20a27a4a095",
+      "normal-4-390.png": "4b0df4600b06e378e5da5e051ac90fb0121aaadead6bea058ae8b208808c915a",
+      "tie-1123-1440.png": "d9c285909466fed9f8497aabec4120bcb7ac901719710e80cdff0354cc67ab41",
+      "tie-1123-390.png": "26198955ecad4632f4e27d9db6b765076f65f6e0138c21a420ece26ff36d316b"
+    },
+    "visualAcceptance": "pending; illustrated environment/podium/medal art still absent"
+  },
+  "suppliedArtPass": {
+    "status": "UNACCEPTED / UNPROMOTED",
+    "logicScenarioGroups": 9,
+    "browserChecks": 21,
+    "liveRematch": "PASS",
+    "liveMainMenu": "PASS",
+    "sourceAssetsUnmodified": {
+      "1st place duo.png": "e42b726125b655b429023dd1797abdcd7d9fa0208e52cbe24e443b5c7115fa3d",
+      "1st place solo.png": "187bcfda382d3883748bc123ac104cebdbad67cf3ea3b683a4a1ee7ec0bcb255",
+      "2nd place.png": "2411a7e8934b469bd6bd30cebad4181425d6be828bca5ac368804c249b0762f9",
+      "3rd place.png": "796a38ee71964bf050e72164bd7eb6fb70fcd8a44aa6aa3329d6ae2f89f7485a",
+      "4th place no player.png": "ceeed146038e4d4933db3c5c8e2e6666d95470a6fc3d3bab682acfe2583062aa",
+      "4th place.png": "7ff8ad4d2dc3f03e42923f88cc1aa1037918ebb5ba43028f6a48ae0658a21069",
+      "Background.png": "c68d96985183a4dd549f203d64d49ea42fb55904e48ac63caf0f9253aa6d0645",
+      "fantasy_medal_icon_collection.png": "ede2d5fe6d2f972ab72d8b8b08b4ae99cd56f52fc254373eba4162cb039ff11e"
+    },
+    "screenshots": {
+      "live-3-human-npc.png": "c765b85c447ac300b1b55e2a965a29a7c454e9a41925c4825430b85bfb730445",
+      "normal-3-1440.png": "21f836bdebfa8cec3173d0a3f13da027d65355b277541adda9052b42b4a839a0",
+      "normal-3-390.png": "c805b9ef7b5cf9bf2a3c9724c2695578975b531a73f547234a989f2d8ed23c08",
+      "normal-4-1440.png": "b24720e6fd3cf5736c995d81c8f511af796423954185cf70b0e57113e40a77fe",
+      "normal-4-390.png": "8abe5034716853273f7bc8ceef79ff5a69b39eb32eb0bcca1f70a8b37e4158ff",
+      "tie-1123-1440.png": "4cce7729676b1af76bc2e4af3d92e42c7a928a0ebef9142719607d1168f539be",
+      "tie-1123-390.png": "e6a98ac70eb17cfc7a0af23656a600aaab74fdcbb00e27c0df3a028d828c9aaa"
+    },
+    "manifestFiles": 959
+  }
+}

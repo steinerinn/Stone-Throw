@@ -5,7 +5,7 @@ const root=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'..'),dir=f
 const originalRoster={...roster};Object.assign(roster,{inf:1,cav:0,castle:0,archer:0,catapult:0,necro:0});
 const app=await startServer({port:0,lan:true,betaGameLog:true,playtestSnapshotOnly:true,stateDir:path.join(dir,'state'),registryDir:path.join(dir,'registry'),seed:42,logger:()=>{}}),browser=await launch(),results=[];
 const sleep=ms=>new Promise(r=>setTimeout(r,ms));
-async function rows(p){return p.evaluate(()=>new Promise(resolve=>{const r=indexedDB.open('StoneThrow-temporary-beta-log',1);r.onsuccess=()=>{const db=r.result,q=db.transaction('rows').objectStore('rows').getAll();q.onsuccess=()=>{db.close();resolve(q.result);};};}));}
+async function rows(p){return p.evaluate(()=>new Promise(resolve=>{const r=indexedDB.open('StoneThrow-temporary-beta-log');r.onsuccess=()=>{const db=r.result,q=db.transaction('rows').objectStore('rows').getAll();q.onsuccess=()=>{db.close();resolve(q.result);};};}));}
 try{for(const viewer of [true,false]){
  const ctx=await browser.newContext({viewport:{width:1440,height:1000}}),p=await ctx.newPage(),errors=[];p.setDefaultTimeout(20000);p.on('pageerror',e=>errors.push(e.message));
  if(process.env.ST_LOG_BEFORE)await p.route('**/client-v13/game-log.js',r=>r.fulfill({contentType:'text/javascript',body:fs.readFileSync(process.env.ST_LOG_BEFORE,'utf8')}));

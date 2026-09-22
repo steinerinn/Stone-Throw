@@ -23,3 +23,10 @@
 .st-observer-hidden{display:none!important}
 #stOnlineOverview.st-spectator-overview{padding-top:58px}
 #stOnlineOverview.st-spectator-overview .st-turn-dial{top:4px}
+
+/* Shooting indication follows the mounted client's legal-input state in every mode. */
+body.st-shell-active .grid .cell{cursor:default!important}
+body.st-shell-active.player-shooting #enemyGrid{cursor:default!important}
+body.st-shell-active.player-shooting #enemyGrid .cell.st-shot-legal{cursor:url("assets/cursors/player-shot.png") 11 11,crosshair!important}
+body.st-shell-active.catapult-aiming #enemyGrid .cell{cursor:url("assets/effects/combat-rock.svg") 11 11,crosshair!important}
+body.st-shell-active.resurrection-cursor #playerGrid .cell{cursor:url("assets/cursors/resurrection.png") 11 11,crosshair!important}

@@ -1,10 +1,93 @@
-# Multiplayer UI Phase 1A — ACCEPTED
+# ACCEPTED — Result Screen / Game Log / physical cleanup
+
+2026-09-22 physical acceptance. Branch result-screen-ui-phase1; parent/base c008851de246968eda21ae37e50484e3e2ffb7f7.
+Manifest: 968/968 files; SHA-256 21a0537d824206f0cd1e9140420ad95ddf3458cf52a7484c529ae2f0203293d4.
+Final focused checks passed: 9 logic groups, 17 browser checks, authority/RNG parity, real rematch lifecycle, Game Log history and final battlefield cleanup.
+
+WATCHLIST only (not blockers):
+- Unexpected multiplayer kick/seat loss: one physical incident, not reproduced.
+- Pre-disconnect Game Log evidence was unavailable for that incident.
+- Castle false reveal via Plague: observed once physically, not reproduced deterministically.
+- Historical Archer -> Catapult missing-choice incident: unproven.
+
+See playtest/RESULT-PHASE-ACCEPTANCE.md for exact included scope/exclusions and verification. This acceptance supersedes earlier candidate status sections below.
+Next authorized phase: online-game-ui-phase1, directly from this accepted commit. Audit/proposal only until combined Online Game Create/Join structure is reviewed; no implementation yet. No merge or deployment.
+
+---
+
+# Game Log history / final battlefield cleanup — UNACCEPTED / UNPROMOTED
+
+Branch result-screen-ui-phase1; HEAD unchanged c008851de246968eda21ae37e50484e3e2ffb7f7.
+20 bounded match logs with selection/export, public Castle diagnostics, and completed-overview Demon effect cleanup. Castle false reveal not reproduced; disclosure rules unchanged. See playtest/GAME-LOG-HISTORY-CASTLE-REPORT.md for exact tests and limitations.
+Manifest: 967 files; SHA-256 ff49b70fcf5ce9a038ab687f0b4388fb1cebc033400f24b98503203069ef8fd6.
+No commit/push/merge/deployment. Physical retest pending.
+
+---
+
+# Result desktop fit micro-pass — UNACCEPTED / UNPROMOTED
+
+Branch result-screen-ui-phase1. Smaller first/second/third podiums and tighter vertical spacing; fourth art and all text sizes preserved. Solo and duo/rat layouts fit at 1850x940 without scrolling. 9 logic groups + 17 desktop/phone browser checks PASS.
+Manifest: 963 files; SHA-256 327c87fa8b294bbfb4881b4819152f46920f4b62907f591dc977ba97407487cf.
+Details: playtest/RESULT-SCREEN-PHASE1-REPORT.md (desktop fit appendix). No commit/push/merge/deployment.
+
+---
+
+# Post-Result-Screen physical bug pass — UNACCEPTED / UNPROMOTED
+
+Branch result-screen-ui-phase1; HEAD unchanged c008851de246968eda21ae37e50484e3e2ffb7f7.
+Presentation replay/error settlement, disposal, target/cursor refresh and Goblin duplication corrections. Result art and all canonical bytes preserved. Archer -> Catapult pending-state tests pass locally and in Group workers/recovery; the physical missing-choice observation remains unresolved, NOT claimed fixed.
+
+Manifest: 963 files; SHA-256 84e79d10147ba5e131c0ac0505b5090e451e7c4226a694d1d073ea8c0b32f88c.
+Detailed findings, exact files, tests and physical retest: playtest/POST-RESULT-PHYSICAL-BUGS.md.
+Minimal follow-up: removed the shootable-map outline only; cursor, target indication and input rules unchanged.
+No commit/push/merge/deployment. Await physical retest.
+
+---
+
+# Result Screen supplied-art pass - UNACCEPTED / UNPROMOTED
+
+Branch result-screen-ui-phase1; unchanged HEAD c008851de246968eda21ae37e50484e3e2ffb7f7. Eight supplied assets used directly; source bytes unchanged. Existing result logic, sequencing, identity and actions preserved. 9 logic groups, 21 browser checks, real Rematch and Main Menu/new-room paths PASS.
+
+Manifest: 959/959 PASS; SHA-256 1de35226adca82e5e400dd7e148ee3a15c434888334041fe9bea7a1eb847329a.
+Micro alignment: only 1ST/2ND/3RD text offsets adjusted inside wreaths; fourth and all platform/layout/behavior unchanged.
+
+Exact changed files, asset mappings and responsive compromises: playtest/RESULT-SCREEN-PHASE1-REPORT.md. Await physical review; no commit/push/merge/deployment.
+
+---
+
+# Result Screen Visual Pass 2 — UNACCEPTED / UNPROMOTED
+
+Branch `result-screen-ui-phase1`; unchanged HEAD/base `c008851de246968eda21ae37e50484e3e2ffb7f7`. Existing uncommitted first-pass implementation preserved. No commit/push/merge/deployment.
+
+Visual-only material/atmosphere/ceremonial framing upgrade plus explicit public AI second-line `(AI)` identity. Geometry, result sequencing, actions, combat/RNG and statistics unchanged. Existing avatars untouched. 9 logic scenario groups and 20 desktop/narrow browser checks PASS; real-service rematch and Main Menu/new-room paths PASS without duplicate finalization. Broader first-pass evidence reused.
+
+Current manifest: **951/951 files**, SHA-256 `15c8220040fff65dbdf0613921eb354895f354dc177f97437d19ff3acf387d47`. Report/evidence: `playtest/RESULT-SCREEN-PHASE1-REPORT.md` and `playtest/RESULT-SCREEN-PHASE1-EVIDENCE.json`. Visual review pending: richer than first pass, still lacks concept-quality illustrated background/podium/medal materials and small rat art. Do not promote or broaden work without user direction.
+
+---
+
+# Result Screen UI Phase 1 â€” UNACCEPTED / UNPROMOTED
+
+Current development branch: `result-screen-ui-phase1`, unchanged HEAD/base `c008851de246968eda21ae37e50484e3e2ffb7f7`. The accepted Multiplayer UI Phase 1A checkpoint remains protected. No commit/push/merge/deployment.
+
+Group-only final podium, dense/shared placements, final awards from authoritative facts, registered/Guest/NPC avatar identities, stable Cruns/Snurk/Rackler allocation and takeover, outcome-to-results sequencing, battlefield/rematch/menu actions and existing menu music are implemented for the first screenshot gate. User authorized closure/finalization when the last joined Human departs, preserving surrender/cutoff accounting and without a fourth NPC.
+
+Verification: 9 logic scenario groups, 18 browser checks, accepted-base authority/RNG equality, real browser rematch and menu/new-room paths, and 8/8 relevant regression suites PASS. First-pass manifest (historical): 951/951 files, SHA-256 `e7e8beb9efeb73080d7f043742127d2e76a2530495d2c428c1cb2085465ba46f`. Details: `playtest/RESULT-SCREEN-PHASE1-REPORT.md` and evidence JSON. Canonical combat and avatar/audio bytes unchanged. Immediate accepted manifest added to the existing recovery allowlist; engine compatibility digest and journal-disabled behavior unchanged.
+
+Visual review remains pending. The empty fourth platform has correct compression/label state but still needs a dedicated small rat asset. CSS material/platform treatment and simple award seals are more stylized than the supplied illustrated castle concept; artwork needs can be decided in the next visual pass. No avatar artwork generated, cropped or edited.
+
+Retain non-blocking locked-click and dual-Plague natural-observation watchlists. Cumulative performance/Game Log/polling/persistence/fsync investigation stays deferred until after UI completion. Do not begin unrelated implementation.
+
+---
+
+# Previous checkpoint records (historical)
+
+# Multiplayer UI Phase 1A â€” ACCEPTED
 
 Physical acceptance was explicitly received on 2026-09-22. Accepted branch/checkpoint: `multiplayer-ui-phase1` / `multiplayer-ui-phase1a`. This acceptance commit is the new protected project checkpoint. Its parent is `9fd9ec7e9691f17c5a539ecf504660169af23d31` (Avatar/Profile); that parent is historical, not the current accepted checkpoint.
 
 Accepted scope: accumulated Phase 1A battlefield/layout/transitions/final overview and physical fixes; rematch/liveness and stale-callback repair; Catapult single-presentation grouping; Scout target-owner footprint visibility with observer privacy; Archer/shared premature-paint correction; Story active-run/lifetime Story Path and Unit Lore separation; Start Over resets only the active run; independent authoritative same-target Plague identity/lifecycle; pending narration survives Main Menu until deployment; locked Multiplayer input is discarded, never queued.
 
-Physical Story Path / Unit Lore / Goblin visibility, Start Over preserving lifetime unlocks, and Main Menu during narration → Continue returning to narration all PASS.
+Physical Story Path / Unit Lore / Goblin visibility, Start Over preserving lifetime unlocks, and Main Menu during narration â†’ Continue returning to narration all PASS.
 
 Non-blocking WATCHLIST (accepted, not unresolved acceptance failures):
 - Multiplayer locked-click/delayed-shot behavior: strong automated/browser coverage; continue natural physical observation.
@@ -24,7 +107,7 @@ Final manifest: **941/941 files**, SHA-256 `545f5a55b326e8c44212cd7f1e49dc997cd8
 
 # Historical handoff entries
 
-# Latest — pre-commit Story / dual-Plague / input fixes (UNACCEPTED)
+# Latest â€” pre-commit Story / dual-Plague / input fixes (UNACCEPTED)
 
 Branch `multiplayer-ui-phase1`; HEAD/base unchanged: `9fd9ec7e9691f17c5a539ecf504660169af23d31`. Existing Phase 1A and overnight fixes remain. Active Story run is separate from lifetime unlocks, with run-bound completed checkpoints and safe Start Over. Narration returns after Main Menu. Same-board Plagues retain separate IDs/frontiers/steps/attribution. Locked pointer gestures and playback clicks cannot queue shots. No authored pacing change.
 
@@ -32,19 +115,19 @@ Focused checks 63/63 plus real service/browser dual-outbreak timelines; existing
 
 ---
 
-# Latest — Phase 1A overnight lifecycle/projectile/Scout fixes (UNACCEPTED)
+# Latest â€” Phase 1A overnight lifecycle/projectile/Scout fixes (UNACCEPTED)
 
 Branch multiplayer-ui-phase1; HEAD/base unchanged: 9fd9ec7e9691f17c5a539ecf504660169af23d31. Heartbeat starvation during busy playback and post-playback stale poll overwrite reproduced and repaired. Catapult double cue allocation fixed; Scout own-board activity visible to owner; premature Archer paint removed. Full regression 8/8 suites PASS; 17 matches / 14 rematch transitions PASS; targeted privacy/parity/browser/layout checks PASS. Manifest 932/932; SHA-256 c41b021e5afc40b11a8cb3de4b262dd5431c1917589a6e97425c99035f4f400b. Optional polish deferred. Await physical retest. No commit/push/merge/promote/deploy. Details: playtest/MULTIPLAYER-UI-OVERNIGHT-REPORT.md and evidence JSON. Prior notes are historical.
 
 ---
 
-# Latest — eliminated-observer frame cleanup (UNACCEPTED)
+# Latest â€” eliminated-observer frame cleanup (UNACCEPTED)
 
 Removed retired primary frame/title scaffolding only after settled elimination; spectator dial is contained above survivor headers. Runtime changes: client-v13/online-overview.js, styles-online-overview.css. Focused browser transition/disposal/audio checks and portable privacy/final-overview checks PASS. Manifest 929/929 files; SHA-256 6465eac46b0b808b0f94728bed37a3cdac1b280be2478beecaeb3b2bfca8fad6. No gameplay/privacy changes, commit, push, merge or deployment. Await physical retest. Details in playtest/MULTIPLAYER-UI-FIX1-REPORT.md. Prior notes below are historical.
 
 ---
 
-# UNACCEPTED — Multiplayer UI Phase 1A physical fix pass 1
+# UNACCEPTED â€” Multiplayer UI Phase 1A physical fix pass 1
 
 Branch multiplayer-ui-phase1; HEAD/base unchanged: 9fd9ec7e9691f17c5a539ecf504660169af23d31. Do not commit/push/merge/promote/deploy. Await desktop physical retest.
 
@@ -56,7 +139,7 @@ Report: playtest/MULTIPLAYER-UI-FIX1-REPORT.md. Evidence: playtest/MULTIPLAYER-U
 
 ---
 
-# UNACCEPTED — Multiplayer UI Phase 1A
+# UNACCEPTED â€” Multiplayer UI Phase 1A
 
 Branch multiplayer-ui-phase1. HEAD/base remains accepted Avatar/Profile commit 9fd9ec7e9691f17c5a539ecf504660169af23d31. Candidate: playtest/. No commit, push, merge or deployment authorized/performed. Stop for physical PC/phone testing. Earlier acceptance entries below are historical.
 
@@ -68,7 +151,7 @@ Report: playtest/MULTIPLAYER-UI-PHASE1A-REPORT.md. Evidence: playtest/MULTIPLAYE
 
 ---
 
-# ACCEPTED — Avatar / Profile Phase 1 + Recovery Cleanup
+# ACCEPTED â€” Avatar / Profile Phase 1 + Recovery Cleanup
 
 Git publication BLOCKED: git add cannot create .git/index.lock (Permission denied) despite explicit repository and Git metadata grants. Nothing staged/committed/pushed by this acceptance operation. HEAD remains the accepted parent b7ca2917303e91610c9512c68438e25b72c628e2. The verified 78-file acceptance payload is prepared for manual commit.
 
@@ -159,13 +242,13 @@ Exact checkpoint file inventory (78 changed/new files):
 
 ---
 
-# Avatar/Profile Phase 1 — recovery notice presentation correction
+# Avatar/Profile Phase 1 â€” recovery notice presentation correction
 
 UNACCEPTED / UNPROMOTED. Stale/default startup recovery notice removed from normal Main Menu; actionable and explicit resume failures retain feedback. Local recovery, saved hosts, Single Player/Story fallback and Online/Rejoin unchanged. Focused recovery regression and Avatar server/desktop/phone checks PASS. Manifest bf151a6844b75dabf03907953b09f3b70b9bb6f3ea8e236177bbb3d4a2f72e6c; 919 files. No commit/push/promotion. See playtest/AVATAR-PROFILE-REPORT.md. Supersedes the earlier candidate digest below.
 
 ---
 
-# DEVELOPMENT CANDIDATE — Avatar / Profile Phase 1
+# DEVELOPMENT CANDIDATE â€” Avatar / Profile Phase 1
 
 UNACCEPTED / UNPROMOTED, 2026-09-21. Branch avatar-profile-phase1 remains directly at accepted Phase 3 parent b7ca2917303e91610c9512c68438e25b72c628e2. No Git metadata, commit, push, merge or deployment. Candidate: playtest/. Manifest: 20cdf6574955e21af91c2a6d3bc7e19d16782a6075333b6d1b160eea7e9bdc36; 919 files.
 
@@ -175,7 +258,7 @@ Uses existing Registry avatar fields, immediate unlimited Profile selection, per
 
 ---
 
-# ACCEPTED — Registry / Hall of Fame Phase 3 + Audio Options
+# ACCEPTED â€” Registry / Hall of Fame Phase 3 + Audio Options
 
 Publication status: BLOCKED by Git metadata permissions. git add cannot create .git/index.lock (Permission denied), including after explicit repository and .git grants. Nothing staged; no acceptance commit or push performed. Prepared physical acceptance remains valid. HEAD stays c901711908036e0ccc7180a65fd2acdd555d8070.
 
@@ -459,7 +542,7 @@ Exact prepared file inventory (271 files; includes this document and HANDOFF):
 
 ---
 
-# DEVELOPMENT CANDIDATE — Registry / Hall of Fame Phase 3 + Audio Options
+# DEVELOPMENT CANDIDATE â€” Registry / Hall of Fame Phase 3 + Audio Options
 
 UNACCEPTED / UNPROMOTED, 2026-09-21. Branch registry-hof-phase3 remains based directly on accepted post-phase2-batch1 commit c901711908036e0ccc7180a65fd2acdd555d8070. No commit, push, merge or deployment performed.
 
@@ -471,7 +554,7 @@ Scout observer/target privacy and Plague ambience lifetime remain WATCHLIST ONLY
 
 ---
 
-# ACCEPTED — post-phase2-batch1
+# ACCEPTED â€” post-phase2-batch1
 
 Git completion blocker (2026-09-21): final verification PASS (593/593), focused rematch/account checks PASS, music 7/7 PASS. Git add fails creating .git/index.lock with Permission denied even after explicit repository and .git write grants. No files staged, no acceptance commit or push performed. Prepared 77-file payload remains physically ACCEPTED; Git publication is pending. HEAD remains 0d2c6b35f9b39692e65f1a2c8be61b927a686055 on post-phase2-batch1. No branch restructuring, merge or deployment.
 
@@ -483,7 +566,7 @@ Normal manifest and focused rematch/account/music verification required before c
 
 ---
 
-# Latest overnight rematch + statistics audit — UNACCEPTED / UNPROMOTED
+# Latest overnight rematch + statistics audit â€” UNACCEPTED / UNPROMOTED
 
 2026-09-21. Candidate: C:/Users/Notandi/Documents/GitHub/Stone-Throw/playtest. Manifest SHA-256: 0bcea80118069a1e5f1c23f295c415f20ced5313df758df2407e1b20ef63d351; normal verification 592/592 PASS.
 
@@ -495,19 +578,19 @@ Detailed report: playtest/OVERNIGHT-REMATCH-STATISTICS-AUDIT.md. Evidence: playt
 
 ---
 
-# Latest Batch 2 Online lifecycle correction — UNACCEPTED / UNPROMOTED
+# Latest Batch 2 Online lifecycle correction â€” UNACCEPTED / UNPROMOTED
 
 Manifest SHA-256: 003d5ff5b82bce2fbcaa9a54475287a7f4f86660d552cedd93b80014a22671aa. Verification: 590/590 PASS.
 
-Reproduced and fixed Victory → Main Menu replaying a saved local loss, and new Group deployment inheriting another room's playback cursors and rendering no grid. Menu return now suspends the local renderer; Online playback caches are scoped to room/seat/match; disposed renderers reject late updates. Group Leave resynchronizes its request-disabled state. Runtime files: client-v13/story-browser.js, client-v13/presentation.js, client-v13/group-lan.js.
+Reproduced and fixed Victory â†’ Main Menu replaying a saved local loss, and new Group deployment inheriting another room's playback cursors and rendering no grid. Menu return now suspends the local renderer; Online playback caches are scoped to room/seat/match; disposed renderers reject late updates. Group Leave resynchronizes its request-disabled state. Runtime files: client-v13/story-browser.js, client-v13/presentation.js, client-v13/group-lan.js.
 
-Real service/browser checks PASS: desktop and phone-sized Group victory → menu → new three-seat Group; desktop Duel victory → new Group; 225 deployment cells, Random/Ready/start, one Victory only, unchanged finalized records/career aggregates, same document and continuous music instance. Existing identity/Rejoin flows and eight music-routing flows PASS; seven music checks PASS. Scout/Plague and authoritative gameplay files unchanged in this correction.
+Real service/browser checks PASS: desktop and phone-sized Group victory â†’ menu â†’ new three-seat Group; desktop Duel victory â†’ new Group; 225 deployment cells, Random/Ready/start, one Victory only, unchanged finalized records/career aggregates, same document and continuous music instance. Existing identity/Rejoin flows and eight music-routing flows PASS; seven music checks PASS. Scout/Plague and authoritative gameplay files unchanged in this correction.
 
 Report: playtest/ONLINE-REMOUNT-FOLLOWUP.md. Evidence: playtest/ONLINE-REMOUNT-EVIDENCE.json. Stop for physical retest. No commit, push, promotion or deployment. Earlier entries below are historical.
 
 ---
 
-# Latest Batch 2 Scout privacy / Plague ambience follow-up — UNACCEPTED / UNPROMOTED
+# Latest Batch 2 Scout privacy / Plague ambience follow-up â€” UNACCEPTED / UNPROMOTED
 
 Manifest 5ac467849412b6f557cfc2697c45831da4989a549a29243249d0f74f13a7665b; 588/588 verification PASS. Group Scout footprints now use the exact observer/target knowledge pair. A public active-spread boolean gates existing Plague ambience/intensity, instead of historical infected-cell marks. Same tracks, levels and fades; no combat/AI/RNG/state rule changes. Startup/identity/music routing remains intact.
 
@@ -515,7 +598,7 @@ Focused worker-backed four-seat Scout/elimination regression, 1440/390 browser D
 
 ---
 
-# Latest Batch 2 startup entry / Online audio continuity — UNACCEPTED / UNPROMOTED
+# Latest Batch 2 startup entry / Online audio continuity â€” UNACCEPTED / UNPROMOTED
 
 Current playtest manifest 2ce908695eee35a0a3fbe4aef902c874f083d8b8549c9d9f292848bde81d5a7a, 583/583 verified. Full-screen existing-banner gate uses authoritative Registry /me welcome copy (generic for Guest). Real tap/click/keyboard Enter unlocks Exploration; gate exists once per document. Ordinary Create/Join/Leave/result return mount the server-selected seat in place, preserving audio context; real reload/exceptional recovery gets a new entry gate. No track/mix or gameplay changes.
 
@@ -525,17 +608,17 @@ Report: playtest/STARTUP-ENTRY.md. Evidence: playtest/STARTUP-ENTRY-EVIDENCE.jso
 
 ---
 
-# Latest Batch 2 music routing follow-up — UNACCEPTED / UNPROMOTED
+# Latest Batch 2 music routing follow-up â€” UNACCEPTED / UNPROMOTED
 
 Current playtest manifest 9ab9eda7be7f6c819a9e5d136fe0992c718a3e40300ff2280397c1fda4d0b7ef, 579/579 verified. Visible battlefield placement now selects Eye of the Storm in Single Player/Story/Duel/Group, continuous through Start. Main Menu primes Exploration and quietly attempts allowed autoplay after bootstrap; top-level interaction unlock refreshes current scene first. No stale-menu retry on Random/Ready; same tracks/levels and approved identity/Story behavior preserved. Only runtime music.js changed; tests/report/compatible recovery predecessor/manifest updated.
 
-Eight actual browser/service flows PASS: desktop + phone-sized × four modes; Main Menu non-navigation interaction, deployment, Random/Ready/Start, no Exploration retry, same battle time/instance, Sound OFF/ON. Seven controller checks PASS. Canonical, Registry/identity, audio assets, narration and other runtime bytes unchanged. Full report playtest/MUSIC-FIRST-PASS.md; evidence workspace outputs/post-phase2-batch2/routing-results.json.
+Eight actual browser/service flows PASS: desktop + phone-sized Ã— four modes; Main Menu non-navigation interaction, deployment, Random/Ready/Start, no Exploration retry, same battle time/instance, Sound OFF/ON. Seven controller checks PASS. Canonical, Registry/identity, audio assets, narration and other runtime bytes unchanged. Full report playtest/MUSIC-FIRST-PASS.md; evidence workspace outputs/post-phase2-batch2/routing-results.json.
 
 Stop for physical test. No commit, branch operation, push, promotion or deployment. Prior entries below are history.
 
 ---
 
-# Latest Batch 2 fix: Online registered-name binding — UNACCEPTED / UNPROMOTED
+# Latest Batch 2 fix: Online registered-name binding â€” UNACCEPTED / UNPROMOTED
 
 Candidate: C:/Users/Notandi/Documents/GitHub/Stone-Throw/playtest. Normal verifier: 579/579; manifest SHA d08c3d8afa26d737887cc6b585586cf13ec0964966ce630cb312cd35143001dc. Online resume unknown-seat error opened setup without identity initialization. Unified showSetup now always loads the authoritative Display Name/Guest identity when setup is shown; existing REJOIN and validation paths preserved. Only runtime change: client-v13/lan.js. Music controller/assets, Registry/statistics/server, canonical gameplay and REJOIN code unchanged by hash.
 
@@ -543,15 +626,15 @@ Four focused real browser flows PASS: desktop + phone, Duel + 3-seat Group (2 Hu
 
 ---
 
-# Latest: two physical music fixes — UNACCEPTED / UNPROMOTED
+# Latest: two physical music fixes â€” UNACCEPTED / UNPROMOTED
 
-Current Git playtest candidate, manifest c4c3148e2f97bde6211784ac2649ed440ab4f047ae3a90f152412e13c24bf46b, 579/579 verification. Story placement now uses Eye of the Storm continuously into combat. Current music primes before playback (only Exploration on first menu; battle primes during Story); no gain/track/audio-file changes. Controlled 350ms request-delay browser measurements: desktop 418→18ms and phone-sized 389→16ms first interaction to playing. Original ~1.10s quiet track opening preserved. Story deployment continuity and Sound OFF/ON/no duplicates pass both sizes; 7 controller checks pass. Runtime code changed only client-v13/music.js; accompanying tests, report, recovery predecessor and manifest metadata updated. Canonical/assets/narration/branding hashes unchanged.
+Current Git playtest candidate, manifest c4c3148e2f97bde6211784ac2649ed440ab4f047ae3a90f152412e13c24bf46b, 579/579 verification. Story placement now uses Eye of the Storm continuously into combat. Current music primes before playback (only Exploration on first menu; battle primes during Story); no gain/track/audio-file changes. Controlled 350ms request-delay browser measurements: desktop 418â†’18ms and phone-sized 389â†’16ms first interaction to playing. Original ~1.10s quiet track opening preserved. Story deployment continuity and Sound OFF/ON/no duplicates pass both sizes; 7 controller checks pass. Runtime code changed only client-v13/music.js; accompanying tests, report, recovery predecessor and manifest metadata updated. Canonical/assets/narration/branding hashes unchanged.
 
 See playtest/MUSIC-FIRST-PASS.md and workspace outputs/post-phase2-batch2/music-fix-before.json / music-fix-after.json. Stop for physical listening test using current PLAYTEST-LAN.cmd and printed URL. No commit, push, promotion, deployment or branch operation. Prior entries below are historical.
 
 ---
 
-# Latest Batch 2 follow-up: music + battle banner — UNACCEPTED / UNPROMOTED
+# Latest Batch 2 follow-up: music + battle banner â€” UNACCEPTED / UNPROMOTED
 
 Candidate: C:/Users/Notandi/Documents/GitHub/Stone-Throw/playtest. All eight actual supplied tracks found and integrated; five WAVs encoded to VBR MP3, three MP3s byte-exact. Originals untouched. Shared menu continuity, Story/epilogue ducking, common battle/win/loss, silent draw and public-only Plague ambience; Sound/gesture/recovery handling. Shared battle header uses supplied CHAIN SIEGE image. No combat/AI/narration content changes. Full report: playtest/MUSIC-FIRST-PASS.md. Exact asset provenance: assets/audio/music/manifest.json.
 
@@ -561,7 +644,7 @@ Physical listening/layout testing remains: start current PLAYTEST-LAN.cmd, verif
 
 ---
 
-# Current work: post-phase2-batch2 — UNACCEPTED / UNPROMOTED
+# Current work: post-phase2-batch2 â€” UNACCEPTED / UNPROMOTED
 
 The user physically passed Batch 1. Its exact 559-file payload is preserved at C:/Users/Notandi/Documents/Codex/2026-09-09/continue-from-the-completed-stone-throw/outputs/post-phase2-batch2/batch1-physical-pass-backup (manifest e42baaac3e4eee3dba768e8118c80e881ada4f147a8bdae6980a52525795a107). Preserve it and all earlier accepted checkpoints.
 
@@ -573,7 +656,7 @@ Physical acceptance still required. Launch playtest/PLAYTEST-LAN.cmd from this e
 
 ---
 
-# post-phase2-batch1 physical Group follow-up — UNACCEPTED / UNPROMOTED
+# post-phase2-batch1 physical Group follow-up â€” UNACCEPTED / UNPROMOTED
 
 Demon playback failure reproduced and corrected: visible-board reservation renumbering after elimination conflicted with the renderer's consumed counter. Each Group cue now carries its own existing reserved public rune data. No authority/RNG/recovery-policy change. Physical match B1DBA6 contains all four completed 29-cell Demon patterns; no lost authoritative attack. Port 3212 was serving accepted Phase 2, not the new Group narrative branch; its old observer renderer explains the raw log dump.
 
@@ -583,7 +666,7 @@ Runtime follow-up: playtest/server/demon-presentation.mjs; playtest/server/group
 
 ---
 
-# post-phase2-batch1 — Group Event Log — UNACCEPTED / UNPROMOTED
+# post-phase2-batch1 â€” Group Event Log â€” UNACCEPTED / UNPROMOTED
 
 Working branch: post-phase2-batch1. Base: accepted Registry Phase 2 commit 0d2c6b35f9b39692e65f1a2c8be61b927a686055. Named public special routing and causal eliminations implemented for 3/4-player Group battles; ordinary prose and Duel retained. All canonical engine files unchanged.
 
@@ -593,13 +676,13 @@ Report: playtest/GROUP-EVENT-LOG.md. Run playtest/PLAYTEST-LAN.cmd; verify node 
 
 ---
 
-# Accepted Registry Phase 2 — registry-phase2-v1
+# Accepted Registry Phase 2 â€” registry-phase2-v1
 
 Physical testing accepted by the user on 2026-09-20. Exact candidate payload copied without gameplay, presentation or architecture changes during promotion.
 
 - Branch: registry-phase2-v1
 - Parent: 922258094cd44d3c1c5cd189f7c04fbfcb1ddedc (registry-phase1-v1)
-- Payload: playtest/ — 554 manifest-listed files plus build-manifest.json
+- Payload: playtest/ â€” 554 manifest-listed files plus build-manifest.json
 - Manifest SHA-256: a4c2d46d53d0cd8332a56866351569dfedc4ee256728e580827398effb8ca2a7
 - Exact source: C:/Users/Notandi/Documents/Codex/2026-09-09/continue-from-the-completed-stone-throw/outputs/registry-phase2/candidate
 - Verify: node playtest/tools/verify.mjs
