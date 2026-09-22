@@ -137,7 +137,7 @@ export function pumpHost(h, maxSteps = 100000, execution) {
                 h.turnStep = 'finish';
                 continue;
             }
-            root(h, [...(h.state.ring ? h.state.plagues.filter(q => q.moveOnPlayerId === p.playerId).map(q => ({ kind: 'plague-step', targetBoardId: q.targetBoardId })) : [{ kind: 'plague-step', targetBoardId: p.reactionTarget.boardId }]), { kind: 'terminal-check', reason: 'direct-end' }], 'exit');
+            root(h, [...(h.state.ring ? h.state.plagues.filter(q => q.moveOnPlayerId === p.playerId).map(q => ({ kind: 'plague-step', targetBoardId: q.targetBoardId, ...(q.outbreaks[0]?.statisticsId ? { plagueId: q.outbreaks[0].statisticsId } : {}) })) : [{ kind: 'plague-step', targetBoardId: p.reactionTarget.boardId }]), { kind: 'terminal-check', reason: 'direct-end' }], 'exit');
         }
         else if (h.turnStep === 'finish')
             nextTurn(h);

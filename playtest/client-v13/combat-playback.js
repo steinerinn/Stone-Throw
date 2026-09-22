@@ -1,7 +1,8 @@
 import {mountLegacyAnimations} from './legacy-animations.js';
 const key=c=>c.x+','+c.y,side=s=>s==='self'?'player':'enemy';
-export function mountCombatPlayback(){
- const a=mountLegacyAnimations(15);let runeSequence=0,battle=null;const goblinGroups=new Map();let displayed=null;
+export function mountCombatPlayback(resolve){
+ const document={getElementById:id=>resolve?resolve(id):globalThis.document.getElementById(id)};
+ const a=mountLegacyAnimations(15,resolve);let runeSequence=0,battle=null;const goblinGroups=new Map();let displayed=null;
  function prepare(s){if(displayed&&s.groupRoom===displayed.groupRoom&&s.battle!==displayed.battle){a.clearTransient();goblinGroups.clear();}displayed={groupRoom:s.groupRoom,battle:s.battle};}
  async function play(frames,paint,feedback,allFrames=frames){
   if(!frames.length||!a.alive())return;const first=frames[0],cue=first.animation,s=first.snapshot;

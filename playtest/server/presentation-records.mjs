@@ -8,5 +8,5 @@ export function presentationRecords(h){let views=roots.get(h.initial);if(!views)
  let n=cache.rows.length;while(n<h.events.length&&isArchive(h.events[n])){const row=h.events[n];add(cache,row,n);cache.rows.push(row);n++;}
  const index=n===h.events.length?cache:{hero:[...cache.hero],stationary:new Map(cache.stationary),catapult:new Map(cache.catapult),plague:new Map(cache.plague)};for(let i=n;i<h.events.length;i++)add(index,h.events[i],i);
  const records=maps=>[...new Map(maps.flatMap(m=>[...m.values()].map(v=>[v.i,v]))).values()].sort((a,b)=>a.i-b.i).map(v=>v.row);
- return {hero:index.hero,stationary:records([index.stationary,index.plague]),catapult:records([index.catapult]),plagueCells:[...index.plague.values()].map(v=>({side:v.target===h.config.players[0].id?'self':'opponent',cell:{...v.cell}}))};
+ return {hero:index.hero,stationary:records([index.stationary,index.plague]),catapult:records([index.catapult]),plagueCells:[...index.plague.values()].filter(v=>h.config.players.some(p=>p.id===v.target)).map(v=>({side:v.target===h.config.players[0].id?'self':'opponent',cell:{...v.cell}}))};
 }

@@ -46,7 +46,7 @@ export async function mountStoryBrowser(transport,{replaceConfiguration,selectMo
   schedule(active);return true;
  }
  window.__stoneThrowPlayAgain=playAgain;
- window.__stoneThrowPresentationReady=()=>latestReplacement;window.__stoneThrowPauseActiveGameForMenu=()=>{const view=window.__stoneThrowViewState();if(busy||view.inputLocked)return false;paused=true;return true;};
+ window.__stoneThrowPresentationReady=()=>latestReplacement;window.__stoneThrowPauseActiveGameForMenu=()=>{const view=window.__stoneThrowViewState?.();if(!view){paused=true;return true;}if(busy||view.inputLocked)return false;paused=true;return true;};
  window.__stoneThrowResumeActiveGameFromMenu=()=>resumeMode('single');
  window.__stoneThrowHasLocalStorySession=()=>localSlots.has('story');
  window.__stoneThrowHasStorySession=()=>localSlots.has('story')||!!window.__stoneThrowStoryAccount?.().progress;
@@ -62,7 +62,7 @@ export async function mountStoryBrowser(transport,{replaceConfiguration,selectMo
  window.__stoneThrowAbortBattleAsync=()=>{paused=true;playback.pending=null;tutorials.reset(active);renderer?.unmount();return true;};
  window.__stoneThrowStoryPlagueTargets=()=>lastSnapshot?.storyPlagueTargets?.map(s=>s==='self'?'player':'enemy')||[];
  window.__stoneThrowStoryRuntimeState=()=>{const view=window.__stoneThrowViewState?.()||{phase:accountContinuation?'over':'place',shotsLeft:0,inputLocked:busy};return {active:active.story,battle:active.battle,phase:view.phase,playerShotsLeft:view.shotsLeft,busy:busy||view.inputLocked};};
- window.__stoneThrowPauseStoryForMenu=()=>{const view=window.__stoneThrowViewState();if(!active.story||view.phase==='over'||busy||view.inputLocked)return false;paused=true;return true;};
+ window.__stoneThrowPauseStoryForMenu=()=>{const view=window.__stoneThrowViewState?.();if(!view){paused=true;return true;}if(!active.story||view.phase==='over'||busy||view.inputLocked)return false;paused=true;return true;};
  window.__stoneThrowResumeStoryRuntime=async()=>{
  if(await resumeMode('story'))return true;
  const account=window.__stoneThrowStoryAccount?.();

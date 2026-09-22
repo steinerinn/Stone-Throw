@@ -1,3 +1,73 @@
+# Multiplayer UI Phase 1A — ACCEPTED
+
+Physical acceptance was explicitly received on 2026-09-22. Accepted branch/checkpoint: `multiplayer-ui-phase1` / `multiplayer-ui-phase1a`. This acceptance commit is the new protected project checkpoint. Its parent is `9fd9ec7e9691f17c5a539ecf504660169af23d31` (Avatar/Profile); that parent is historical, not the current accepted checkpoint.
+
+Accepted scope: accumulated Phase 1A battlefield/layout/transitions/final overview and physical fixes; rematch/liveness and stale-callback repair; Catapult single-presentation grouping; Scout target-owner footprint visibility with observer privacy; Archer/shared premature-paint correction; Story active-run/lifetime Story Path and Unit Lore separation; Start Over resets only the active run; independent authoritative same-target Plague identity/lifecycle; pending narration survives Main Menu until deployment; locked Multiplayer input is discarded, never queued.
+
+Physical Story Path / Unit Lore / Goblin visibility, Start Over preserving lifetime unlocks, and Main Menu during narration → Continue returning to narration all PASS.
+
+Non-blocking WATCHLIST (accepted, not unresolved acceptance failures):
+- Multiplayer locked-click/delayed-shot behavior: strong automated/browser coverage; continue natural physical observation.
+- Dual same-target Plague: authoritative replacement defect fixed and independently verified; continue natural physical observation of rare pacing/presentation cases.
+
+Deferred separate work: cumulative performance / Game Log / polling / persistence / fsync investigation after UI completion. Do not begin it in this acceptance task.
+
+Final verification: 18/18 verification jobs PASS, including TypeScript compilation, the requested focused/browser/service/UI checks and the full existing runner (8/8 suites PASS). Named Story/storage/input/dual-Plague/continuation checks: 63/63. No new regression; no assertions weakened. Runtime/assets remain byte-identical to the physically accepted 941-file manifest `6be6d6d6b62453660ac80d9cfb5c07afe40858a91023945c8ca83ba6bb5ec7cf`; only acceptance/evidence/build/recovery-handoff metadata changed during acceptance. The immediate predecessor is added to the existing compatible local-recovery allowlist; no save is deleted or relabelled and checkpoint.journal remains disabled.
+
+Only intended repository runtime, assets, regression tests, public synthetic fixture and useful project reports/manifests/handoffs are included. Private Registry databases, browser profiles, captures, scratch probes, workspace outputs and machine-local test artifacts are excluded. Earlier reports/status entries below are historical and superseded by this acceptance.
+
+Acceptance commit/push is authorized. No merge or deployment. Next branch: `result-screen-ui-phase1`, created directly from the pushed acceptance commit, with no Result Screen implementation yet.
+
+Final manifest: **941/941 files**, SHA-256 `545f5a55b326e8c44212cd7f1e49dc997cd8c7d5f67ce6f241f1607ffefd6b96`. The full commit identity is the Git commit containing this acceptance record; `multiplayer-ui-phase1` is the accepted reference.
+
+---
+
+# Historical handoff entries
+
+# Latest — pre-commit Story / dual-Plague / input fixes (UNACCEPTED)
+
+Branch `multiplayer-ui-phase1`; HEAD/base unchanged: `9fd9ec7e9691f17c5a539ecf504660169af23d31`. Existing Phase 1A and overnight fixes remain. Active Story run is separate from lifetime unlocks, with run-bound completed checkpoints and safe Start Over. Narration returns after Main Menu. Same-board Plagues retain separate IDs/frontiers/steps/attribution. Locked pointer gestures and playback clicks cannot queue shots. No authored pacing change.
+
+Focused checks 63/63 plus real service/browser dual-outbreak timelines; existing Story account checks 11/11; full regression runner 8/8 suites PASS. Current UI/privacy/animation/host-RNG parity, heartbeat and bounded capture checks PASS. Manifest 941/941, SHA-256 `6be6d6d6b62453660ac80d9cfb5c07afe40858a91023945c8ca83ba6bb5ec7cf`. No private Registry migration or test data packaged; journal remains disabled. No staging, commit, push, merge, promotion or deployment. Await physical testing; exact report, change list, limitations and checklist: `playtest/MULTIPLAYER-UI-PRECOMMIT-REPORT.md`; evidence: `playtest/MULTIPLAYER-UI-PRECOMMIT-EVIDENCE.json`. Earlier entries are historical.
+
+---
+
+# Latest — Phase 1A overnight lifecycle/projectile/Scout fixes (UNACCEPTED)
+
+Branch multiplayer-ui-phase1; HEAD/base unchanged: 9fd9ec7e9691f17c5a539ecf504660169af23d31. Heartbeat starvation during busy playback and post-playback stale poll overwrite reproduced and repaired. Catapult double cue allocation fixed; Scout own-board activity visible to owner; premature Archer paint removed. Full regression 8/8 suites PASS; 17 matches / 14 rematch transitions PASS; targeted privacy/parity/browser/layout checks PASS. Manifest 932/932; SHA-256 c41b021e5afc40b11a8cb3de4b262dd5431c1917589a6e97425c99035f4f400b. Optional polish deferred. Await physical retest. No commit/push/merge/promote/deploy. Details: playtest/MULTIPLAYER-UI-OVERNIGHT-REPORT.md and evidence JSON. Prior notes are historical.
+
+---
+
+# Latest — eliminated-observer frame cleanup (UNACCEPTED)
+
+Removed retired primary frame/title scaffolding only after settled elimination; spectator dial is contained above survivor headers. Runtime changes: client-v13/online-overview.js, styles-online-overview.css. Focused browser transition/disposal/audio checks and portable privacy/final-overview checks PASS. Manifest 929/929 files; SHA-256 6465eac46b0b808b0f94728bed37a3cdac1b280be2478beecaeb3b2bfca8fad6. No gameplay/privacy changes, commit, push, merge or deployment. Await physical retest. Details in playtest/MULTIPLAYER-UI-FIX1-REPORT.md. Prior notes below are historical.
+
+---
+
+# UNACCEPTED — Multiplayer UI Phase 1A physical fix pass 1
+
+Branch multiplayer-ui-phase1; HEAD/base unchanged: 9fd9ec7e9691f17c5a539ecf504660169af23d31. Do not commit/push/merge/promote/deploy. Await desktop physical retest.
+
+Supersedes the centered third-board and reduced final-layout design below: third board is bottom-left; final matches restore all original participants exactly once with authorized global unit reveal after playback. Compact full-roster layout, SVG arrowheads, settled 230 ms slides, central dial anchoring. Confirmed secondary Plague attribution bug fixed by exact participant filtering; accepted host/RNG replay remains identical.
+
+Verification: 929/929 files PASS. Manifest SHA-256 a6d49ee18bf27729b0297428bbf3d255432f5f238b2929d3d24bc5c55f3a959d. Existing regression runner 8/8 suites PASS; targeted privacy, authoritative replay, 2/3/4 final reveal, full-roster desktop/phone geometry, five special animations and transition/disposal/SFX checks PASS. 684 protected engine/assets/account/statistics/audio files unchanged.
+
+Report: playtest/MULTIPLAYER-UI-FIX1-REPORT.md. Evidence: playtest/MULTIPLAYER-UI-FIX1-EVIDENCE.json. New portable regression: node playtest/tools/online-final-overview-check.mjs. Run playtest/PLAYTEST-LAN.cmd for physical testing. No new phone design or audio policy. Prior notes are historical.
+
+---
+
+# UNACCEPTED — Multiplayer UI Phase 1A
+
+Branch multiplayer-ui-phase1. HEAD/base remains accepted Avatar/Profile commit 9fd9ec7e9691f17c5a539ecf504660169af23d31. Candidate: playtest/. No commit, push, merge or deployment authorized/performed. Stop for physical PC/phone testing. Earlier acceptance entries below are historical.
+
+Implemented Online-only turn dial, public secondary battlefields/unit strips, surviving-ring routes, ordered special playback and settled elimination transitions. No engine, Registry, statistics, artwork or audio-policy changes. Scout remains observer+target scoped.
+
+Verification: 926/926 manifest files PASS. Manifest SHA-256: 712c592758d37db33fee280e76210dc4debc50287752e24dee0f63c8d137a20a. Existing full runner 8/8 suites PASS; Avatar and recovery checks PASS. Targeted layout, animation, elimination, disposal, privacy, local-mode and exact accepted-host/RNG comparison tests PASS. 684 protected engine/assets/Registry/statistics/audio files unchanged.
+
+Report: playtest/MULTIPLAYER-UI-PHASE1A-REPORT.md. Evidence: playtest/MULTIPLAYER-UI-PHASE1A-EVIDENCE.json. Portable privacy regression: node playtest/tools/online-overview-check.mjs. Normal playtest: double-click playtest/PLAYTEST-LAN.cmd. First-pass phone compromise: secondary cards stack vertically. Final art polish and cross-board Catapult are not part of this phase.
+
+---
+
 # ACCEPTED — Avatar / Profile Phase 1 + Recovery Cleanup
 
 Git publication BLOCKED: git add cannot create .git/index.lock (Permission denied) despite explicit repository and Git metadata grants. Nothing staged/committed/pushed by this acceptance operation. HEAD remains the accepted parent b7ca2917303e91610c9512c68438e25b72c628e2. The verified 78-file acceptance payload is prepared for manual commit.

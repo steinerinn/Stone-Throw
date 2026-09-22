@@ -20,7 +20,7 @@ export function pumpHost(h:HostState,maxSteps=100000,execution?:HostExecution):v
  else if(h.turnStep==='catapult'){h.turnStep=primary?'resurrection':'budget';if(p.catapultLater){const count=p.catapultLater;p.catapultLater=0;root(h,[{kind:'catapult-series',ownerId:p.playerId,remaining:count}],'entry');}}
  else if(h.turnStep==='budget'){budget(h);h.turnStep='actions';}
  else if(h.turnStep==='actions'){if(p.ordinaryShots<=0){h.turnStep='plague';continue;}if(!primary){const probe=startResolution(h.state,'match-root-'+(h.rootSerial+1),'host-root-'+(h.rootSerial+1),p.playerId,[],h.rng);if(checkTerminal(probe,'enemy-pre-shot')){h.rootSerial++;h.pendingRoot=probe;h.rootEventCursor=0;collect(h);h.pendingRoot=null;terminal(h,execution);return;}}h.status='awaiting-command';}
- else if(h.turnStep==='plague'){if(h.lastProbeSkippedPlague){h.turnStep='finish';continue;}root(h,[...(h.state.ring?h.state.plagues.filter(q=>q.moveOnPlayerId===p.playerId).map(q=>({kind:'plague-step' as const,targetBoardId:q.targetBoardId})):[{kind:'plague-step' as const,targetBoardId:p.reactionTarget.boardId}]),{kind:'terminal-check',reason:'direct-end'}],'exit');}
+ else if(h.turnStep==='plague'){if(h.lastProbeSkippedPlague){h.turnStep='finish';continue;}root(h,[...(h.state.ring?h.state.plagues.filter(q=>q.moveOnPlayerId===p.playerId).map(q=>({kind:'plague-step' as const,targetBoardId:q.targetBoardId,...(q.outbreaks[0]?.statisticsId?{plagueId:q.outbreaks[0].statisticsId}:{})})):[{kind:'plague-step' as const,targetBoardId:p.reactionTarget.boardId}]),{kind:'terminal-check',reason:'direct-end'}],'exit');}
  else if(h.turnStep==='finish')nextTurn(h);
  else throw Error('Unsupported host continuation '+h.turnStep);
  }refreshHost(h);}

@@ -1,0 +1,481 @@
+{
+  "status": "UNACCEPTED / UNPROMOTED",
+  "branch": "multiplayer-ui-phase1",
+  "head": "9fd9ec7e9691f17c5a539ecf504660169af23d31",
+  "heartbeatBefore": {
+    "beats": 0,
+    "absence": {
+      "id": "6d567bd2e04e1af8a41fbe96",
+      "startedAt": 1790034003681,
+      "policy": "choice"
+    },
+    "seenAge": 8501
+  },
+  "heartbeatAfter": {
+    "beats": 8,
+    "absence": null,
+    "seenAge": 511
+  },
+  "stalePoll": {
+    "passed": true,
+    "results": [
+      {
+        "before": true,
+        "oldPollRestoredOldRoom": true
+      },
+      {
+        "before": false,
+        "oldPollRestoredOldRoom": false
+      }
+    ]
+  },
+  "rematchCycles": {
+    "passed": true,
+    "results": [
+      {
+        "n": 4,
+        "humans": 2,
+        "cycle": 0,
+        "code": "C72C13",
+        "epoch": 1,
+        "turns": 17,
+        "identitiesPreserved": true,
+        "humansConnected": true,
+        "noEpisodes": true,
+        "noDuplicateFinalization": true
+      },
+      {
+        "n": 4,
+        "humans": 2,
+        "cycle": 1,
+        "code": "BD60FA",
+        "epoch": 2,
+        "turns": 17,
+        "identitiesPreserved": true,
+        "humansConnected": true,
+        "noEpisodes": true,
+        "noDuplicateFinalization": true
+      },
+      {
+        "n": 4,
+        "humans": 2,
+        "cycle": 2,
+        "code": "660064",
+        "epoch": 2,
+        "turns": 17,
+        "identitiesPreserved": true,
+        "humansConnected": true,
+        "noEpisodes": true,
+        "noDuplicateFinalization": true
+      },
+      {
+        "n": 4,
+        "humans": 2,
+        "cycle": 3,
+        "code": "BD71AD",
+        "epoch": 2,
+        "turns": 17,
+        "identitiesPreserved": true,
+        "humansConnected": true,
+        "noEpisodes": true,
+        "noDuplicateFinalization": true
+      },
+      {
+        "n": 4,
+        "humans": 2,
+        "cycle": 4,
+        "code": "960678",
+        "epoch": 2,
+        "turns": 17,
+        "identitiesPreserved": true,
+        "humansConnected": true,
+        "noEpisodes": true,
+        "noDuplicateFinalization": true
+      },
+      {
+        "n": 4,
+        "humans": 2,
+        "cycle": 5,
+        "code": "08E788",
+        "epoch": 2,
+        "turns": 17,
+        "identitiesPreserved": true,
+        "humansConnected": true,
+        "noEpisodes": true,
+        "noDuplicateFinalization": true
+      },
+      {
+        "n": 4,
+        "humans": 2,
+        "cycle": 6,
+        "code": "D9A1EC",
+        "epoch": 2,
+        "turns": 17,
+        "identitiesPreserved": true,
+        "humansConnected": true,
+        "noEpisodes": true,
+        "noDuplicateFinalization": true
+      },
+      {
+        "n": 4,
+        "humans": 2,
+        "cycle": 7,
+        "code": "233030",
+        "epoch": 2,
+        "turns": 17,
+        "identitiesPreserved": true,
+        "humansConnected": true,
+        "noEpisodes": true,
+        "noDuplicateFinalization": true
+      },
+      {
+        "n": 4,
+        "humans": 2,
+        "cycle": 8,
+        "code": "AC7A3F",
+        "epoch": 2,
+        "turns": 17,
+        "identitiesPreserved": true,
+        "humansConnected": true,
+        "noEpisodes": true,
+        "noDuplicateFinalization": true
+      },
+      {
+        "n": 4,
+        "humans": 2,
+        "cycle": 9,
+        "code": "D43E10",
+        "epoch": 2,
+        "turns": 17,
+        "identitiesPreserved": true,
+        "humansConnected": true,
+        "noEpisodes": true,
+        "noDuplicateFinalization": true
+      },
+      {
+        "n": 4,
+        "humans": 2,
+        "cycle": 10,
+        "code": "559524",
+        "epoch": 2,
+        "turns": 17,
+        "identitiesPreserved": true,
+        "humansConnected": true,
+        "noEpisodes": true,
+        "noDuplicateFinalization": true
+      },
+      {
+        "n": 4,
+        "humans": 3,
+        "cycle": 0,
+        "code": "D9097E",
+        "epoch": 1,
+        "turns": 19,
+        "identitiesPreserved": true,
+        "humansConnected": true,
+        "noEpisodes": true,
+        "noDuplicateFinalization": true
+      },
+      {
+        "n": 4,
+        "humans": 3,
+        "cycle": 1,
+        "code": "07D304",
+        "epoch": 2,
+        "turns": 19,
+        "identitiesPreserved": true,
+        "humansConnected": true,
+        "noEpisodes": true,
+        "noDuplicateFinalization": true
+      },
+      {
+        "n": 4,
+        "humans": 3,
+        "cycle": 2,
+        "code": "B7B977",
+        "epoch": 2,
+        "turns": 19,
+        "identitiesPreserved": true,
+        "humansConnected": true,
+        "noEpisodes": true,
+        "noDuplicateFinalization": true
+      },
+      {
+        "n": 2,
+        "humans": 2,
+        "cycle": 0,
+        "code": "080034",
+        "epoch": 1,
+        "turns": 7,
+        "identitiesPreserved": true,
+        "humansConnected": true,
+        "noEpisodes": true,
+        "noDuplicateFinalization": true
+      },
+      {
+        "n": 2,
+        "humans": 2,
+        "cycle": 1,
+        "code": "080034",
+        "epoch": 2,
+        "turns": 7,
+        "identitiesPreserved": true,
+        "humansConnected": true,
+        "noEpisodes": true,
+        "noDuplicateFinalization": true
+      },
+      {
+        "n": 2,
+        "humans": 2,
+        "cycle": 2,
+        "code": "080034",
+        "epoch": 3,
+        "turns": 7,
+        "identitiesPreserved": true,
+        "humansConnected": true,
+        "noEpisodes": true,
+        "noDuplicateFinalization": true
+      }
+    ]
+  },
+  "catapultBefore": {
+    "groups": [
+      1,
+      2,
+      2,
+      2,
+      2
+    ],
+    "steps": [
+      0,
+      1,
+      2,
+      3,
+      4
+    ]
+  },
+  "catapultParity": {
+    "passed": true,
+    "exactAcceptedHostEventsAndRng": true
+  },
+  "projectiles": {
+    "passed": true,
+    "results": [
+      {
+        "kind": "archer",
+        "samplesBeforeArrival": 77,
+        "priorPreserved": true,
+        "impactPainted": true
+      },
+      {
+        "kind": "catapult",
+        "intros": 1,
+        "summaryCount": 1,
+        "rollCells": 5
+      }
+    ]
+  },
+  "fullRegression": [
+    {
+      "file": "outputs/registry-hof-phase3/hof-check.mjs",
+      "passed": true,
+      "stdout": "{\"passed\":true,\"accounts\":22,\"modeIsolation\":true,\"topNearby\":true,\"ties\":true,\"qualification\":true,\"currentIdentityAndCountry\":true,\"idempotent\":true,\"dir\":\"C:\\\\Users\\\\Notandi\\\\Documents\\\\Codex\\\\2026-09-09\\\\continue-from-the-completed-stone-throw\\\\outputs\\\\registry-hof-phase3\\\\hof-private-SBenBv\"}\n"
+    },
+    {
+      "file": "outputs/registry-hof-phase3/public-qualification-check.mjs",
+      "passed": true,
+      "stdout": "{\"passed\":true,\"productionQualification\":true,\"perMode\":true,\"requestCannotBypass\":true}\n"
+    },
+    {
+      "file": "outputs/registry-hof-phase3/browser-check.mjs",
+      "passed": true,
+      "stdout": "{\"passed\":true,\"widths\":[1440,390],\"audioMatrix\":true,\"independentPlague\":true,\"persistence\":true,\"noRestart\":true}\n"
+    },
+    {
+      "file": "outputs/registry-hof-phase3/live-check.mjs",
+      "passed": true,
+      "stdout": "{\n  passed: true,\n  dir: 'C:\\\\Users\\\\Notandi\\\\Documents\\\\Codex\\\\2026-09-09\\\\continue-from-the-completed-stone-throw\\\\outputs\\\\registry-hof-phase3\\\\live-private-XK9aHG',\n  evidence: [\n    {\n      seats: 2,\n      finalized: true,\n      liveExcluded: true,\n      sharedGlobal: true,\n      sameDocumentRematch: true,\n      rematchStartedAndFinalizedOnce: true,\n      joinedHumanProtected: false\n    },\n    {\n      seats: 3,\n      finalized: true,\n      liveExcluded: true,\n      sharedGlobal: true,\n      sameDocumentRematch: true,\n      rematchStartedAndFinalizedOnce: true,\n      joinedHumanProtected: true\n    },\n    {\n      seats: 4,\n      finalized: true,\n      liveExcluded: true,\n      sharedGlobal: true,\n      sameDocumentRematch: false,\n      rematchStartedAndFinalizedOnce: false,\n      joinedHumanProtected: false\n    }\n  ],\n  crossDeviceSameAccount: true,\n  storyWinExcluded: true,\n  liveRejoinPreservesStateAndAccounting: true,\n  logoutAndSwitch: true,\n  additiveMaxAwardsRatios: true,\n  guestGlobalOnly: true,\n  noDuplicateFinalization: true\n}\n"
+    },
+    {
+      "file": "outputs/registry-hof-phase3/routing-check.mjs",
+      "passed": true,
+      "stdout": "PASS 1440 single\nPASS 1440 story\nPASS 1440 duel\nPASS 1440 group\nPASS 390 single\nPASS 390 story\nPASS 390 duel\nPASS 390 group\n{\"passed\":true,\"flows\":8}\n"
+    },
+    {
+      "file": "outputs/post-phase2-batch2/overnight-rematch-check.mjs",
+      "passed": true,
+      "stdout": "{ rematchApplyDisabled: false }\nPASS rematch configure once -> Random/Ready/start; original statistics unchanged; no reload\n"
+    },
+    {
+      "file": "C:/Users/Notandi/Documents/GitHub/Stone-Throw/playtest/tools/music-check.mjs",
+      "passed": true,
+      "stdout": "{\"passed\":true,\"checks\":7,\"autoplayRetry\":true,\"oneInstancePerTrack\":true,\"menuContinuity\":true,\"drawSilent\":true,\"ducking\":true,\"publicOnly\":true}\n"
+    },
+    {
+      "file": "C:/Users/Notandi/Documents/GitHub/Stone-Throw/playtest/tools/statistics-reliability-check.mjs",
+      "passed": true,
+      "stdout": "{\"passed\":true,\"checks\":8,\"disconnectRejoinFull\":true,\"waitNegative\":true,\"autoDisconnect\":true,\"manualKick\":true,\"surrenderQuit\":true,\"takeoverExcludesAI\":true,\"recoveryMatchIdentity\":true}\n"
+    }
+  ],
+  "scout": {
+    "realChoices": 5,
+    "actorResult": true,
+    "targetOwnerFootprint": true,
+    "unrelatedObserversEmpty": true,
+    "eliminationTargetSwitchNoLeak": true,
+    "hostRngNotMutated": true
+  },
+  "layout": {
+    "passed": true,
+    "evidence": [
+      {
+        "count": 2,
+        "width": 1440,
+        "secondary": 0,
+        "routes": 0,
+        "hiddenPlacementSafe": true
+      },
+      {
+        "count": 2,
+        "width": 390,
+        "secondary": 0,
+        "routes": 0,
+        "hiddenPlacementSafe": true
+      },
+      {
+        "count": 3,
+        "width": 1440,
+        "secondary": 1,
+        "routes": 3,
+        "hiddenPlacementSafe": true
+      },
+      {
+        "count": 3,
+        "width": 390,
+        "secondary": 1,
+        "routes": 3,
+        "hiddenPlacementSafe": true
+      },
+      {
+        "count": 4,
+        "width": 1440,
+        "secondary": 2,
+        "routes": 4,
+        "hiddenPlacementSafe": true
+      },
+      {
+        "count": 4,
+        "width": 390,
+        "secondary": 2,
+        "routes": 4,
+        "hiddenPlacementSafe": true
+      }
+    ]
+  },
+  "transitions": {
+    "passed": true,
+    "localHidden": true,
+    "results": [
+      {
+        "spectator": false,
+        "progression": "4\u21923\u21922\u21921",
+        "noMidChainReposition": true,
+        "correctSurvivorLayout": true,
+        "staleUpdateAfterDisposeIgnored": true,
+        "sounds": 3,
+        "expected": 3
+      },
+      {
+        "spectator": true,
+        "progression": "4\u21923\u21922\u21921",
+        "noMidChainReposition": true,
+        "correctSurvivorLayout": true,
+        "staleUpdateAfterDisposeIgnored": true,
+        "sounds": 1,
+        "expected": 1
+      }
+    ]
+  },
+  "finalOverview": {
+    "passed": true,
+    "results": [
+      {
+        "count": 2,
+        "unique": true,
+        "exactPlagueDom": true,
+        "finalReveal": true,
+        "afterPlaybackOnly": true
+      },
+      {
+        "count": 3,
+        "unique": true,
+        "exactPlagueDom": true,
+        "finalReveal": true,
+        "afterPlaybackOnly": true
+      },
+      {
+        "count": 4,
+        "unique": true,
+        "exactPlagueDom": true,
+        "finalReveal": true,
+        "afterPlaybackOnly": true
+      }
+    ]
+  },
+  "animations": {
+    "passed": true,
+    "results": [
+      {
+        "kind": "wizard",
+        "completed": true,
+        "observed": "wizard-meteor-flight",
+        "stableTurn": true,
+        "disposed": true
+      },
+      {
+        "kind": "dragon",
+        "completed": true,
+        "observed": "dragon-flight-overlay",
+        "stableTurn": true,
+        "disposed": true
+      },
+      {
+        "kind": "demon",
+        "completed": true,
+        "observed": "demon-mega-blast",
+        "stableTurn": true,
+        "disposed": true
+      },
+      {
+        "kind": "archer",
+        "completed": true,
+        "observed": "archer-arrow-flight",
+        "stableTurn": true,
+        "disposed": true
+      },
+      {
+        "kind": "goblin",
+        "completed": true,
+        "observed": "goblin-bomb-flight",
+        "stableTurn": true,
+        "disposed": true
+      }
+    ]
+  },
+  "plagueIdentity": {
+    "passed": true,
+    "exactAcceptedHostAndRng": true,
+    "oldCrossBoardPlagueReproduced": true,
+    "realPlagueBoards": 4,
+    "exactBoardPlague": true,
+    "liveHidden": true,
+    "allFinalUnits": true,
+    "uniqueParticipants": true,
+    "allObserversEqual": true,
+    "hostRngUnchangedByProjection": true
+  },
+  "protectedFiles": {
+    "count": 694,
+    "allMatchAcceptedBase": true
+  }
+}

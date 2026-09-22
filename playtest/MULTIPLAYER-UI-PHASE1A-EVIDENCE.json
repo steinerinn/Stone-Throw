@@ -1,0 +1,275 @@
+{
+  "status": "UNACCEPTED / UNPROMOTED",
+  "branch": "multiplayer-ui-phase1",
+  "base": "9fd9ec7e9691f17c5a539ecf504660169af23d31",
+  "protectedFilesUnchanged": 684,
+  "layout": {
+    "passed": true,
+    "evidence": [
+      {
+        "count": 2,
+        "width": 1440,
+        "secondary": 0,
+        "routes": 0,
+        "hiddenPlacementSafe": true
+      },
+      {
+        "count": 2,
+        "width": 390,
+        "secondary": 0,
+        "routes": 0,
+        "hiddenPlacementSafe": true
+      },
+      {
+        "count": 3,
+        "width": 1440,
+        "secondary": 1,
+        "routes": 3,
+        "hiddenPlacementSafe": true
+      },
+      {
+        "count": 3,
+        "width": 390,
+        "secondary": 1,
+        "routes": 3,
+        "hiddenPlacementSafe": true
+      },
+      {
+        "count": 4,
+        "width": 1440,
+        "secondary": 2,
+        "routes": 4,
+        "hiddenPlacementSafe": true
+      },
+      {
+        "count": 4,
+        "width": 390,
+        "secondary": 2,
+        "routes": 4,
+        "hiddenPlacementSafe": true
+      }
+    ]
+  },
+  "animation": {
+    "passed": true,
+    "results": [
+      {
+        "kind": "wizard",
+        "completed": true,
+        "observed": "wizard-meteor-flight",
+        "stableTurn": true,
+        "disposed": true
+      },
+      {
+        "kind": "dragon",
+        "completed": true,
+        "observed": "dragon-flight-overlay",
+        "stableTurn": true,
+        "disposed": true
+      },
+      {
+        "kind": "demon",
+        "completed": true,
+        "observed": "demon-mega-blast",
+        "stableTurn": true,
+        "disposed": true
+      },
+      {
+        "kind": "archer",
+        "completed": true,
+        "observed": "archer-arrow-flight",
+        "stableTurn": true,
+        "disposed": true
+      },
+      {
+        "kind": "goblin",
+        "completed": true,
+        "observed": "goblin-bomb-flight",
+        "stableTurn": true,
+        "disposed": true
+      }
+    ]
+  },
+  "transition": {
+    "passed": true,
+    "localHidden": true,
+    "results": [
+      {
+        "spectator": false,
+        "progression": "4→3→2→1",
+        "noMidChainReposition": true,
+        "correctSurvivorLayout": true,
+        "staleUpdateAfterDisposeIgnored": true,
+        "sounds": 3,
+        "expected": 3
+      },
+      {
+        "spectator": true,
+        "progression": "4→3→2→1",
+        "noMidChainReposition": true,
+        "correctSurvivorLayout": true,
+        "staleUpdateAfterDisposeIgnored": true,
+        "sounds": 1,
+        "expected": 1
+      }
+    ]
+  },
+  "parity": {
+    "passed": true,
+    "results": [
+      {
+        "kind": "inf",
+        "exactHostAndRng": true,
+        "steps": 3
+      },
+      {
+        "kind": "wizard",
+        "exactHostAndRng": true,
+        "steps": 1
+      },
+      {
+        "kind": "dragon",
+        "exactHostAndRng": true,
+        "steps": 1
+      },
+      {
+        "kind": "demon",
+        "exactHostAndRng": true,
+        "steps": 1
+      },
+      {
+        "kind": "archer",
+        "exactHostAndRng": true,
+        "steps": 1
+      },
+      {
+        "kind": "goblin",
+        "exactHostAndRng": true,
+        "steps": 1
+      }
+    ]
+  },
+  "privacy-dom": {
+    "passed": true,
+    "legitimateScoutRetained": true,
+    "foreignScoutAbsentBeforeAndAfterTargetSwitch": true,
+    "onlyAcceptedPublicMissesAddedDuringElimination": true
+  },
+  "local": [
+    {
+      "width": 390,
+      "mode": "single",
+      "firstMenuInteraction": true,
+      "deploymentBattle": true,
+      "noMenuBlip": true,
+      "continuous": true,
+      "soundNoDuplicates": true,
+      "before": {
+        "index": 1,
+        "time": 1.561542,
+        "battlePlays": 1,
+        "menuPlays": 1
+      },
+      "after": {
+        "index": 1,
+        "time": 2.37424,
+        "battlePlays": 1,
+        "menuPlays": 1
+      }
+    },
+    {
+      "width": 390,
+      "mode": "story",
+      "firstMenuInteraction": true,
+      "deploymentBattle": true,
+      "noMenuBlip": true,
+      "continuous": true,
+      "soundNoDuplicates": true,
+      "before": {
+        "index": 3,
+        "time": 1.381587,
+        "battlePlays": 1,
+        "menuPlays": 1
+      },
+      "after": {
+        "index": 3,
+        "time": 1.909841,
+        "battlePlays": 1,
+        "menuPlays": 1
+      }
+    }
+  ],
+  "privacy": {
+    "secondaryPrivacy": true,
+    "primaryProjectionParity": true,
+    "passed": true,
+    "realScoutChoices": 5,
+    "observer": 3,
+    "target": 0,
+    "newObserver": 2,
+    "realEliminationTargetSwitch": true,
+    "legitimateKnowledgeRetained": true,
+    "noForeignFootprintOrScoutVisual": true,
+    "projectionDoesNotMutateHostOrRng": true
+  },
+  "inherited": [
+    {
+      "suite": "hof-check.mjs",
+      "passed": true
+    },
+    {
+      "suite": "public-qualification-check.mjs",
+      "passed": true
+    },
+    {
+      "suite": "browser-check.mjs",
+      "passed": true
+    },
+    {
+      "suite": "live-check.mjs",
+      "passed": true
+    },
+    {
+      "suite": "routing-check.mjs",
+      "passed": true
+    },
+    {
+      "suite": "overnight-rematch-check.mjs",
+      "passed": true
+    },
+    {
+      "suite": "music-check.mjs",
+      "passed": true
+    },
+    {
+      "suite": "statistics-reliability-check.mjs",
+      "passed": true
+    }
+  ],
+  "avatar": {
+    "passed": true,
+    "assets": 63,
+    "atomicRegistration": true,
+    "forgedDenied": 12,
+    "unlimitedChanges": 15,
+    "fiveFinalizedWinsAcrossModes": true,
+    "fourWinsLocked": true,
+    "storyCompletion": true,
+    "guestAiUnfinishedDuplicateExcluded": true,
+    "multiSessionRestart": true,
+    "fallback": true,
+    "specialA": true
+  },
+  "recovery": {
+    "passed": true,
+    "staleStartupNoticeAbsent": true,
+    "explicitResumeErrorVisible": true,
+    "phoneMenu": true,
+    "onlineCreate": true,
+    "localRetry": true,
+    "restartPreservesReference": true,
+    "exactSavedHost": true,
+    "originalUntouched": true,
+    "journalDisabled": true
+  }
+}

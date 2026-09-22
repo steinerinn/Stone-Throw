@@ -3,7 +3,7 @@ import { neighbors8 } from '../rules/coordinates.js';
 import { plagueBranchCount, plagueWeightedChoice, plagueWholeEdgeCandidates } from './units/plague.js';
 import { work } from './scheduling.js';
 export function plagueProgress(ctx, op) {
-    const p = ctx.frames.at(-1).detachedPlague || ctx.state.plagues.find(p => p.targetBoardId === op.targetBoardId);
+    const p = ctx.frames.at(-1).detachedPlague || ctx.state.plagues.find(p => p.targetBoardId === op.targetBoardId && (!op.plagueId || p.outbreaks.some(o => o.statisticsId === op.plagueId)));
     if (!p)
         return;
     const outbreak = p.outbreaks[op.outbreakIndex], frame = ctx.frames.at(-1), insert = (...ops) => frame.current.splice(frame.cursor, 0, ...ops.map(op => work(ctx, op, 'turn-boundary')));
@@ -11,7 +11,7 @@ export function plagueProgress(ctx, op) {
         p.announced = true;
         const active = p.outbreaks.some(o => o.round > 0 && o.round < 5 && o.frontier.length > 0);
         if (!active) {
-            ctx.state.plagues = ctx.state.plagues.filter(q => q.targetBoardId !== op.targetBoardId);
+            ctx.state.plagues = ctx.state.plagues.filter(q => q !== p);
             emit(ctx, 'plague-contained');
         }
         return;

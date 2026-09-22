@@ -281,9 +281,10 @@ export function stepResolution(ctx, options = {}) {
         catapultImpact(ctx, op.meta, d.answer.cell, op.impact, op.generated);
     }
     else if (op.kind === 'plague-step') {
-        const plague = ctx.state.plagues.find(p => p.targetBoardId === op.targetBoardId);
-        if (plague && plague.moveOnPlayerId === ctx.activePlayerId) {
-            const frame = pushFrame(ctx, 'plague', [{ kind: 'plague-progress', targetBoardId: op.targetBoardId, outbreakIndex: 0, parentIndex: 0, childIndex: 0, wanted: 0, oldFrontier: [], nextFrontier: [], reserved: [], stage: 'start' }]);
+        const due = ctx.state.plagues.filter(p => p.targetBoardId === op.targetBoardId && p.moveOnPlayerId === ctx.activePlayerId && (!op.plagueId || p.outbreaks.some(o => o.statisticsId === op.plagueId)));
+        for (const plague of [...due].reverse()) {
+            const plagueId = plague.outbreaks[0]?.statisticsId;
+            const frame = pushFrame(ctx, 'plague', [{ kind: 'plague-progress', targetBoardId: op.targetBoardId, ...(plagueId ? { plagueId } : {}), outbreakIndex: 0, parentIndex: 0, childIndex: 0, wanted: 0, oldFrontier: [], nextFrontier: [], reserved: [], stage: 'start' }]);
             frame.compatibilityTurnId = plague.triggerPlayerId;
         }
     }

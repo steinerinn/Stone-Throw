@@ -1,0 +1,772 @@
+{
+  "status": "ACCEPTED",
+  "branch": "multiplayer-ui-phase1",
+  "before": {
+    "workingTree": "dirty; existing Phase 1A and overnight work retained",
+    "manifest": "c41b021e5afc40b11a8cb3de4b262dd5431c1917589a6e97425c99035f4f400b",
+    "inputRace": "Original controller dispatched one command for locked-down/unlocked-up; corrected dispatch count zero.",
+    "dualPlague": "Original scheduling retained one container after two schedules; corrected retains two."
+  },
+  "story": {
+    "passed": true,
+    "checks": 11,
+    "activeBattle": 1,
+    "lifetime": {
+      "scenes": [
+        "border",
+        "castle",
+        "catapult",
+        "phase2_equal",
+        "phase2_dwarf",
+        "phase2_elf",
+        "phase2_goblin",
+        "phase2_sync",
+        "phase3_necro"
+      ],
+      "units": [
+        "inf",
+        "cav",
+        "archer",
+        "castle",
+        "catapult",
+        "dwarf",
+        "elf",
+        "goblin",
+        "necro"
+      ],
+      "finished": false
+    }
+  },
+  "storyStorage": {
+    "passed": true,
+    "checks": 9,
+    "additiveLegacyRead": true,
+    "staleRunRejected": true,
+    "activeMonotonicWithinRun": true,
+    "lifetimePreserved": true,
+    "permanentHeroUnlock": true,
+    "conditionalCleric": true,
+    "unrelatedAccountAuthCareerUnchanged": true
+  },
+  "input": {
+    "passed": true,
+    "checks": 6,
+    "lockedSpam": 8,
+    "playbackSpam": 15,
+    "pointerRaces": 2,
+    "ordinaryClicks": 2
+  },
+  "dualPlague": {
+    "passed": true,
+    "checks": 15,
+    "ids": [
+      "create-plague-0",
+      "create-plague-1"
+    ],
+    "timeline": [
+      {
+        "round": 1,
+        "id": "create-plague-0",
+        "owner": "seat-0",
+        "cells": 1,
+        "ms": 0.9451000000000036,
+        "rngBefore": 0,
+        "rngAfter": 0
+      },
+      {
+        "round": 1,
+        "id": "create-plague-1",
+        "owner": "seat-2",
+        "cells": 1,
+        "ms": 0.09649999999999892,
+        "rngBefore": 0,
+        "rngAfter": 0
+      },
+      {
+        "round": 2,
+        "id": "create-plague-0",
+        "owner": "seat-0",
+        "cells": 1,
+        "ms": 0.31059999999999377,
+        "rngBefore": 0,
+        "rngAfter": 2
+      },
+      {
+        "round": 2,
+        "id": "create-plague-1",
+        "owner": "seat-2",
+        "cells": 2,
+        "ms": 0.31269999999999243,
+        "rngBefore": 2,
+        "rngAfter": 5
+      },
+      {
+        "round": 3,
+        "id": "create-plague-0",
+        "owner": "seat-0",
+        "cells": 1,
+        "ms": 0.11849999999999739,
+        "rngBefore": 5,
+        "rngAfter": 7
+      },
+      {
+        "round": 3,
+        "id": "create-plague-1",
+        "owner": "seat-2",
+        "cells": 3,
+        "ms": 0.16849999999999454,
+        "rngBefore": 7,
+        "rngAfter": 12
+      },
+      {
+        "round": 4,
+        "id": "create-plague-0",
+        "owner": "seat-0",
+        "cells": 2,
+        "ms": 0.09430000000000405,
+        "rngBefore": 12,
+        "rngAfter": 15
+      },
+      {
+        "round": 4,
+        "id": "create-plague-1",
+        "owner": "seat-2",
+        "cells": 5,
+        "ms": 0.3511999999999773,
+        "rngBefore": 15,
+        "rngAfter": 23
+      },
+      {
+        "round": 5,
+        "id": "create-plague-0",
+        "owner": "seat-0",
+        "cells": 3,
+        "ms": 0.13980000000000814,
+        "rngBefore": 23,
+        "rngAfter": 28
+      },
+      {
+        "round": 5,
+        "id": "create-plague-1",
+        "owner": "seat-2",
+        "cells": 10,
+        "ms": 0.28480000000001837,
+        "rngBefore": 28,
+        "rngAfter": 43
+      }
+    ]
+  },
+  "plagueRegression": {
+    "passed": true,
+    "cases": 22,
+    "results": [
+      {
+        "type": "inf",
+        "counts": [
+          1,
+          1,
+          2,
+          2,
+          4
+        ],
+        "resumeParity": true
+      },
+      {
+        "type": "cav",
+        "counts": [
+          1,
+          1,
+          2,
+          2,
+          4
+        ],
+        "resumeParity": true
+      },
+      {
+        "type": "castle",
+        "counts": [
+          1,
+          1,
+          2,
+          2,
+          4
+        ],
+        "resumeParity": true
+      },
+      {
+        "type": "archer",
+        "counts": [
+          1,
+          1,
+          2,
+          2,
+          4
+        ],
+        "resumeParity": true
+      },
+      {
+        "type": "monk",
+        "counts": [
+          1,
+          1,
+          2,
+          2,
+          4
+        ],
+        "resumeParity": true
+      },
+      {
+        "type": "dwarf",
+        "counts": [
+          1,
+          1,
+          2,
+          2,
+          4
+        ],
+        "resumeParity": true
+      },
+      {
+        "type": "elf",
+        "counts": [
+          1,
+          1,
+          2,
+          2,
+          4
+        ],
+        "resumeParity": true
+      },
+      {
+        "type": "catapult",
+        "counts": [
+          1,
+          1,
+          2,
+          2,
+          4
+        ],
+        "resumeParity": true
+      },
+      {
+        "type": "wizard",
+        "counts": [
+          1,
+          1,
+          2,
+          2,
+          4
+        ],
+        "resumeParity": true
+      },
+      {
+        "type": "goblin",
+        "counts": [
+          1,
+          1,
+          2,
+          2,
+          4
+        ],
+        "resumeParity": true
+      },
+      {
+        "type": "cleric",
+        "counts": [
+          1,
+          1,
+          2,
+          2,
+          4
+        ],
+        "resumeParity": true
+      },
+      {
+        "type": "necro",
+        "counts": [
+          1,
+          1,
+          2,
+          2,
+          4
+        ],
+        "resumeParity": true
+      },
+      {
+        "type": "dragon",
+        "counts": [
+          1,
+          1,
+          2,
+          2,
+          4
+        ],
+        "resumeParity": true
+      },
+      {
+        "type": "demon",
+        "counts": [
+          1,
+          1,
+          2,
+          2,
+          4
+        ],
+        "resumeParity": true
+      },
+      {
+        "type": "hero",
+        "counts": [
+          1,
+          1,
+          2,
+          2,
+          4
+        ],
+        "resumeParity": true
+      },
+      {
+        "type": "hero",
+        "seats": 2,
+        "target": 0,
+        "counts": [
+          1,
+          1,
+          2,
+          2,
+          4
+        ]
+      },
+      {
+        "type": "hero",
+        "seats": 2,
+        "target": 1,
+        "counts": [
+          1,
+          1,
+          2,
+          2,
+          4
+        ]
+      },
+      {
+        "type": "hero",
+        "seats": 4,
+        "target": 0,
+        "counts": [
+          1,
+          1,
+          2,
+          2,
+          4
+        ]
+      },
+      {
+        "type": "hero",
+        "seats": 4,
+        "target": 1,
+        "counts": [
+          1,
+          1,
+          2,
+          2,
+          4
+        ]
+      },
+      {
+        "type": "genuinely-blocked",
+        "contained": true
+      },
+      {
+        "type": "source-eliminated-host-recovery",
+        "rounds": [
+          1,
+          2,
+          3,
+          4,
+          5
+        ]
+      },
+      {
+        "type": "infected-board-eliminated",
+        "contained": true
+      }
+    ]
+  },
+  "plagueService": {
+    "passed": true,
+    "timeline": [
+      {
+        "command": 1,
+        "owner": "seat-2",
+        "id": "dual-real-plague-1",
+        "step": 1,
+        "cells": 1,
+        "serviceMs": 9.35520000000001,
+        "presentationFrames": 2
+      },
+      {
+        "command": 5,
+        "owner": "seat-0",
+        "id": "dual-real-plague-0",
+        "step": 1,
+        "cells": 1,
+        "serviceMs": 8.767300000000006,
+        "presentationFrames": 2
+      },
+      {
+        "command": 9,
+        "owner": "seat-2",
+        "id": "dual-real-plague-1",
+        "step": 2,
+        "cells": 1,
+        "serviceMs": 8.392799999999994,
+        "presentationFrames": 2
+      },
+      {
+        "command": 13,
+        "owner": "seat-0",
+        "id": "dual-real-plague-0",
+        "step": 2,
+        "cells": 1,
+        "serviceMs": 8.636099999999999,
+        "presentationFrames": 2
+      },
+      {
+        "command": 17,
+        "owner": "seat-2",
+        "id": "dual-real-plague-1",
+        "step": 3,
+        "cells": 1,
+        "serviceMs": 8.857100000000003,
+        "presentationFrames": 2
+      },
+      {
+        "command": 21,
+        "owner": "seat-0",
+        "id": "dual-real-plague-0",
+        "step": 3,
+        "cells": 2,
+        "serviceMs": 11.902599999999978,
+        "presentationFrames": 3
+      },
+      {
+        "command": 25,
+        "owner": "seat-2",
+        "id": "dual-real-plague-1",
+        "step": 4,
+        "cells": 2,
+        "serviceMs": 12.675200000000018,
+        "presentationFrames": 3
+      },
+      {
+        "command": 29,
+        "owner": "seat-0",
+        "id": "dual-real-plague-0",
+        "step": 4,
+        "cells": 3,
+        "serviceMs": 16.369000000000028,
+        "presentationFrames": 4
+      },
+      {
+        "command": 33,
+        "owner": "seat-2",
+        "id": "dual-real-plague-1",
+        "step": 5,
+        "cells": 3,
+        "serviceMs": 18.199299999999994,
+        "presentationFrames": 4
+      },
+      {
+        "command": 37,
+        "owner": "seat-0",
+        "id": "dual-real-plague-0",
+        "step": 5,
+        "cells": 6,
+        "serviceMs": 29.181699999999978,
+        "presentationFrames": 7
+      }
+    ]
+  },
+  "plagueBrowser": {
+    "passed": true,
+    "timeline": [
+      {
+        "i": 0,
+        "frames": 2,
+        "ms": 225.79999995231628,
+        "position": 1,
+        "plagueCells": 1
+      },
+      {
+        "i": 1,
+        "frames": 2,
+        "ms": 245,
+        "position": 1,
+        "plagueCells": 2
+      },
+      {
+        "i": 2,
+        "frames": 2,
+        "ms": 239.5,
+        "position": 2,
+        "plagueCells": 3
+      },
+      {
+        "i": 3,
+        "frames": 2,
+        "ms": 282.10000002384186,
+        "position": 2,
+        "plagueCells": 4
+      },
+      {
+        "i": 4,
+        "frames": 2,
+        "ms": 242.89999997615814,
+        "position": 3,
+        "plagueCells": 5
+      },
+      {
+        "i": 5,
+        "frames": 3,
+        "ms": 279.39999997615814,
+        "position": 3,
+        "plagueCells": 7
+      },
+      {
+        "i": 6,
+        "frames": 3,
+        "ms": 259.8000000715256,
+        "position": 4,
+        "plagueCells": 9
+      },
+      {
+        "i": 7,
+        "frames": 4,
+        "ms": 297.60000002384186,
+        "position": 4,
+        "plagueCells": 12
+      },
+      {
+        "i": 8,
+        "frames": 4,
+        "ms": 309.7999999523163,
+        "position": 5,
+        "plagueCells": 15
+      },
+      {
+        "i": 9,
+        "frames": 7,
+        "ms": 419.10000002384186,
+        "position": 5,
+        "plagueCells": 21
+      }
+    ]
+  },
+  "regression": {
+    "suites": 8,
+    "passed": 8,
+    "results": [
+      {
+        "file": "hof-check.mjs",
+        "passed": true
+      },
+      {
+        "file": "public-qualification-check.mjs",
+        "passed": true
+      },
+      {
+        "file": "browser-check.mjs",
+        "passed": true
+      },
+      {
+        "file": "live-check.mjs",
+        "passed": true
+      },
+      {
+        "file": "routing-check.mjs",
+        "passed": true
+      },
+      {
+        "file": "overnight-rematch-check.mjs",
+        "passed": true
+      },
+      {
+        "file": "music-check.mjs",
+        "passed": true
+      },
+      {
+        "file": "statistics-reliability-check.mjs",
+        "passed": true
+      }
+    ]
+  },
+  "existingTargeted": {
+    "storyAccountChecks": 11,
+    "combatExactParityUnits": [
+      "inf",
+      "wizard",
+      "dragon",
+      "demon",
+      "archer",
+      "goblin"
+    ],
+    "exactAcceptedSingleOutbreakHostRng": true,
+    "layoutDesktopPhoneDuelThreeFour": true,
+    "survivorTransitionAndSpectator": true,
+    "scoutPrivacyRealElimination": true,
+    "finalOverviewTwoThreeFour": true,
+    "archerArrivalAndOneCatapultCue": true,
+    "mixedTwoHumanTwoAiHeartbeat": true,
+    "stalePollGeneration": true,
+    "captureWorkerExactHostRngAndRotation": true
+  },
+  "filesChangedInThisPass": [
+    "StoneThrow-v1.427-stage13-development.html",
+    "StoneThrow-v1.427-stage13-production.html",
+    "canonical/compiled/combat/contracts.d.ts",
+    "canonical/compiled/combat/plague-scheduler.js",
+    "canonical/compiled/combat/resolver.js",
+    "canonical/compiled/combat/serialization.js",
+    "canonical/compiled/combat/statistical-facts.js",
+    "canonical/compiled/combat/units/necromancer.js",
+    "canonical/compiled/host/lifecycle.js",
+    "canonical/compiled/local-host/normal-policy.js",
+    "canonical/compiled/policy/auto-target.js",
+    "canonical/compiled/policy/special-decisions.js",
+    "canonical/shared/combat/contracts.ts",
+    "canonical/shared/combat/plague-scheduler.ts",
+    "canonical/shared/combat/resolver.ts",
+    "canonical/shared/combat/serialization.ts",
+    "canonical/shared/combat/statistical-facts.ts",
+    "canonical/shared/combat/units/necromancer.ts",
+    "canonical/shared/host/lifecycle.ts",
+    "canonical/shared/local-host/normal-policy.ts",
+    "canonical/shared/policy/auto-target.ts",
+    "canonical/shared/policy/special-decisions.ts",
+    "client-v13/presentation.js",
+    "client-v13/story-account.js",
+    "client-v13/story-browser.js",
+    "server/main.mjs",
+    "server/plague-capture.mjs",
+    "server/registry.mjs",
+    "server/story-progress.mjs",
+    "source/legacy/story.js",
+    "tools/local-recovery-contract.json"
+  ],
+  "filesAddedInThisPass": [
+    "tools/dual-plague-check.mjs",
+    "tools/story-run-storage-check.mjs",
+    "tools/precommit-story-browser-check.mjs",
+    "tools/precommit-input-browser-check.mjs",
+    "tools/precommit-plague-service-check.mjs",
+    "tools/precommit-plague-browser-check.mjs",
+    "tools/fixtures/input-archer.json",
+    "MULTIPLAYER-UI-PRECOMMIT-REPORT.md",
+    "MULTIPLAYER-UI-PRECOMMIT-EVIDENCE.json"
+  ],
+  "noPrivateRegistryModified": true,
+  "noCommitPushMergeDeploy": true,
+  "after": {
+    "trackedModified": 42,
+    "untrackedFiles": 22,
+    "staged": 0,
+    "totalPaths": 64
+  },
+  "launcher": {
+    "productionStartup": true,
+    "restart": true,
+    "isolatedRegistry": true,
+    "journalAbsent": true
+  },
+  "testedBaseHead": "9fd9ec7e9691f17c5a539ecf504660169af23d31",
+  "acceptedGitRef": "multiplayer-ui-phase1",
+  "acceptance": {
+    "date": "2026-09-22",
+    "physicalStoryChecks": "PASS",
+    "watchlist": [
+      "locked-click natural physical observation",
+      "dual-Plague natural pacing/presentation observation"
+    ],
+    "deferred": "cumulative performance / Game Log / polling / persistence / fsync after UI completion",
+    "verificationJobs": 18,
+    "verificationJobsPassed": 18,
+    "fullRegressionSuites": 8,
+    "fullRegressionPassed": 8,
+    "focusedNamedChecks": 63,
+    "tests": [
+      {
+        "file": "outputs/stage6/tools/package/lib/tsc.js",
+        "passed": true
+      },
+      {
+        "file": "tools/precommit-story-browser-check.mjs",
+        "passed": true
+      },
+      {
+        "file": "tools/story-run-storage-check.mjs",
+        "passed": true
+      },
+      {
+        "file": "tools/dual-plague-check.mjs",
+        "passed": true
+      },
+      {
+        "file": "outputs/multiplayer-ui-phase1/overnight/projectile-check.mjs",
+        "passed": true
+      },
+      {
+        "file": "tools/online-catapult-check.mjs",
+        "passed": true
+      },
+      {
+        "file": "tools/online-overview-check.mjs",
+        "passed": true
+      },
+      {
+        "file": "tools/online-final-overview-check.mjs",
+        "passed": true
+      },
+      {
+        "file": "tools/plague-continuation-check.mjs",
+        "passed": true
+      },
+      {
+        "file": "tools/precommit-input-browser-check.mjs",
+        "passed": true
+      },
+      {
+        "file": "tools/precommit-plague-service-check.mjs",
+        "passed": true
+      },
+      {
+        "file": "tools/precommit-plague-browser-check.mjs",
+        "passed": true
+      },
+      {
+        "file": "outputs/multiplayer-ui-phase1/fix1/layout-check.mjs",
+        "passed": true
+      },
+      {
+        "file": "outputs/multiplayer-ui-phase1/fix1/transition-check.mjs",
+        "passed": true
+      },
+      {
+        "file": "outputs/multiplayer-ui-phase1/spectator/check.mjs",
+        "passed": true
+      },
+      {
+        "file": "outputs/multiplayer-ui-phase1/overnight/heartbeat-check.mjs",
+        "passed": true
+      },
+      {
+        "file": "outputs/multiplayer-ui-phase1/overnight/stale-check.mjs",
+        "passed": true
+      },
+      {
+        "file": "outputs/registry-hof-phase3/final-check.mjs",
+        "passed": true
+      }
+    ]
+  }
+}

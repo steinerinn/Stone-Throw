@@ -46,8 +46,8 @@ export type Operation=
  |{kind:'catapult';meta:SourceMetadata;cell:Cell;impact:number;generated:ReactionEntry[]}
  |{kind:'catapult-resume';meta:SourceMetadata;impact:number;generated:ReactionEntry[];decisionId:RuleDecisionId}
  |{kind:'catapult-series';ownerId:PlayerId;remaining:number}
- |{kind:'plague-step';targetBoardId:BoardId}
- |{kind:'plague-progress';targetBoardId:BoardId;outbreakIndex:number;parentIndex:number;childIndex:number;wanted:number;oldFrontier:string[];nextFrontier:string[];reserved:string[];stage:'start'|'branch'|'child'|'finish'}
+ |{kind:'plague-step';targetBoardId:BoardId;plagueId?:string}
+ |{kind:'plague-progress';targetBoardId:BoardId;plagueId?:string;outbreakIndex:number;parentIndex:number;childIndex:number;wanted:number;oldFrontier:string[];nextFrontier:string[];reserved:string[];stage:'start'|'branch'|'child'|'finish'}
  |{kind:'terminal-check';reason:'chain-end'|'direct-end'|'catapult-sibling'|'plague-sibling'};
 export interface RuleWork {id:WorkId;rootId:ResolutionId;parentId:WorkId|null;timing:Timing;operation:Operation}
 export interface AttackFrame {detachedPlague:CompatPlague|null;compatibilityTurnId:PlayerId;id:WorkId;kind:'root'|'attack'|'wave'|'interrupt'|'catapult'|'plague';current:RuleWork[];next:ReactionEntry[];deferred:{unitId:UnitId;cell:Cell;meta:SourceMetadata}[];cursor:number;terminalCheck:boolean;stage:'body'|'finish'}

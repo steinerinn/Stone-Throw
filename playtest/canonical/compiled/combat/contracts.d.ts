@@ -173,9 +173,11 @@ export type Operation = {
 } | {
     kind: 'plague-step';
     targetBoardId: BoardId;
+    plagueId?: string;
 } | {
     kind: 'plague-progress';
     targetBoardId: BoardId;
+    plagueId?: string;
     outbreakIndex: number;
     parentIndex: number;
     childIndex: number;

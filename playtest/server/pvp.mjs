@@ -1,3 +1,4 @@
+import {publicBoardView} from './board-overview.mjs';
 import {presence,DISCONNECT_GRACE_MS,HEARTBEAT_TIMEOUT_MS} from './disconnect-policy.mjs';
 import {duelAiStep} from './duel-ai.mjs';
 import {roomPresentation} from './room-presentation.mjs';
@@ -22,7 +23,7 @@ export function createPvpService(roster,{seed,now=Date.now}={}){
  function sample(r){for(let i=0;i<2;i++)captureStatistics(perspective(r,i),r.statistics[i]);}
  function handle(map,id,prefix){if(!map.has(id))map.set(id,prefix+(map.size+1));return map.get(id);}
  function project(r,i,after=0){const h=perspective(r,i),own=h.config.players[0].id;for(const u of h.state.match.units.filter(u=>u.ownerId===own))handle(r.handles[i],u.id,`own-${r.epoch}-${i}-`);for(const d of h.pendingRoot?.decisions.filter(d=>d.actorId===own)||[])handle(r.choices[i],d.id,`choice-${r.epoch}-${i}-`);
-  const memory={...r.memory,...(i?{resultMessage:null}:{})};const update=projectSeat(h,memory,r.statistics[i],r.epoch,r.revision,r.handles[i],r.choices[i],after);if(r.host.status==='placement')for(const row of Object.values(update.snapshot.strips.opponent)){row.placed=0;row.destroyed=0;row.heroHits=0;}return update;
+  const memory={...r.memory,...(i?{resultMessage:null}:{})};const update=projectSeat(h,memory,r.statistics[i],r.epoch,r.revision,r.handles[i],r.choices[i],after);update.snapshot.online={room:'duel-'+r.epoch,self:i,names:r.seats.map(s=>s?.name||''),originalRing:[0,1],ring:[0,1],current:r.host.config.players.findIndex(p=>p.id===r.host.activePlayerId),shots:r.host.state.seats.find(s=>s.playerId===r.host.activePlayerId)?.ordinaryShots||0,boards:r.host.status==='complete'?[publicBoardView(perspective(r,1),0),publicBoardView(perspective(r,0),1)]:[],complete:r.host.status==='complete'};if(r.host.status==='placement')for(const row of Object.values(update.snapshot.strips.opponent)){row.placed=0;row.destroyed=0;row.heroHits=0;}return update;
  }
  const metadata=(r,i)=>{const state=presence(r,now());return {code:r.code,self:i,names:r.seats.map(s=>s?.name||null),ready:[...r.ready],rematch:[...r.rematch],connected:state.map(s=>s.connected),presence:state,graceMs:DISCONNECT_GRACE_MS,controllers:r.seats.map(s=>s?.controller||'human'),closed:r.closed,news:r.news||[],quickStart:{status:r.quick?.status||'available',proposer:0},waiting:!!r.host.pendingRoot?.decisions.some(d=>d.status==='pending'&&d.actorId!==r.host.config.players[i].id)};};
  function read(r,i,after=0){return presentation.decorate(r,i,{...project(r,i,after),lan:metadata(r,i)},after);}

@@ -1,0 +1,25 @@
+#stOnlineOverview{position:relative;width:100%;padding-top:64px;margin:12px 0 24px}#stOnlineOverview[hidden]{display:none}.st-secondary-boards{display:flex;justify-content:center;gap:36px;align-items:start;flex-wrap:wrap}.st-secondary-card{padding:12px;max-width:46%;box-sizing:border-box;--cell:clamp(9px,1.45vw,22px)}.st-secondary-card[hidden]{display:none}.st-secondary-card h3{margin:0 0 12px;color:#e6c575;text-align:center}.st-secondary-card .grid{display:grid;gap:1px}.st-secondary-card .unit-strip{display:flex;justify-content:center;flex-wrap:wrap;margin-top:8px}.st-secondary-card .st-grid-host{width:max-content;max-width:100%;margin:auto}.st-turn-dial{position:absolute;top:0;left:calc(50% - 23px);width:46px;height:46px;border:2px solid #9f7d3c;border-radius:50%;display:grid;place-items:center;background:#171b1b;color:#f2d28b;z-index:2}.st-turn-dial strong{font-size:25px}.st-turn-pointer{position:absolute;inset:-12px;display:flex;align-items:center;justify-content:flex-end;color:#dca84a;transform-origin:center;pointer-events:none}.st-route-arrows{position:absolute;inset:0;width:100%;height:100%;overflow:visible;pointer-events:none;z-index:1}.st-route-arrows path{stroke:#9e713a;stroke-width:2;fill:none;opacity:.75}#stOnlineOverview[data-survivors="3"] .st-turn-dial{left:calc(25% - 23px)}.st-main-menu-mode #stOnlineOverview{display:none}@media(max-width:650px){.st-secondary-boards{gap:12px}.st-secondary-card{padding:6px;max-width:48%;--cell:clamp(6px,1.7vw,11px)}.st-secondary-card h3{font-size:14px;overflow-wrap:anywhere}.st-secondary-card .unit-strip{zoom:.65}.st-route-arrows path{stroke-width:1.5}}
+
+.st-secondary-card{position:relative;z-index:2;background:#151b1e}.st-multiplayer-mode .st-board-wrap{position:relative;z-index:2}.st-turn-dial{z-index:3}@media(max-width:650px){.st-secondary-boards{flex-direction:column;align-items:center}.st-secondary-card{max-width:100%;--cell:var(--st-cell,18px)}#stOnlineOverview{max-width:100%}}
+.st-turn-dial[hidden]{display:none}
+/* Desktop correction: compact shared composition; narrow stacking remains unchanged. */
+#stOnlineOverview{padding-top:32px;margin:4px 0 16px}
+.st-secondary-boards{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:24px;align-items:start}
+.st-secondary-card{width:100%;max-width:none;padding:6px;--cell:22px}
+.st-secondary-card h3{margin:0 0 6px;line-height:22px}
+.st-secondary-card .unit-strip{flex-wrap:nowrap;width:max-content;max-width:100%;margin:4px auto 0}
+.st-secondary-card .unit-strip-item{flex-shrink:0}
+.st-turn-dial,#stOnlineOverview[data-survivors="3"] .st-turn-dial{top:-10px;left:calc(50% - 23px)}
+.st-route-arrows{z-index:3}
+.st-route-arrows .st-route-link{stroke:#b48343;stroke-width:1.7;fill:none;opacity:.85}
+.st-route-arrows .st-route-tip{fill:#bf8d49;stroke:none;opacity:1}
+.st-final-hidden{display:none!important}
+#stOnlineOverview.st-final-overview{padding-top:0}
+@media(max-width:650px){.st-secondary-boards{display:flex;flex-direction:column;align-items:center;gap:12px}.st-secondary-card{width:auto;max-width:100%;--cell:var(--st-cell,18px)}.st-secondary-card .unit-strip{flex-wrap:wrap}}
+
+.st-secondary-card h3{margin-bottom:12px}
+
+/* Retired primary scaffolding must not leave miniature frames above spectator boards. */
+.st-observer-hidden{display:none!important}
+#stOnlineOverview.st-spectator-overview{padding-top:58px}
+#stOnlineOverview.st-spectator-overview .st-turn-dial{top:4px}

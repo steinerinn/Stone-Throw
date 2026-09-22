@@ -1,9 +1,9 @@
 // Legacy visual functions extracted verbatim except cancellation handling and authorized reserved Demon glyph/rotation lookup.
 import {logEvent} from './game-log.js';
-export function mountLegacyAnimations(size){
+export function mountLegacyAnimations(size,resolve=id=>globalThis.document.getElementById(id)){
  let SIZE=size,disposed=false,battleAsyncEpoch=0;const AUTO_MATCH_MODE=false,DEMON_STEP_MS=200,activeScreenShakes=new Map(),reserved=new Map(),elements=new Set(),animations=new Set();
  let stSalesBlastToken=0;const stSalesBlastTimers=new Map(),phase='play',fastSimulationMode=()=>false;
- const realDocument=globalThis.document,document={querySelector:q=>realDocument.querySelector(q),getElementById:id=>realDocument.getElementById(id),body:{appendChild:e=>{if(!disposed)appendAnchored(e);return e;}},createElement:tag=>{const e=realDocument.createElement(tag);elements.add(e);const remove=e.remove.bind(e);e.remove=()=>{for(const child of e.querySelectorAll("*"))elements.delete(child);elements.delete(e);remove();};const native=e.animate.bind(e);e.animate=(...args)=>{const a=native(...args);animations.add(a);a.finished.catch(()=>{}).finally(()=>animations.delete(a));return a;};return e;}};
+ const realDocument=globalThis.document,document={querySelector:q=>realDocument.querySelector(q),getElementById:id=>resolve(id),body:{appendChild:e=>{if(!disposed)appendAnchored(e);return e;}},createElement:tag=>{const e=realDocument.createElement(tag);elements.add(e);const remove=e.remove.bind(e);e.remove=()=>{for(const child of e.querySelectorAll("*"))elements.delete(child);elements.delete(e);remove();};const native=e.animate.bind(e);e.animate=(...args)=>{const a=native(...args);animations.add(a);a.finished.catch(()=>{}).finally(()=>animations.delete(a));return a;};return e;}};
  const playerGrid=document.getElementById('playerGrid'),enemyGrid=document.getElementById('enemyGrid');
  // Keep the legacy viewport choreography in a board-anchored coordinate plane.
  // Layout movement transforms the plane, never the animation or gameplay clock.

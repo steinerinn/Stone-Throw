@@ -51,9 +51,9 @@ export function catapultOrigin(h, actor, avoidKnown = [], avoidOrigins = []) { c
         if (!safe.has(k))
             outside.push(k);
     } return bestCatapult(h, actor, outside.length ? outside : all, safe); }
-export function heroPlagueSafe(h, owner, candidates) { const p = h.state.plagues.find(p => p.targetPlayerId === owner); if (!candidates.length || !p)
+export function heroPlagueSafe(h, owner, candidates) { const outbreaks = h.state.plagues.filter(p => p.targetPlayerId === owner).flatMap(p => p.outbreaks); if (!candidates.length || !outbreaks.length)
     return [...candidates]; const protectedSet = protectedCells(h, owner), safe = candidates.filter(k => !protectedSet.has(k)); if (safe.length)
-    return safe; const distance = (k) => { const c = parseKey(k); let best = Infinity; for (const o of p.outbreaks) {
+    return safe; const distance = (k) => { const c = parseKey(k); let best = Infinity; for (const o of outbreaks) {
     const seeds = o.frontier.length ? o.frontier : o.infected.length ? o.infected : o.origin ? [cellKey(o.origin)] : [];
     for (const seed of seeds) {
         const q = parseKey(seed);

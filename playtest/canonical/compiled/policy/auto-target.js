@@ -6,8 +6,7 @@ import { random } from '../combat/rng.js';
 export const brain = (h, id) => h.brains.find(b => b.playerId === id);
 export const draw = (h, purpose) => random(h.pendingRoot?.rng || h.rng, 'policy:' + purpose);
 export function pick(h, list, purpose) { return list.length ? list[Math.floor(draw(h, purpose) * list.length)] : null; }
-export function protectedCells(h, targetId) { const result = new Set(), p = h.state.plagues.find(p => p.targetPlayerId === targetId); if (!p)
-    return result; for (const o of p.outbreaks) {
+export function protectedCells(h, targetId) { const result = new Set(), outbreaks = h.state.plagues.filter(p => p.targetPlayerId === targetId).flatMap(p => p.outbreaks); for (const o of outbreaks) {
     const remaining = Math.max(0, 5 - o.round);
     if (remaining <= 0)
         continue;
