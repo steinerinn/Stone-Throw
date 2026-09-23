@@ -8,7 +8,13 @@ export function monkProximity(ctx, meta, k) {
         const possible = near.filter(c => !target.shots.includes(c));
         observer.monkCandidates = observer.monkCandidates.length ? observer.monkCandidates.filter(c => possible.includes(c)) : possible;
         emit(ctx, 'monk-clue', { ...meta, origin: parseKey(k) }, monk.id, observer.monkCandidates.map(parseKey), null, 'positive');
-        return { kind: 'monk-deflect', meta: reactionMeta(ctx.state, monk, 'monk-deflect', monk.cells[0]) };
+        const retaliation = reactionMeta(ctx.state, monk, 'monk-deflect', monk.cells[0]);
+        if (meta.source === 'direct-human' || meta.source === 'direct-ai') {
+            const attacker = seat(ctx.state, meta.actorId);
+            retaliation.targetPlayerId = attacker.playerId;
+            retaliation.targetBoardId = attacker.boardId;
+        }
+        return { kind: 'monk-deflect', meta: retaliation };
     }
     if (mk && mk !== k && observer.monkCandidates.length) {
         const before = [...observer.monkCandidates], impossible = [k, ...near];

@@ -1,3 +1,35 @@
+# ACCEPTED — Online / Single Player setup and causal fixes
+
+2026-09-23; branch online-game-ui-phase1. Accepted parent/base: 6d37741720b94518da2d7a66d154fc7b8a77ec3a.
+Scope: Online Create/Join/private discovery, 1/2/3-AI Single Player, Quick Start, classification/backfill tooling, Story Scout/Cleric, PLAYER/Main Menu cleanup and Monk retaliation targeting.
+Final verification: 188 checks/groups plus accepted-base authority/RNG parity PASS; TypeScript and changed compiled output parity PASS.
+Manifest: 994/994 PASS; SHA-256 441812518a61cd20781b7a7bb78882201b36c662e2c8559e0a444b04b662916a.
+Exact commit scope and all eight non-blocking WATCHLIST entries: playtest/ONLINE-GAME-PHASE1-ACCEPTANCE.md. These are accepted watchlist items, not failed/unaccepted blockers.
+Private Registry/backup and test artifacts excluded. checkpoint.journal remains disabled. Commit/push authorized; no merge or deployment.
+
+---
+
+# Monk direct-shot retaliation — UNACCEPTED / UNPROMOTED
+
+Branch: online-game-ui-phase1. Direct retaliation uses the incoming authoritative attacker; Monk-deflect default targeting remains unchanged. Physical retest required; original physical cached-target divergence not reproduced from a fresh synchronized room.
+Runtime scope: canonical Monk proximity source + compiled output only. Report: playtest/MONK-RETALIATION-REPORT.md.
+37 focused groups plus accepted-base authority/RNG parity PASS. Manifest: 993/993 PASS; SHA-256 e23b528641aef3e7d85cf85de94bb9051fb5222e2dcb7938810dcf332bae1d24.
+No commit, push, merge, deployment. Existing candidate work and watchlist preserved.
+
+---
+
+# Story causal fixes + entry wording — UNACCEPTED / UNPROMOTED
+
+Branch: online-game-ui-phase1. Accepted baseline: 6d37741720b94518da2d7a66d154fc7b8a77ec3a.
+Prior Online/local SP/Quick Start/classification work physically passed. Current follow-up adds missing local enemy-Scout footprints, requires executed Plague evidence for Cleric progression, uses MAIN MENU at Online entry, and visible PLAYER / AI / EMPTY terminology without changing internal controllers.
+Report: playtest/STORY-CAUSAL-UI-REPORT.md. Prior reports: playtest/QUICK-START-CLASSIFICATION.md and playtest/SINGLE-PLAYER-LOCAL-GROUP.md.
+102 focused checks/groups plus accepted-base authority/RNG parity PASS.
+Manifest: 991/991 PASS; SHA-256 46182f105264c0b52326987ca39e73b63f04b970637d07601bea23e74fa1c3a6.
+Recovery compatibility explicitly retains the previous candidate; host/checkpoint schema and combat/RNG unchanged. Private Registry untouched in this pass. checkpoint.journal remains disabled.
+Await physical Story and wording retest. No commit, push, merge, deployment or acceptance. Existing watchlist unchanged.
+
+---
+
 # ACCEPTED — Result Screen / Game Log / physical cleanup
 
 2026-09-22 physical acceptance. Branch result-screen-ui-phase1; parent/base c008851de246968eda21ae37e50484e3e2ffb7f7.
