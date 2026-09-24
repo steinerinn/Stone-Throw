@@ -2,7 +2,7 @@ import type {UnitType} from '../model.js';import type {ExplicitRng} from '../com
 type Roster=Partial<Record<UnitType,number>>;type Cav={x:number;y:number;orient:'H'|'V';cells?:string[]};type Castle={id:string;cells:Set<string>;complete:boolean};
 export interface PolicyPlacement {type:UnitType;cells:string[]}
 /** Mechanically isolated compatibility policy; source provenance records each omitted visual statement. */
-export function legacyRandomPlacement(profile:'first-seat'|'second-seat',SIZE:number,roster:Roster,rng:ExplicitRng,STORY_MODE_ACTIVE=false,STORY_BATTLE_NUMBER=0):PolicyPlacement[]{
+export function legacyRandomPlacement(profile:'first-seat'|'second-seat',SIZE:number,roster:Roster,rng:ExplicitRng,STORY_MODE_ACTIVE=false,STORY_BATTLE_NUMBER=0,fixedCells:readonly string[]=[]):PolicyPlacement[]{
 const nextRandom=()=>random(rng,'placement:'+profile),CASTLE_SIZE=5;const INF_COUNT=roster.inf||0,CAV_COUNT=roster.cav||0,ARCHER_COUNT=roster.archer||0,MONK_COUNT=roster.monk||0,CASTLE_COUNT=roster.castle||0,DWARF_COUNT=roster.dwarf||0,GOBLIN_COUNT=roster.goblin||0,CATAPULT_COUNT=roster.catapult||0,ELF_COUNT=roster.elf||0,CLERIC_COUNT=roster.cleric||0,DEMON_COUNT=roster.demon||0,DRAGON_COUNT=roster.dragon||0,WIZARD_COUNT=roster.wizard||0,NECRO_COUNT=roster.necro||0,HERO_COUNT=roster.hero||0;const CURRENT_ENEMY_ROSTER=roster;
 const playerUnits=new Set<string>(),enemyUnits=new Set<string>(),enemyInfKeys=new Set<string>(),playerArcherAbilityUsed=new Set<string>(),enemyArcherAbilityUsed=new Set<string>();const cavMap=new Map<string,Cav>(),enemyCavMap=new Map<string,Cav>(),cellToCav=new Map<string,string>(),enemyCellToCav=new Map<string,string>(),playerCastles=new Map<string,Castle>(),enemyCastles=new Map<string,Castle>();const playerArcherKeys:string[]=[],enemyArcherKeys:string[]=[],playerCatapultKeys:string[]=[],enemyCatapultKeys:string[]=[],playerNecroKeys:string[]=[],enemyNecroKeys:string[]=[];let cavIdSeq=0,castleIdSeq=0,enemyCastleIdSeq=0;let monkKey:string|null=null,dwarfKey:string|null=null,goblinKey:string|null=null,elfKey:string|null=null,clericKey:string|null=null,demonKey:string|null=null,dragonKey:string|null=null,wizardKey:string|null=null,heroKey:string|null=null;let enemyMonkKey:string|null=null,enemyDwarfKey:string|null=null,enemyGoblinKey:string|null=null,enemyElfKey:string|null=null,enemyClericKey:string|null=null,enemyDemonKey:string|null=null,enemyDragonKey:string|null=null,enemyWizardKey:string|null=null,enemyHeroKey:string|null=null,heroActivated=false,enemyHeroActivated=false;
 const key=geometry.key,parseKey=geometry.parseKey,inBounds=(x:number,y:number)=>geometry.inBounds({size:SIZE},x,y),neighbors4=(x:number,y:number)=>geometry.neighbors4({size:SIZE},x,y),ring3x3CellsOf=(cells:readonly string[])=>geometry.ring3x3CellsOf({size:SIZE},cells),cavCellsAt=(x:number,y:number,o:'H'|'V')=>geometry.cavCellsAt(x,y,o),castleCellsConnected=(cells:Set<string>)=>legality.castleCellsConnected({size:SIZE},cells);
@@ -112,7 +112,7 @@ function clericFarEnoughFromMonk(clericK: string | null, monkK: string | null) {
 }
 function placeEnemyStoryCoreRoster(roster: Roster) {
     for (let attempt = 0; attempt < 500; attempt++) {
-        enemyUnits.clear();
+        enemyUnits.clear();for(const k of fixedCells)enemyUnits.add(k);
         enemyInfKeys.clear();
         enemyCavMap.clear();
         enemyCellToCav.clear();
@@ -331,7 +331,7 @@ function placeEnemyRandom() {
     if (STORY_MODE_ACTIVE)
         return placeEnemyStoryCoreRoster(CURRENT_ENEMY_ROSTER);
     for (let boardAttempt = 0; boardAttempt < 80; boardAttempt++) {
-        enemyUnits.clear();
+        enemyUnits.clear();for(const k of fixedCells)enemyUnits.add(k);
         enemyInfKeys.clear();
         enemyCavMap.clear();
         enemyCellToCav.clear();
@@ -651,7 +651,7 @@ function playerRandomNearMonk(maxDist = 2, avoidOuterEdge = false) {
 }
 function randomPlayerStoryCoreRoster() {
     for (let attempt = 0; attempt < 500; attempt++) {
-        playerUnits.clear();
+        playerUnits.clear();for(const k of fixedCells)playerUnits.add(k);
         cavMap.clear();
         cellToCav.clear();
         cavIdSeq = 0;
@@ -874,7 +874,7 @@ function randomPlayerPlacement() {
         return randomPlayerStoryCoreRoster();
     const MAX_ATTEMPTS = 50;
     for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
-        playerUnits.clear();
+        playerUnits.clear();for(const k of fixedCells)playerUnits.add(k);
         cavMap.clear();
         cellToCav.clear();
         cavIdSeq = 0;
@@ -1203,7 +1203,7 @@ function randomPlayerPlacement() {
             continue;
         return;
     }
-    playerUnits.clear();
+    playerUnits.clear();for(const k of fixedCells)playerUnits.add(k);
     cavMap.clear();
     cellToCav.clear();
     cavIdSeq = 0;
@@ -1227,4 +1227,4 @@ function randomPlayerPlacement() {
 }
 
 if(profile==='first-seat')randomPlayerPlacement();else placeEnemyRandom();
-const units=profile==='first-seat'?playerUnits:enemyUnits,cavs=profile==='first-seat'?cavMap:enemyCavMap,byCell=profile==='first-seat'?cellToCav:enemyCellToCav,castles=profile==='first-seat'?playerCastles:enemyCastles,archers=profile==='first-seat'?playerArcherKeys:enemyArcherKeys,catapults=profile==='first-seat'?playerCatapultKeys:enemyCatapultKeys,necros=profile==='first-seat'?playerNecroKeys:enemyNecroKeys;const singles:Partial<Record<UnitType,string|null>>=profile==='first-seat'?{monk:monkKey,dwarf:dwarfKey,goblin:goblinKey,elf:elfKey,cleric:clericKey,demon:demonKey,dragon:dragonKey,wizard:wizardKey,hero:heroKey}:{monk:enemyMonkKey,dwarf:enemyDwarfKey,goblin:enemyGoblinKey,elf:enemyElfKey,cleric:enemyClericKey,demon:enemyDemonKey,dragon:enemyDragonKey,wizard:enemyWizardKey,hero:enemyHeroKey};const seen=new Set<string>(),out:PolicyPlacement[]=[];for(const k of units){if(seen.has(k))continue;const castle=[...castles.values()].find(c=>c.cells.has(k)),cav=cavs.get(byCell.get(k)||'');let cells=[k],type:UnitType='inf';if(castle){cells=[...castle.cells];type='castle';}else if(cav){cells=cav.cells||cavCellsAt(cav.x,cav.y,cav.orient);type='cav';}else if(archers.includes(k))type='archer';else if(catapults.includes(k))type='catapult';else if(necros.includes(k))type='necro';else {const single=Object.entries(singles).find(([,v])=>v===k);if(single)type=single[0] as UnitType;}for(const c of cells)seen.add(c);out.push({type,cells});}return out;}
+const units=profile==='first-seat'?playerUnits:enemyUnits,cavs=profile==='first-seat'?cavMap:enemyCavMap,byCell=profile==='first-seat'?cellToCav:enemyCellToCav,castles=profile==='first-seat'?playerCastles:enemyCastles,archers=profile==='first-seat'?playerArcherKeys:enemyArcherKeys,catapults=profile==='first-seat'?playerCatapultKeys:enemyCatapultKeys,necros=profile==='first-seat'?playerNecroKeys:enemyNecroKeys;const singles:Partial<Record<UnitType,string|null>>=profile==='first-seat'?{monk:monkKey,dwarf:dwarfKey,goblin:goblinKey,elf:elfKey,cleric:clericKey,demon:demonKey,dragon:dragonKey,wizard:wizardKey,hero:heroKey}:{monk:enemyMonkKey,dwarf:enemyDwarfKey,goblin:enemyGoblinKey,elf:enemyElfKey,cleric:enemyClericKey,demon:enemyDemonKey,dragon:enemyDragonKey,wizard:enemyWizardKey,hero:enemyHeroKey};const seen=new Set<string>(),out:PolicyPlacement[]=[];for(const k of units){if(fixedCells.includes(k)||seen.has(k))continue;const castle=[...castles.values()].find(c=>c.cells.has(k)),cav=cavs.get(byCell.get(k)||'');let cells=[k],type:UnitType='inf';if(castle){cells=[...castle.cells];type='castle';}else if(cav){cells=cav.cells||cavCellsAt(cav.x,cav.y,cav.orient);type='cav';}else if(archers.includes(k))type='archer';else if(catapults.includes(k))type='catapult';else if(necros.includes(k))type='necro';else {const single=Object.entries(singles).find(([,v])=>v===k);if(single)type=single[0] as UnitType;}for(const c of cells)seen.add(c);out.push({type,cells});}return out;}

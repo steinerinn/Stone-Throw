@@ -30,3 +30,24 @@ body.st-shell-active.player-shooting #enemyGrid{cursor:default!important}
 body.st-shell-active.player-shooting #enemyGrid .cell.st-shot-legal{cursor:url("assets/cursors/player-shot.png") 11 11,crosshair!important}
 body.st-shell-active.catapult-aiming #enemyGrid .cell{cursor:url("assets/effects/combat-rock.svg") 11 11,crosshair!important}
 body.st-shell-active.resurrection-cursor #playerGrid .cell{cursor:url("assets/cursors/resurrection.png") 11 11,crosshair!important}
+
+/* Artwork overlays only: the accepted dial box, board geometry and DOM remain intact. */
+.st-turn-dial{border:0;border-radius:0;background:none;isolation:isolate;transform:translate(-2px,-20px)}
+.st-turn-dial::before{content:"";position:absolute;left:50%;top:50%;width:72px;height:72px;transform:translate(-50%,-50%);background:url('assets/battlefield/turn-medallion.png') center/contain no-repeat;z-index:-1;pointer-events:none}
+.st-turn-count{position:absolute;inset:0;width:46px;height:46px;overflow:visible;pointer-events:none}.st-turn-count text{font:bold 22px Georgia,serif;fill:currentColor;filter:drop-shadow(0 1px 3px #000)}
+.st-turn-pointer{inset:-22px;display:block}
+.st-turn-pointer::after{content:"";position:absolute;right:0;top:50%;width:44px;height:44px;transform:translateY(-50%) rotate(90deg);background:url('assets/battlefield/turn-pointer.png') center/contain no-repeat}
+.st-route-art{pointer-events:none;opacity:1;filter:brightness(1.35) drop-shadow(0 0 2px #d6a441)}
+@media(max-width:650px){.st-route-arrows,.st-turn-dial{display:none!important}}
+
+/* Remove only the four-player lower-row spacer; overlays remain out of flow. */
+@media(min-width:651px){#stOnlineOverview[data-survivors="4"]:not(.st-final-overview):not(.st-spectator-overview){padding-top:5px;margin-top:0}#stOnlineOverview[data-survivors="4"]:not(.st-final-overview):not(.st-spectator-overview) .st-turn-dial{top:-6px}}
+
+/* Use the same responsive cell dimensions as the primary battlefields. */
+@media(min-width:651px){.st-secondary-card{--cell:inherit;padding-inline:1px;min-width:376px}}
+
+/* Five pixels of additional breathing room, without changing board dimensions. */
+@media(min-width:651px){#stOnlineOverview[data-survivors="3"]:not(.st-spectator-overview):not(.st-final-overview){padding-top:1px}#stOnlineOverview.st-spectator-overview .st-secondary-boards{row-gap:5px}}
+
+/* Measured map dimensions must not be clamped by the secondary card content box. */
+@media(min-width:651px){.st-secondary-card .st-grid-host{max-width:none;margin-inline:0;left:50%;translate:-50% 0}}

@@ -7,6 +7,7 @@ export function prepareStatistics(holder,h,epoch,{mode,build,now,participants,ne
  if(d.endedAt){d.classification??=classifyMatch(d);return d;}
  if(!d.startedAt){d.participants=participants.map((s,i)=>({actor:h.config.players[i].id,seat:i,kind:s?.controller==='ai'?'ai':s?.identity?.kind==='account'?'account':'guest',playerId:s?.controller==='ai'?null:s?.identity?.playerId||null,displayName:s?.name||s?.identity?.displayName||'Guest',outcome:null,reliability:null}));if(h.status==='placement')return null;d.startedAt=now();d.configuration=structuredClone(h.config);d.initialPlacements=structuredClone(h.placements);d.initialRng=structuredClone(h.initialRng);}
  d.classification??=classifyMatch(d);
+ if(holder.deploymentDiagnostics)d.deploymentDiagnostics=structuredClone(holder.deploymentDiagnostics);
  for(const n of news){if(n.id<=d.newsCursor)continue;d.reliabilityEvents.push({...n,observedAt:now()});d.newsCursor=Math.max(d.newsCursor,n.id);}
  for(let i=0;i<d.participants.length;i++){const p=d.participants[i],s=participants[i];if(p.kind==='ai')continue;if(s?.statDeparture){p.cutoff=s.statDeparture.eventCursor;p.takeover=s.statDeparture.reason;p.reliability=s.statDeparture.reason==='surrender'?'Quit':s.statDeparture.reason==='kick'?'Kick':'Disconnect';p.outcome='Loss';}}
  if(gaveUp){const p=d.participants[0];p.outcome='Loss';p.reliability='Quit';}

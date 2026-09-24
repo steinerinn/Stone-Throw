@@ -9,15 +9,12 @@ else
     p.nextShots += 5; if (meta.source.startsWith('direct-') || p.playerId !== ruleTurn(ctx))
     futureBenefit(ctx, meta, 'dwarf', 5); emit(ctx, 'benefit-scheduled', meta, null, [], 5, 'dwarf'); }
 export function catapultBenefit(ctx, meta) { const p = seat(ctx.state, meta.targetPlayerId); if (meta.source === 'plague')
-    return; if (meta.source.startsWith('direct-'))
-    p.catapultLater++;
-else if (p.playerId === ruleTurn(ctx))
+    return; if (p.playerId === ruleTurn(ctx))
     p.catapultNow++;
-else if (meta.source === 'archer')
-    p.nextShots++;
-else
-    p.catapultLater++; if (meta.source.startsWith('direct-') || p.playerId !== ruleTurn(ctx))
-    futureBenefit(ctx, meta, meta.source === 'archer' ? 'ordinary-shots' : 'catapult', 1); emit(ctx, 'benefit-scheduled', meta, null, [], 1, meta.source === 'archer' && p.playerId !== ruleTurn(ctx) ? 'archer-ordinary-shot-quirk' : 'catapult'); }
+else {
+    p.catapultLater++;
+    futureBenefit(ctx, meta, 'catapult', 1);
+} emit(ctx, 'benefit-scheduled', meta, null, [], 1, 'catapult'); }
 export function elfRule(ctx, meta) { const p = seat(ctx.state, meta.targetPlayerId); if (meta.source === 'plague')
     return; if (!meta.source.startsWith('direct-') && p.playerId === ruleTurn(ctx))
     p.elfNow = true;

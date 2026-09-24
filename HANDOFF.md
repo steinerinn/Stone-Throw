@@ -1,3 +1,56 @@
+# ACCEPTED — Battlefield / Deployment Phase
+
+2026-09-24. Branch: `battlefield-deployment-phase1`. Accepted parent: `b25d1da884f6084015996d49435077b2c29cffbb` (Online / Single Player checkpoint).
+
+The user has physically accepted the current candidate. Battlefield UI is complete and frozen for this phase. This acceptance supersedes all earlier UNACCEPTED / UNPROMOTED labels in the historical notes below. Commit and push authorized; no merge or deployment.
+
+Accepted scope: supplied battlefield route/medallion assets; equal-size aligned battlefield maps and animation-safe geometry; live/spectator/final cleanup; floating central deployment window covering stats/map banners without moving maps; portraits/identity/flags/readiness; stable Random layout; Ready/Unready and 120-second timer starting after required PLAYER seats join; canonical missing-unit timeout placement and durable rejoin; finalized Online reliability and minimum gates; diagnostic-only deployment AFK; removal of room banner; Leave navigation and newest-first visible Events. The explicitly authorized source-independent non-Plague Catapult benefit correction is included; its physical reaction case remains WATCHLIST. No Score implementation or unrelated combat/RNG redesign.
+
+Final verification: 35 focused suites completed successfully, comprising 574 explicitly counted cases/groups and seven additional pass/fail suites. TypeScript 5.9.3 compilation PASS; all 160 generated canonical files match byte-for-byte. Exact accepted-parent combat/RNG comparison: 47 cases PASS. Build manifest: 1008/1008 PASS (digest reported after final metadata refresh; manifest cannot contain its own digest).
+
+Non-blocking follow-up only:
+- Event panel polish: backlog.
+- Catapult reaction physical case: WATCHLIST, not a failed acceptance gate.
+- Match Score / PLAYER vs AI: separate next phase; dry-run outputs excluded from Git.
+- Profile work: separate next phase.
+- Historical isolated Castle/Plague disclosure and multiplayer seat-loss reports remain documented watchlist evidence, with no speculative new fixes.
+
+No private Registry/database/backup, screenshots, browser captures, generated accounts, logs, Score analysis, archives or OS-temp artifacts belong to this checkpoint. Normal playtest launcher keeps checkpoint.journal disabled; durable tests confirm no journal. Exact candidate scope and verification are in `playtest/BATTLEFIELD-DEPLOYMENT-REPORT.md`.
+
+---
+
+## Historical development notes (superseded by acceptance above)
+
+# Battlefield / Deployment / Online Reliability — UNACCEPTED / UNPROMOTED
+
+2026-09-23. Branch battlefield-deployment-phase1; directly based on accepted b25d1da884f6084015996d49435077b2c29cffbb.
+Supplied route/turn assets copied verbatim and scaled in accepted existing gaps; exact accepted battlefield geometry restored; deployment identities/readiness/countdown; reversible Ready; 120-second deadline begins when all required PLAYER seats join. Timeout fills only missing units through canonical placement. Deadline/placement/RNG survive restart/rejoin.
+Reliability uses finalized Online records only: surrender completed, permanent disconnect/abandonment one failure, grace/rejoin unpenalized. New accounts UNRATED and Guests cannot satisfy positive room minimums. Deployment AFK is diagnostic-only; no combat AFK rule.
+Verification: 289 checks/groups PASS plus accepted-base authority/RNG parity, TypeScript/compiled-byte parity and original-asset equality. Manifest: 1008/1008 PASS; SHA-256 739ca6878e80bc82f4427cb028fb4b5579ae424a4c45f820a29519f57372ffb2.
+Authoritative geometry correction: 52 focused cases PASS, including 10 exact accepted map/DOM geometry comparisons on desktop/phone. Earlier 289-case result above is historical. No gameplay/server/asset changes in this correction.
+Latest art-only follow-up: dial overlay 20px higher; pointer 44px; readable 56px broad / 64px curved arrows. 10 browser cases rerun PASS; maps unchanged.
+Tiny follow-up: only desktop 4P lower row raised 20px; horizontal digit ink centered with unchanged vertical position. No arrow/gameplay logic change.
+Final three-item correction: active desktop 4P wrapper gap measures 0px; measured digit ink centered on both axes; straight directions strictly cardinal. 10 focused browser cases PASS. Medallion position, map dimensions and gameplay unchanged.
+Horizontal-gap clarification completed: lower desktop 4P cards move inward 12px each; horizontal gap 0px, sizes and vertical positions unchanged. 10 browser cases PASS.
+Equal-map-size follow-up: active desktop lower maps now inherit primary cell size; all four grids measure equally, horizontal gap stays closed. 10 browser cases PASS.
+Real-match regression fixed: hidden-card DOM order made nth-child offsets hit wrong cards after the first action. Visible-child selectors keep the horizontal gap 0px through six actions each in full-roster Single Player and Online; 14 live checkpoints plus 10 fixture cases PASS.
+Spectator follow-up: curved arrow beside lower map; shared indicator anchor under top maps in every desktop live/spectator state. Lower rows gain 5px breathing room. 10 browser cases PASS.
+Unified desktop layouts: equal map sizes in live/spectator/final, common 72px indicator and same 5px lower-row gap for live 3P/4P and spectator.
+Indicator center raised into the upper unit-bar bottoms; lower frames/cells follow measured primary dimensions. Full frame and grid size checks added to live and fixture browser suites.
+Demon orphan follow-up: failed animation cleanup now occurs immediately, not only at whole-room completion. Browser failure cleanup and four final overview cases PASS; successful combat unchanged.
+Indicator/width-cap follow-up: moved the shared dial 2px left with its vertical position unchanged. Removed the desktop secondary frame max-width cap and centered the frame independently of card content width, preserving measured primary dimensions. The physical browser was unavailable, so the exact physical discrepancy remains unconfirmed. Ten desktop/phone overview checks PASS at 1440/390px; fourteen real Single Player/Online checkpoints PASS at 1280px through six actions per mode. All four frames measured 343.015625 square and grids 311.015625 square at 1280px. Runtime change only styles-online-overview.css. No gameplay change.
+
+Visible-column alignment correction: supersedes the earlier zero lower-card-gap objective. Removed the opposing 12px inward offsets. In active desktop 4P, each lower card is positioned from its actual map-frame left edge to the corresponding upper map-frame left edge; frame sizes remain synchronized. No indicator is used as a reference or changed. Both visible frame edges and widths are now asserted, rather than only card gap/width. Real full-roster Single Player and Online: start plus six actions each at 1440px and 1280px, 28 checkpoints PASS. Ten overview desktop/phone checks PASS. Screenshots at both desktop widths reviewed with matching frame columns and equal grid/frame dimensions. Runtime files: client-v13/online-overview.js and styles-online-overview.css. No gameplay changes; UNACCEPTED / UNPROMOTED.
+
+Animation/layout regression correction: reproduced lower-card displacement of about 186px when a board shake replaces the frame centering transform and a scroll geometry update compensates the animated rectangle. Centering now uses the independent CSS translate property; column alignment subtracts transient transform translations before positioning cards. Shake timing/strength and gameplay unchanged. Regression samples six paused shake frames with scroll/layout updates: failed before, PASS after with stationary card and bounded intended shake. Ten overview cases and fourteen real Single Player/Online start/action checkpoints PASS. Runtime files: styles-online-overview.css and client-v13/online-overview.js. Indicator unchanged. UNACCEPTED / UNPROMOTED.
+
+Authoritative Catapult rule correction: every new non-Plague Catapult hit now grants a Catapult benefit. Removed off-turn Archer nextShots++ and ordinary-shots ledger conversion; removed direct-source forced deferral on the owner turn. Owner-turn benefits use catapultNow; off-turn benefits use existing catapultLater plus Catapult ledger entry. Plague excluded. Existing duplicate-hit guard, turn-entry delivery, serialization, targeting/roll/RNG algorithms and visuals unchanged. Expanded archer-catapult-group-check.mjs with 66 deterministic cases (11 sources x own/off turn x 2/3/4 seats), duplicate hit checks, ordinary budget unchanged, pending/private restore and normal turn transitions, exactly one choice and five resolved contacts. Original eight Group cases covered own-turn chains only, leaving the off-turn exception untested; retained and PASS. Browser Archer chain deterministic state/RNG and single presentation PASS; Online Catapult five-frame single-group PASS; ten local Group authority/RNG parity groups PASS; TypeScript build PASS. Runtime changes only canonical/shared/combat/units/benefits.ts and generated canonical/compiled/combat/units/benefits.js. Physical retest: Archer hits Catapult off-turn -> next legal owner turn offers Catapult target choice; ordinary shot budget unchanged. UNACCEPTED / UNPROMOTED; no commit/push/merge/deployment.
+
+Exact runtime/assets/test scope and physical retest list: playtest/BATTLEFIELD-DEPLOYMENT-REPORT.md. Prior accepted watchlist preserved. Private Registry untouched; test DBs/screenshots only in OS temp; checkpoint.journal remains disabled.
+NO COMMIT / NO PUSH / NO MERGE / NO DEPLOYMENT. Stop for physical testing.
+
+---
+
 # ACCEPTED — Online / Single Player setup and causal fixes
 
 2026-09-23; branch online-game-ui-phase1. Accepted parent/base: 6d37741720b94518da2d7a66d154fc7b8a77ec3a.

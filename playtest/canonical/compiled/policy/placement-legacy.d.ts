@@ -6,5 +6,5 @@ export interface PolicyPlacement {
     cells: string[];
 }
 /** Mechanically isolated compatibility policy; source provenance records each omitted visual statement. */
-export declare function legacyRandomPlacement(profile: 'first-seat' | 'second-seat', SIZE: number, roster: Roster, rng: ExplicitRng, STORY_MODE_ACTIVE?: boolean, STORY_BATTLE_NUMBER?: number): PolicyPlacement[];
+export declare function legacyRandomPlacement(profile: 'first-seat' | 'second-seat', SIZE: number, roster: Roster, rng: ExplicitRng, STORY_MODE_ACTIVE?: boolean, STORY_BATTLE_NUMBER?: number, fixedCells?: readonly string[]): PolicyPlacement[];
 export {};

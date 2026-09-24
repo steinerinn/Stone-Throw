@@ -22,3 +22,33 @@
 
 /* Leave clearance for the existing 11px outer battlefield frame. */
 .st-group-board-name{margin:4px 0 16px;text-align:center;color:#f3d786;font-weight:bold;line-height:1.35;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%;padding-inline:12px;}
+
+/* Deployment information is an overlay; accepted header and battlefield geometry remain unchanged. */
+/* Deployment floats across central stats and map banners without moving the maps. */
+#csDeployment{position:absolute;z-index:50;box-sizing:border-box;padding:10px 12px;margin:0;border:1px solid #927341;background:linear-gradient(180deg,#192126,#0c1317);box-shadow:0 5px 18px #0009;color:#dfd9c8;text-align:center;overflow:auto;display:flex;flex-direction:column}
+#csDeployment[hidden],body.st-main-menu-mode #csDeployment{display:none}
+#csDeployment h3{margin:0 0 6px;color:#f0d79b;font-size:20px;letter-spacing:.14em}
+.cs-deployment-clock{margin:0 0 8px;color:#d9c69e;font-size:14px}
+.cs-deployment-seats{display:flex;justify-content:center;gap:12px;flex-wrap:wrap}
+.cs-deployment-seat{box-sizing:border-box;flex:1 1 0;min-width:0;max-width:240px;padding:6px;background:rgba(0,0,0,.2);border:1px solid #494333;display:flex;flex-direction:column;align-items:center;gap:5px}
+.cs-deployment-avatar,.cs-deployment-placeholder{width:clamp(54px,5vw,76px);height:clamp(54px,5vw,76px);object-fit:contain}
+.cs-deployment-placeholder{border:1px solid #555c60;border-radius:50%;background:#252b2e;overflow:hidden;opacity:.55}
+.cs-deployment-placeholder svg{width:100%;height:100%;fill:#899093}
+.cs-deployment-name{display:flex;align-items:center;justify-content:center;gap:5px;min-height:22px;font-size:14px;line-height:1.2;overflow-wrap:anywhere}
+.cs-deployment-flag{width:20px;height:14px;object-fit:contain;flex-shrink:0}
+.cs-deployment-ready{display:inline-flex;align-items:center;gap:6px;padding:5px 9px;border-radius:14px;background:#341d20;color:#ffb6b6;border:1px solid #824449;font:700 11px Arial,sans-serif;letter-spacing:.04em}
+.cs-deployment-ready:before{content:'';width:7px;height:7px;border-radius:50%;background:#ef7777}
+.cs-deployment-seat[data-ready="true"] .cs-deployment-ready{background:#193421;border-color:#41794c;color:#b8efbb}
+.cs-deployment-seat[data-ready="true"] .cs-deployment-ready:before{background:#75da81}
+@media(max-width:650px){#csDeployment{padding:10px}.cs-deployment-seats{gap:8px}.cs-deployment-seat{flex:1 1 calc(50% - 8px);max-width:calc(50% - 4px)}.cs-deployment-clock{font-size:14px}.cs-deployment-avatar,.cs-deployment-placeholder{width:54px;height:54px}}
+
+/* No room banner: retain only actionable setup/error/consent controls. */
+#stLanStatus{display:contents}
+#stLanStatus>*,#stLanStatus>.st-mp-actions{display:none}
+#stLanStatus>#stGroupRematchSetup,#stLanStatus>#stGroupError:not(:empty),#stLanStatus>#stGroupQuickAccept,#stLanStatus>#stGroupQuickDecline{display:block}
+#stLanStatus:has(#stGroupQuickAccept)>p:not(#stGroupTurn):not(:empty){display:block}
+
+/* Keep the deployment header height stable when Random enables READY. */
+body:has(> #csDeployment:not([hidden])) #stStatus{display:block!important}
+
+body.st-multiplayer-mode #stLocalLeave,body.st-main-menu-mode #stLocalLeave{display:none!important}

@@ -2,7 +2,7 @@ import { random } from '../combat/rng.js';
 import * as legality from '../rules/placement.js';
 import * as geometry from '../rules/index.js';
 /** Mechanically isolated compatibility policy; source provenance records each omitted visual statement. */
-export function legacyRandomPlacement(profile, SIZE, roster, rng, STORY_MODE_ACTIVE = false, STORY_BATTLE_NUMBER = 0) {
+export function legacyRandomPlacement(profile, SIZE, roster, rng, STORY_MODE_ACTIVE = false, STORY_BATTLE_NUMBER = 0, fixedCells = []) {
     const nextRandom = () => random(rng, 'placement:' + profile), CASTLE_SIZE = 5;
     const INF_COUNT = roster.inf || 0, CAV_COUNT = roster.cav || 0, ARCHER_COUNT = roster.archer || 0, MONK_COUNT = roster.monk || 0, CASTLE_COUNT = roster.castle || 0, DWARF_COUNT = roster.dwarf || 0, GOBLIN_COUNT = roster.goblin || 0, CATAPULT_COUNT = roster.catapult || 0, ELF_COUNT = roster.elf || 0, CLERIC_COUNT = roster.cleric || 0, DEMON_COUNT = roster.demon || 0, DRAGON_COUNT = roster.dragon || 0, WIZARD_COUNT = roster.wizard || 0, NECRO_COUNT = roster.necro || 0, HERO_COUNT = roster.hero || 0;
     const CURRENT_ENEMY_ROSTER = roster;
@@ -121,6 +121,8 @@ export function legacyRandomPlacement(profile, SIZE, roster, rng, STORY_MODE_ACT
     function placeEnemyStoryCoreRoster(roster) {
         for (let attempt = 0; attempt < 500; attempt++) {
             enemyUnits.clear();
+            for (const k of fixedCells)
+                enemyUnits.add(k);
             enemyInfKeys.clear();
             enemyCavMap.clear();
             enemyCellToCav.clear();
@@ -340,6 +342,8 @@ export function legacyRandomPlacement(profile, SIZE, roster, rng, STORY_MODE_ACT
             return placeEnemyStoryCoreRoster(CURRENT_ENEMY_ROSTER);
         for (let boardAttempt = 0; boardAttempt < 80; boardAttempt++) {
             enemyUnits.clear();
+            for (const k of fixedCells)
+                enemyUnits.add(k);
             enemyInfKeys.clear();
             enemyCavMap.clear();
             enemyCellToCav.clear();
@@ -660,6 +664,8 @@ export function legacyRandomPlacement(profile, SIZE, roster, rng, STORY_MODE_ACT
     function randomPlayerStoryCoreRoster() {
         for (let attempt = 0; attempt < 500; attempt++) {
             playerUnits.clear();
+            for (const k of fixedCells)
+                playerUnits.add(k);
             cavMap.clear();
             cellToCav.clear();
             cavIdSeq = 0;
@@ -883,6 +889,8 @@ export function legacyRandomPlacement(profile, SIZE, roster, rng, STORY_MODE_ACT
         const MAX_ATTEMPTS = 50;
         for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
             playerUnits.clear();
+            for (const k of fixedCells)
+                playerUnits.add(k);
             cavMap.clear();
             cellToCav.clear();
             cavIdSeq = 0;
@@ -1212,6 +1220,8 @@ export function legacyRandomPlacement(profile, SIZE, roster, rng, STORY_MODE_ACT
             return;
         }
         playerUnits.clear();
+        for (const k of fixedCells)
+            playerUnits.add(k);
         cavMap.clear();
         cellToCav.clear();
         cavIdSeq = 0;
@@ -1241,7 +1251,7 @@ export function legacyRandomPlacement(profile, SIZE, roster, rng, STORY_MODE_ACT
     const singles = profile === 'first-seat' ? { monk: monkKey, dwarf: dwarfKey, goblin: goblinKey, elf: elfKey, cleric: clericKey, demon: demonKey, dragon: dragonKey, wizard: wizardKey, hero: heroKey } : { monk: enemyMonkKey, dwarf: enemyDwarfKey, goblin: enemyGoblinKey, elf: enemyElfKey, cleric: enemyClericKey, demon: enemyDemonKey, dragon: enemyDragonKey, wizard: enemyWizardKey, hero: enemyHeroKey };
     const seen = new Set(), out = [];
     for (const k of units) {
-        if (seen.has(k))
+        if (fixedCells.includes(k) || seen.has(k))
             continue;
         const castle = [...castles.values()].find(c => c.cells.has(k)), cav = cavs.get(byCell.get(k) || '');
         let cells = [k], type = 'inf';
