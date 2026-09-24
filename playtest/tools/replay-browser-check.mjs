@@ -1,0 +1,17 @@
+import assert from 'node:assert/strict';import fs from 'node:fs';import os from 'node:os';import path from 'node:path';
+import {startServer} from '../server/main.mjs';
+const {launch}=await import(process.env.ST_BROWSER_HARNESS||'playwright');
+const out=fs.mkdtempSync(path.join(os.tmpdir(),'cs-replay-browser-')),app=await startServer({port:0,registryDir:path.join(out,'registry'),playtestSnapshotOnly:true,logger:()=>{}}),browser=await launch();let checks=0;
+const replay={replayVersion:'CHAIN_SIEGE_PUBLIC_REPLAY_V1',matchId:'test-only',rulesVersion:'test',build:'test',mode:'online',format:'4p',size:15,startedAt:1790208000000,endedAt:1790208600000,coverage:'full-public-events',participants:['VondurDEV','Matti','Rackler','Snurk'].map((name,seat)=>({name,seat,ai:seat>1})),timeline:[{kind:'checkpoint',round:1,turn:1,active:0,boards:[]},...Array.from({length:42},(_,i)=>({kind:i%9===0?'plague':i%7===0?'catapult':'shot',actor:i%4,board:(i+1)%4,observation:i%3===0?'hit':'miss',cells:[{x:i%15,y:Math.floor(i/4)%15}]})),{kind:'checkpoint',round:2,turn:5,active:1,boards:[{seat:1,cells:[{x:0,y:0,observation:'hit',kind:'inf'}]}]},{kind:'special',name:'archer',actor:1},{kind:'elimination',seats:[3]},{kind:'result',placements:[1,2,3,4]}]};
+try{for(const width of [1280,390]){
+ const p=await browser.newPage({viewport:{width,height:width===390?844:1100}}),errors=[];p.on('pageerror',e=>errors.push(e.message));await p.addInitScript(r=>window.replayFixture=r,replay);
+ await p.route('**/client-v13/replay-*.js',r=>{const name=new URL(r.request().url()).pathname.split('/').pop();if(!['replay-viewer.js','replay-state.js'].includes(name))throw Error('Unexpected module');return r.fulfill({contentType:'text/javascript',body:fs.readFileSync(new URL('../client-v13/'+name,import.meta.url),'utf8')});});
+ await p.route('**/replay-test',r=>r.fulfill({contentType:'text/html',body:'<!doctype html><meta name="viewport" content="width=device-width,initial-scale=1"><body style="margin:0;background:#080d10"><main></main><script type="module">import {mountReplayViewer} from "/client-v13/replay-viewer.js";window.viewer=mountReplayViewer(document.querySelector("main"),window.replayFixture);window.ready=true;</script>'}));
+ await p.goto(app.origin+'/replay-test',{waitUntil:'domcontentloaded'});await p.waitForFunction(()=>window.ready);assert.equal(await p.locator('.cs-replay-board').count(),4);checks++;
+ await p.getByRole('button',{name:'NEXT EVENT',exact:true}).click();assert.match(await p.locator('.cs-replay-status').textContent(),/1 \/.*Round 1/);checks++;
+ await p.getByRole('button',{name:'END',exact:true}).click();assert.equal(await p.locator('.cs-replay-board.eliminated').count(),1);checks++;
+ await p.getByRole('button',{name:'PREVIOUS EVENT',exact:true}).click();await p.getByRole('button',{name:'BEGINNING',exact:true}).click();assert.equal(await p.locator('.cs-replay-cell.hit').count(),0);checks++;
+ await p.locator('input[type=range]').evaluate(e=>{e.value='45';e.dispatchEvent(new Event('input'));});assert.match(await p.locator('.cs-replay-status').textContent(),/45 \//);checks++;
+ assert.equal(await p.locator('body').evaluate(e=>e.scrollWidth>innerWidth),false);assert.deepEqual(errors,[]);checks++;
+ await p.screenshot({path:path.join(out,'replay-'+width+'.png'),fullPage:true});await p.close();
+}console.log(JSON.stringify({passed:true,checks,out}));}finally{await browser.close();await app.close();}

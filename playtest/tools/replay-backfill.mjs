@@ -1,0 +1,8 @@
+import {DatabaseSync,backup} from 'node:sqlite';import fs from 'node:fs';import path from 'node:path';
+import {backfillReplays,migrateReplays} from '../server/replay-store.mjs';
+const [file,report,...flags]=process.argv.slice(2),apply=flags.includes('--apply');if(!file||!report)throw Error('Usage: replay-backfill.mjs DATABASE REPORT [--apply]');
+const db=new DatabaseSync(file,{readOnly:!apply});try{
+ const coverage=backfillReplays(db);let backupPath=null,storage=null;
+ if(apply){const prior=JSON.parse(fs.readFileSync(report,'utf8'));if(JSON.stringify(prior.coverage)!==JSON.stringify(coverage))throw Error('Historical coverage changed; review new dry run');backupPath=path.join(path.dirname(file),'backups','registry-before-replays-'+Date.now()+'.sqlite');fs.mkdirSync(path.dirname(backupPath),{recursive:true});await backup(db,backupPath);const verify=new DatabaseSync(backupPath,{readOnly:true});try{if(verify.prepare('PRAGMA integrity_check').get().integrity_check!=='ok')throw Error('Backup integrity failed');}finally{verify.close();}migrateReplays(db);backfillReplays(db,{apply:true});const first=JSON.stringify(db.prepare('SELECT * FROM stat_replays ORDER BY match_id').all());backfillReplays(db,{apply:true});if(first!==JSON.stringify(db.prepare('SELECT * FROM stat_replays ORDER BY match_id').all()))throw Error('Replay backfill is not idempotent');storage=db.prepare('SELECT count(*) retained, sum(length(CAST(payload AS BLOB))) bytes, avg(length(CAST(payload AS BLOB))) averageBytes,max(length(CAST(payload AS BLOB))) maxBytes FROM stat_replays').get();}
+ const result={coverage,applied:apply,backupPath,storage};fs.writeFileSync(apply?report+'.applied.json':report,JSON.stringify(result,null,2));console.log(JSON.stringify(result));
+}finally{db.close();}

@@ -1,5 +1,7 @@
+import {migrateReplays} from './replay-store.mjs';
 import {storyUnlocks,mergeStoryUnlocks} from './story-progress.mjs';
 import {DEFAULT_AVATAR,avatarById} from '../assets/avatars/catalog.mjs';
+import {migrateScores} from './score-store.mjs';
 import {migrateStatistics,statisticsStore} from './statistics-store.mjs';
 import {DatabaseSync} from 'node:sqlite';
 import {randomBytes,randomInt,randomUUID,createHash,scrypt,timingSafeEqual} from 'node:crypto';
@@ -25,7 +27,7 @@ export function openRegistry(directory,{now=Date.now}={}){
  CREATE TABLE IF NOT EXISTS challenges(id TEXT PRIMARY KEY,browser_hash TEXT NOT NULL,answer_hash TEXT NOT NULL,expires INTEGER NOT NULL);
  CREATE TABLE IF NOT EXISTS limits(key TEXT PRIMARY KEY,count INTEGER NOT NULL,reset INTEGER NOT NULL);
 `);
- let migrationBackup;try{migrationBackup=migrateStatistics(db,directory);}catch(error){db.close();throw error;}const statistics=statisticsStore(db,{onFinalized:ids=>{for(const id of ids)refreshAvatar(id);}});
+ let migrationBackup;try{migrationBackup=migrateStatistics(db,directory);if(!db.prepare('PRAGMA table_info(stat_participants)').all().some(c=>c.name==='score_components')){const backups=path.join(directory,'backups');fs.mkdirSync(backups,{recursive:true,mode:0o700});db.prepare('VACUUM INTO ?').run(path.join(backups,'registry-before-match-score-'+randomUUID()+'.sqlite'));}db.exec('BEGIN IMMEDIATE');try{migrateScores(db);migrateReplays(db);db.exec('COMMIT');}catch(e){db.exec('ROLLBACK');throw e;}}catch(error){db.close();throw error;}const statistics=statisticsStore(db,{onFinalized:ids=>{for(const id of ids)refreshAvatar(id);}});
  const q=(sql,...args)=>db.prepare(sql).get(...args),run=(sql,...args)=>db.prepare(sql).run(...args);
  const tx=fn=>{db.exec('BEGIN IMMEDIATE');try{const result=fn();db.exec('COMMIT');return result;}catch(e){db.exec('ROLLBACK');throw e;}};
  // Existing reserved columns suffice; only unset legacy defaults receive the stable Peasant fallback.
