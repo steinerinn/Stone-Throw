@@ -1,3 +1,10 @@
+export function scoreLines(score){
+ if(!score||!Number.isFinite(score.score))return [];
+ const number=n=>new Intl.NumberFormat('en-US',{maximumFractionDigits:2}).format(n);
+ const lines=['MATCH SCORE: '+number(score.score)],c=score.comparison;
+ if(c&&c.samples>=5)lines.push(number(Math.abs(c.percent))+'% '+(c.percent<0?'below':'above')+' average for '+c.label);
+ return lines;
+}
 const el=(tag,cls,text)=>{const n=document.createElement(tag);if(cls)n.className=cls;if(text!==undefined)n.textContent=text;return n;};
 const labels=['','1ST','2ND','3RD','4TH'];
 const artFile=name=>'assets/result-screen/'+name+'.png';
@@ -5,7 +12,7 @@ const medalNames=['Lucky Shooter','The Blind One','Eagle Eye','Most Fierce','Cha
 function emblem(name){const n=el('span','cs-medal');const i=medalNames.indexOf(name);n.style.backgroundPosition=`${(i%3)*50}% ${Math.floor(i/3)*100}%`;n.dataset.medal=name;return n;}
 export function buildResultScreen(data,{view,rematch,menu}){
  const panel=el('section','cs-results');panel.setAttribute('role','dialog');panel.setAttribute('aria-modal','true');panel.setAttribute('aria-label','Battle results');
- const header=el('header','cs-result-heading');header.append(el('p','cs-result-kicker','CHAIN SIEGE'),el('h1','','BATTLE RESULTS'),el('div','cs-result-rule'));panel.append(header);
+ const header=el('header','cs-result-heading');header.append(el('p','cs-result-kicker','CHAIN SIEGE'),el('h1','','BATTLE RESULTS'),el('div','cs-result-rule'));for(const text of scoreLines(data.matchScore))header.append(el('p','cs-match-score',text));panel.append(header);
  const podium=el('div','cs-podium');podium.dataset.count=data.count;
  for(let place=1;place<=data.count;place++){
   const players=data.players.filter(p=>p.placement===place);if(!players.length&&place!==4)continue;
@@ -37,14 +44,14 @@ export function mountGroupResult(){
   if(s.phase!=='finished')return false;
   if(animating)return true;
   if(!s.online.complete){if(early)return true;early=true;return false;}
-  if(final)return true;final=true;
+  if(final){if(s.matchScore&&!finalData?.matchScore){finalData={...finalData,matchScore:s.matchScore};if(panel)for(const text of scoreLines(s.matchScore))panel.querySelector('.cs-result-heading').append(el('p','cs-match-score',text));document.getElementById('resultSubtitle').replaceChildren(...scoreLines(s.matchScore).map(text=>el('div','cs-match-score',text)));}return true;}final=true;
   if(!s.groupResult)return true;finalData=s.groupResult;
-  if(early){open(s.groupResult);return true;}
+  if(early){open(finalData);return true;}
   const outcome=s.outcome,art=outcome==='win'?'win':outcome==='draw'?'draw':'lose';
   document.getElementById('resultTitle').textContent=outcome==='win'?'VICTORY':outcome==='draw'?'DRAW':'YOU LOSE';
-  document.getElementById('resultArt').src='assets/results/'+art+'.svg';document.getElementById('resultSubtitle').textContent='';
+  document.getElementById('resultArt').src='assets/results/'+art+'.svg';document.getElementById('resultSubtitle').replaceChildren(...scoreLines(s.matchScore).map(text=>el('div','cs-match-score',text)));
   for(const id of ['playAgainBtn','storyRetryBtn','stLocalResultMenu','stLanResultMenu']){const n=document.getElementById(id);if(n)n.hidden=true;}
   document.getElementById('resultCloseBtn').style.display='none';overlay().style.display='flex';
-  timer=setTimeout(()=>{overlay().classList.add('cs-result-outro');fade=setTimeout(()=>open(s.groupResult),300);},2400);return true;
+  timer=setTimeout(()=>{overlay().classList.add('cs-result-outro');fade=setTimeout(()=>open(finalData),300);},2400);return true;
  },unmount(){disposed=true;reset();menuObserver.disconnect();document.removeEventListener('keydown',keyboard);window.removeEventListener('cs-open-group-results',reopen);css.remove();}};
 }

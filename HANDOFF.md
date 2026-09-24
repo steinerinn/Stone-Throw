@@ -1,3 +1,17 @@
+# ACCEPTED — Match Score V1 tactical completion and Result visibility
+
+2026-09-24. Branch: `match-score-profile-foundation`. Extends code foundation `4729c25ef44b60f74fb97ca25aa7923387096dce`. Commit/push only; NO MERGE / NO DEPLOY.
+
+The user physically confirmed Score visibility. MATCH_SCORE_V1 now includes successful Scouting (+20/result), canonical Plague spread (+5/cell), and special-ability unit kills (+10/unit), with duplicate suppression and the existing PLAYER departure cutoff. Existing components, dense placements, awards, combat, RNG and Battlefield layout are unchanged. Persisted Result scores cover Single Player and Online Duel/3P/4P and retain the same value when reopened.
+
+Historical revised backfill: 67 finalized matches; 86 registered PLAYER participations; 68 fully scoreable and 18 ambiguous (11 missing dense placements, seven missing departure cutoffs). Registry was backed up and integrity-checked before transactional apply; repeat apply was identical. Non-Score participation fields, faction rows and unrelated tables were unchanged. Private backups and detailed audits remain outside Git.
+
+The Score commit is isolated at `C:/Users/Notandi/Documents/Codex/score-v1-acceptance`. The original `Stone-Throw` checkout remains on `afk-disconnect-reliability-phase1`, preserving its pending Monk, spectator and reliability work. No such gameplay/Battlefield changes are included in this acceptance. Catapult remains watchlist; AFK/Disconnect/Reliability and Profile visual overhaul are separate phases.
+
+See `playtest/MATCH-SCORE-REPLAY-REPORT.md` for scope and verification. Playtest journal remains disabled by the normal launcher. No private Registry, backups, screenshots, test databases or logs belong in Git.
+
+---
+
 # ACCEPTED — Battlefield / Deployment Phase
 
 2026-09-24. Branch: `battlefield-deployment-phase1`. Accepted parent: `b25d1da884f6084015996d49435077b2c29cffbb` (Online / Single Player checkpoint).

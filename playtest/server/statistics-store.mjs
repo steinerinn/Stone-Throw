@@ -1,3 +1,4 @@
+import {matchResultScore} from './score-store.mjs';
 import {captureReplayCheckpoint,finalizeReplay,recentMatches,replayForProfile} from './replay-store.mjs';
 import {persistScores,scoreReadModel} from './score-store.mjs';
 import {rankHallOfFame} from './hall-of-fame.mjs';
@@ -41,7 +42,7 @@ export function statisticsStore(db,{onFinalized=()=>{}}={}){
    onFinalized([...new Set(d.participants.filter(p=>p.kind==='account'&&p.playerId).map(p=>p.playerId))]);
   });
  }
- return {capture,profileSummary(playerId){return {...scoreReadModel(db,playerId),reliability:this.reliability(playerId),career:all('SELECT mode,value FROM stat_career WHERE player_id=?',playerId).map(r=>({mode:r.mode,...JSON.parse(r.value)}))};},factionContributions:()=>all('SELECT match_id,value FROM stat_factions ORDER BY match_id').map(r=>({matchId:r.match_id,...JSON.parse(r.value)})),recentBattles:playerId=>recentMatches(db,playerId),replay:(playerId,matchId)=>replayForProfile(db,playerId,matchId),scoreSummary:playerId=>scoreReadModel(db,playerId),reliability(playerId){
+ return {capture,matchResultScore:(matchId,actor)=>matchResultScore(db,matchId,actor),profileSummary(playerId){return {...scoreReadModel(db,playerId),reliability:this.reliability(playerId),career:all('SELECT mode,value FROM stat_career WHERE player_id=?',playerId).map(r=>({mode:r.mode,...JSON.parse(r.value)}))};},factionContributions:()=>all('SELECT match_id,value FROM stat_factions ORDER BY match_id').map(r=>({matchId:r.match_id,...JSON.parse(r.value)})),recentBattles:playerId=>recentMatches(db,playerId),replay:(playerId,matchId)=>replayForProfile(db,playerId,matchId),scoreSummary:playerId=>scoreReadModel(db,playerId),reliability(playerId){
  const rows=playerId?all("SELECT p.match_id,p.reliability,p.seat,m.descriptor FROM stat_participants p JOIN stat_matches m ON m.id=p.match_id WHERE p.player_id=? AND p.kind='account' AND m.finalized=1 AND m.mode IN ('Duel','3 Players','4 Players')",playerId):[];
  const matches=new Map();for(const row of rows){const d=JSON.parse(row.descriptor);if(d.classification?.mode==='single')continue;const prior=matches.get(row.match_id)||{failed:false,afk:false};prior.failed||=['Quit','Disconnect','Kick'].includes(row.reliability);prior.afk||=(d.deploymentDiagnostics||[]).some(e=>e.seat===row.seat&&e.kind==='deployment-timeout-afk');matches.set(row.match_id,prior);}
  const games=matches.size,failures=[...matches.values()].filter(r=>r.failed).length,afkIncidents=[...matches.values()].filter(r=>r.afk).length;return {status:games?'rated':'unrated',games,completed:games-failures,failures,afkIncidents,percent:games?100*(games-failures)/games:null};

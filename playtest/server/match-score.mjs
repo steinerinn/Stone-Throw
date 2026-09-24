@@ -1,3 +1,4 @@
+import {tacticalScoreFacts} from './score-tactics.mjs';
 import {summarizeMatch} from './statistics-metrics.mjs';
 import {processedChainCells} from '../canonical/compiled/combat/chain-statistics.js';
 
@@ -23,7 +24,7 @@ export function scorePlacements(d,facts){
 }
 
 export function calculateScores(d,facts,{expectedEvents=facts.length}={}){
- const reasons=[];if(!d.endedAt)reasons.push('not-finalized');
+ const tactics=tacticalScoreFacts(d,facts),reasons=[];if(!d.endedAt)reasons.push('not-finalized');
  if(facts.length!==expectedEvents||facts.some((f,i)=>f.index!==i))reasons.push('incomplete-event-history');
  const placements=scorePlacements(d,facts),metrics=summarizeMatch(d,facts),activeHeroes=new Set(),penalties={},chains={},seen=new Set();
  for(const f of facts){const e=f.event,s=e.statistics||{},m=e.meta||{},p=d.participants.find(p=>p.actor===m.ownerId),eligible=p&&p.kind!=='ai'&&f.index<(p.cutoff??Infinity);
@@ -38,12 +39,12 @@ export function calculateScores(d,facts,{expectedEvents=facts.length}={}){
  const all=summarizeMatch({...d,participants:d.participants.map(p=>({...p,kind:'guest',cutoff:undefined}))},facts);
  const awards=new Map();for(const [actor,s]of Object.entries(all))for(const name of s.awards){if(!awards.has(name))awards.set(name,[]);awards.get(name).push(actor);}
  const scores=d.participants.filter(p=>p.kind==='account'&&p.playerId).map(p=>{
-  const issues=[...reasons],full=completed(p),m=metrics[p.actor],rank=placements?.[p.actor]??null;
+  const issues=[...reasons,...tactics[p.actor].issues],full=completed(p),m=metrics[p.actor],rank=placements?.[p.actor]??null;
   if(full&&!rank)issues.push('dense-placement-unavailable');
   if(!full&&!Number.isInteger(p.cutoff))issues.push('departure-cutoff-unavailable');
   if(!['Full','Quit','Disconnect','Kick','AFK'].includes(p.reliability))issues.push('participation-status-unavailable');
   const others=d.participants.filter(q=>q.actor!==p.actor&&completed(q));
-  const components={completion:rational(full?500:0),placement:rational(full?({2:[0,200,0],3:[0,250,100,0],4:[0,300,150,75,0]}[d.participants.length]?.[rank]??0):0),efficiency:m.shots?rational(Math.min(100*m.shots,250*m.hits),m.shots):rational(),biggestChain:rational(Math.max(0,...Object.values(chains).filter(c=>c.actor===p.actor).map(c=>c.cells))),fewerShots:rational(full&&rank===1&&others.length&&others.every(q=>m.shots<metrics[q.actor].shots)?100:0),awardBonus:rational(),directSpecialPenalty:rational(-10*(penalties[p.actor]||0))};
+  const components={completion:rational(full?500:0),placement:rational(full?({2:[0,200,0],3:[0,250,100,0],4:[0,300,150,75,0]}[d.participants.length]?.[rank]??0):0),efficiency:m.shots?rational(Math.min(100*m.shots,250*m.hits),m.shots):rational(),biggestChain:rational(Math.max(0,...Object.values(chains).filter(c=>c.actor===p.actor).map(c=>c.cells))),fewerShots:rational(full&&rank===1&&others.length&&others.every(q=>m.shots<metrics[q.actor].shots)?100:0),awardBonus:rational(),successfulScouting:rational(20*tactics[p.actor].scouts),plagueSpread:rational(5*tactics[p.actor].plagueCells),specialAbilityKills:rational(10*tactics[p.actor].kills),directSpecialPenalty:rational(-10*(penalties[p.actor]||0))};
   if(full)for(const winners of awards.values())if(winners.includes(p.actor))components.awardBonus=add(components.awardBonus,rational(10,winners.length));
   const exact=Object.values(components).reduce(add,rational());
   return {actor:p.actor,playerId:p.playerId,completed:full,participation:full?'completed':'Disconnect/Abandon',placement:rank,formulaVersion:SCORE_VERSION,components,exact,score:issues.length?null:numeric(exact),issues};

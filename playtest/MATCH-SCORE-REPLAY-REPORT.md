@@ -1,3 +1,60 @@
+# Final MATCH_SCORE_V1 acceptance — 2026-09-24
+
+Score visibility is physically confirmed. This supplements the earlier code-foundation checkpoint below; no formula-version bump. Commit/push only; no merge or deployment.
+
+## Final additions
+
+- `server/score-tactics.mjs` consumes canonical facts only. A previously unknown occupied Scout result earns 20; empty choices, phase entry and duplicate discoveries earn zero. Genuine Plague impact cells earn five, attributed to Plague owner rather than the triggering shooter. Explicit canonical ability sources earn ten per destroyed enemy unit, not per occupied cell. Hero queue deaths use the same last-authoritative-impact attribution as Registry kills. Resurrection starts a new unit life; repeated death records do not add kills.
+- All three components obey the authoritative PLAYER departure cutoff. Direct shots cannot earn ability-kill points; indirect/Plague hits cannot incur the existing direct-special penalty. Missing evidence remains an explicit issue, with no invented score.
+- `match-score.mjs` adds the three rational components to MATCH_SCORE_V1 without changing prior components. `score-store.mjs` replaces old totals during backfill and clears stale totals/version together when evidence is ambiguous, retaining the decomposition/issues. Career and Result cohorts exclude those ambiguous rows.
+- Existing Score visibility wiring reads persisted own-seat scores after finalization across Single Player/Online Duel/3P/4P. Result reopening does not recompute Score. Comparison cohorts read revised stored totals with their existing finalization-time boundary.
+- No combat, RNG, placement, Battlefield, AFK policy, Profile visuals or schema changes in this final increment.
+
+## Revised historical backfill
+
+67 finalized matches / 86 registered PLAYER participations. 68 scoreable; 18 ambiguous: 11 dense-placement evidence gaps and seven departure-cutoff gaps. No additional tactical evidence gaps in the retained history. Scoreable totals, including departure outcomes: mean 757.6681, median 756.2575, range 0–1174.9655.
+
+| New component | Mean points among 68 scoreable participations | Positive participations | Maximum |
+| --- | ---: | ---: | ---: |
+| Successful Scouting | 15.2941 | 37 | 60 |
+| Plague Spread | 24.1912 | 35 | 125 |
+| Special Ability Kills | 56.9118 | 66 | 120 |
+
+Private backup was created before transactional apply; backup and live integrity checks passed. Dry/apply digest `d1f3698507f8613b80dc63a27ded7086883fe63965106f27a3be9153ca58f11a`. Repeated apply produced identical score rows. All unrelated tables, non-Score participation fields and faction rows were unchanged. Full dry/apply reports and backup paths are outside Git.
+
+## Verification
+
+The tactical suite has 41 deterministic checks, including +20 successful Scout, +65 for 13 Plague cells, +20 for two ability kills, duplicates, ownership, cutoff, Hero deaths, ambiguity, replacement of stale V1 totals, rollback and idempotence. The existing 79 Score checks and 15 real-host Score/Replay integration checks pass. Six real HTTP/browser Result-score paths and persistent reopening pass.
+
+All 30 final suites PASS. Final regression run also covers Replay/disclosure/browser; Registry/service/browser/multiplayer/rematch; classification; Result/authority/browser/live/physical cleanup; statistics/chain/seat/reliability/parity; local Group authority; Story causal progression; journal-disabled snapshots; deployment/restart; and Online reliability. Older tests were adapted to the accepted startup gate, seat-button controls, same-document entry, real host shape for replay capture, the accepted default-avatar migration, and OS-temp report output. No assertions were removed to hide runtime failures. Legacy reference imports use the existing archived fixtures through an external test loader.
+
+The final manifest digest is reported with the acceptance commit, not embedded in the file it hashes. The original AFK candidate remains preserved separately; its pending changes are excluded.
+
+## Files in this final acceptance commit
+
+- `CURRENT-STATE.md`
+- `HANDOFF.md`
+- `playtest/MATCH-SCORE-REPLAY-REPORT.md`
+- `playtest/build-manifest.json`
+- `playtest/client-v13/presentation.js`
+- `playtest/client-v13/result-screen.js`
+- `playtest/server/main.mjs`
+- `playtest/server/match-score.mjs`
+- `playtest/server/score-store.mjs`
+- `playtest/server/score-tactics.mjs`
+- `playtest/server/statistics-store.mjs`
+- `playtest/styles-result-screen.css`
+- `playtest/tools/registry-browser-check.mjs`
+- `playtest/tools/registry-multiplayer-check.mjs`
+- `playtest/tools/result-score-cohort-check.mjs`
+- `playtest/tools/result-score-paths-check.mjs`
+- `playtest/tools/result-screen-live-check.mjs`
+- `playtest/tools/result-screen-regression-check.mjs`
+- `playtest/tools/score-tactics-check.mjs`
+- `playtest/tools/statistics-check.mjs`
+
+---
+
 # Match Score / recent battles candidate
 
 Branch: `match-score-profile-foundation`
