@@ -88,3 +88,7 @@
 
 /* Supplied title artwork, unchanged bytes and aspect ratio. */
 .st-chain-siege-banner{display:block;width:100%;height:auto;object-fit:contain;margin:0 auto;}
+
+/* Live battle repaint/choice layers are not stable browser scroll anchors.
+   Keep the user viewport fixed without changing focus, layout or manual scrolling. */
+.st-main{overflow-anchor:none}

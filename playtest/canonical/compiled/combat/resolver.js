@@ -318,8 +318,8 @@ export function stepResolution(ctx, options = {}) {
             const monks = ctx.state.match.units.filter(u => u.type === 'monk' && !u.abilities.some(a => a.kind === 'monk' && a.spent) && u.cells.some(c => !seat(ctx.state, u.ownerId).shots.includes(cellKey(c))));
             const target = monks.find(u => u.ownerId === op.meta.targetPlayerId);
             if ((ctx.state.ring ? monks.length >= 2 : monks.length === 2) && target) {
-                const p = seat(ctx.state, target.ownerId);
-                frame.next.push({ kind: 'monk-deflect', meta: { actorId: target.ownerId, ownerId: target.ownerId, targetPlayerId: p.reactionTarget.playerId, targetBoardId: p.reactionTarget.boardId, sourceUnitId: target.id, source: 'monk-deflect', origin: target.cells[0] } });
+                const p = seat(ctx.state, op.meta.ownerId);
+                frame.next.push({ kind: 'monk-deflect', meta: { actorId: target.ownerId, ownerId: target.ownerId, targetPlayerId: p.playerId, targetBoardId: p.boardId, sourceUnitId: target.id, source: 'monk-deflect', origin: target.cells[0] } });
             }
         }
     }

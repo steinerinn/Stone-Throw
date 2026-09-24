@@ -1,3 +1,13 @@
+# FINAL CHECKPOINT — Score V1 / Monk pair / scroll stability
+
+2026-09-24. Branch `match-score-profile-foundation`, following accepted Score commit `cbc7d15ef9814db8ef8690e29611c89a6cbf71b6`. Scope is frozen to completed tactical Score, the confirmed Monk ring-targeting correction and shared browser scroll anchoring correction. Commit/push only after final verification; NO MERGE / NO DEPLOY.
+
+Monk exchanges stay with the two triggering Monks; direct proximity returns to the actual shooter, exact hits still kill without retaliation, and Duel stopping/RNG behavior is preserved. Live battlefield repaint layers no longer serve as unstable browser scroll anchors; manual scrolling and keyboard focus remain available, without changing map layout. See `playtest/MONK-SCROLL-REPORT.md` for reproduction, scope, tests and limitations.
+
+No Chaos Manifestation, Goblin redesign, second Elf or Assassin is included. Those ideas require a fresh branch after this checkpoint. AFK/reliability work and unrelated pending spectator changes remain preserved in the original checkout; this acceptance checkout is isolated at `C:/Users/Notandi/Documents/Codex/score-v1-acceptance`.
+
+---
+
 # ACCEPTED — Match Score V1 tactical completion and Result visibility
 
 2026-09-24. Branch: `match-score-profile-foundation`. Extends code foundation `4729c25ef44b60f74fb97ca25aa7923387096dce`. Commit/push only; NO MERGE / NO DEPLOY.
