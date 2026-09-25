@@ -1,3 +1,4 @@
+import { settleAssassin } from './units/assassin.js';
 import { cloneCombat, cloneRng } from '../archives.js';
 import { normalTarget, survives } from '../host/ring.js';
 import { catapultImpact, catapultSeries } from './catapult.js';
@@ -23,7 +24,7 @@ export function startResolution(state, rootId, acceptedActionId, activePlayerId,
     throw Error('Cannot accept action after outcome'); const ctx = { contract: 'stone-throw-resolution-v1', scope, id: id(rootId), acceptedActionId, activePlayerId, compatibility: 'golden-v1.427', status: 'running', externalEntropy: [], state: cloneCombat(state), rng: cloneRng(rng), frames: [], future: [], decisions: [], events: [], generated: [], nextWork: 1, nextDecision: 1, completedAtEvent: null }; seat(ctx.state, activePlayerId); pushFrame(ctx, 'root', operations); return ctx; }
 export function living(ctx, ownerId) { const p = seat(ctx.state, ownerId); if (p.resurrection.searchActive && p.resurrection.actualUnitId)
     return true; return ctx.state.match.units.some(u => u.ownerId === ownerId && (u.type === 'hero' ? !!u.hero?.activated && !!u.hero.currentCell : ['inf', 'cav', 'archer', 'monk', 'castle'].includes(u.type || '') && !destroyed(ctx.state, u) && u.cells.length > 0)); }
-export function checkTerminal(ctx, reason) { if (ctx.state.ring)
+export function checkTerminal(ctx, reason) { if (ctx.state.ring || ctx.assassinPending?.length)
     return false; const dead = ctx.state.seats.filter(p => !living(ctx, p.playerId)).map(p => p.playerId); if (!dead.length)
     return false; ctx.state.match.outcome = dead.length === ctx.state.seats.length ? { kind: 'draw' } : { kind: 'win', winnerIds: ctx.state.seats.filter(p => !dead.includes(p.playerId)).map(p => p.playerId), eliminatedIds: dead }; emit(ctx, 'outcome', null, null, [], null, ctx.state.match.outcome.kind); terminalTruncate(ctx, reason); return true; }
 function attack(ctx, entry) {
@@ -49,7 +50,7 @@ function attack(ctx, entry) {
         defer = true;
     }
     else if (entry.kind === 'goblin')
-        layers = [goblinTargets(available(ctx.state, meta.targetBoardId, meta.targetPlayerId), ctx.rng).map(parseKey)];
+        layers = [goblinTargets(available(ctx.state, meta.targetBoardId, meta.targetPlayerId), ctx.rng, ctx.state.match.config.rulesVersion === 'stone-throw-pacing-v1').map(parseKey)];
     else if (entry.kind === 'dragon')
         layers = dragonFlightPathsFrom({ size }, cellKey(meta.origin)).map(a => a.map(parseKey));
     else if (entry.kind === 'demon')
@@ -153,6 +154,13 @@ function effects(ctx, deferTerminal = false) {
             }
         }
     }
+    if (p.areaScoutNow) {
+        p.areaScoutLater = (p.areaScoutLater || 0) + p.areaScoutNow;
+        const count = p.areaScoutNow;
+        p.areaScoutNow = 0;
+        pushFrame(ctx, 'root', [...Array.from({ length: count }, () => ({ kind: 'turn-scout', ownerId: p.playerId, count: 1, area: true })), { kind: 'same-turn-effects' }]);
+        return;
+    }
     if (p.elfNow) {
         p.elfNow = false;
         const target = normalTarget(ctx.state, p.playerId);
@@ -177,6 +185,8 @@ export function stepResolution(ctx, options = {}) {
                 return;
             }
         }
+        if (settleAssassin(ctx))
+            return;
         if (options.deferTerminal && checkTerminal(ctx, 'settled-root'))
             return;
         complete(ctx);
@@ -299,6 +309,14 @@ export function stepResolution(ctx, options = {}) {
             else
                 requireDecision(ctx, 'resurrection', p.playerId, p.boardId, null, [], choices);
         }
+    }
+    else if (op.kind === 'turn-scout' && op.area) {
+        const p = seat(ctx.state, op.ownerId), target = normalTarget(ctx.state, p.playerId);
+        if (ctx.state.ring && !survives(ctx.state, target.playerId))
+            return;
+        p.areaScoutLater = Math.max(0, (p.areaScoutLater || 0) - 1);
+        const size = boardSize(ctx.state, target.boardId), cells = Array.from({ length: size * size }, (_, i) => ({ x: i % size, y: Math.floor(i / size) }));
+        requireDecision(ctx, 'scout', p.playerId, target.boardId, null, cells, [], 1).area = true;
     }
     else if (op.kind === 'turn-scout') {
         const p = seat(ctx.state, op.ownerId), target = normalTarget(ctx.state, p.playerId);

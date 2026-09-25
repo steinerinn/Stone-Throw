@@ -50,6 +50,8 @@ export function resolveImpact(ctx, meta, cell, deferReactions = false) {
     if (!u)
         return { type: null, unitId: null, reaction: null, repeat: false, deferred: null };
     syncDamage(ctx.state, u);
+    if (u.type === 'assassin' && !plague)
+        (ctx.assassinPending ??= []).push({ meta: { ...meta }, unitId: u.id, stage: 'activate' });
     if (u.type === 'hero')
         heroHit(ctx, u, meta);
     if (u.type === 'monk') {

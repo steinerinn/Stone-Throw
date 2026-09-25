@@ -10,5 +10,5 @@ export function installSingleEntry(session,client){
  by('csSingleBack').onclick=()=>{panel.hidden=true;document.body.classList.add('st-main-menu-mode');};
  by('csSingleStart').onclick=async()=>{if(busy)return;busy=true;by('csSingleStart').disabled=true;try{const opened=await session.request('single/setup',{npcNames:names.filter(Boolean)});await client.enterLocal(opened);panel.hidden=true;document.body.classList.remove('st-main-menu-mode');}catch(e){by('csSingleMessage').textContent=e.code||e.message;}finally{busy=false;by('csSingleStart').disabled=false;}};
  document.addEventListener('click',async e=>{if(!e.target.closest('#stMenuFull'))return;e.preventDefault();e.stopImmediatePropagation();if(busy)return;busy=true;try{if(await window.__stoneThrowResumeActiveGameFromMenu?.()){document.body.classList.remove('st-main-menu-mode');return;}await show();}catch(e){by('csSingleMessage').textContent=e.code||e.message;}finally{busy=false;}},true);
- return {hide:()=>panel.hidden=true};
+ return {show,hide:()=>panel.hidden=true};
 }

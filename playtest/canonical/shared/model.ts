@@ -9,7 +9,7 @@ export function id<K extends string>(value:string):Id<K>{
   return value as Id<K>;
 }
 export interface Cell {x:number;y:number}
-export type UnitType='inf'|'cav'|'archer'|'monk'|'castle'|'dwarf'|'goblin'|'catapult'|'elf'|'cleric'|'demon'|'dragon'|'wizard'|'necro'|'hero';
+export type UnitType='inf'|'cav'|'archer'|'monk'|'castle'|'dwarf'|'goblin'|'catapult'|'elf'|'cleric'|'demon'|'dragon'|'wizard'|'necro'|'hero'|'assassin';
 export interface Player {id:PlayerId;boardIds:BoardId[]}
 export interface Board {id:BoardId;ownerId:PlayerId;width:number;height:number}
 export interface MatchConfiguration {
@@ -21,6 +21,7 @@ export interface MatchConfiguration {
 }
 export interface HeroState {activated:boolean;hitsTaken:number;originalCell:Cell|null;currentCell:Cell|null;relocationPending:boolean}
 export interface Unit {
+ scoutMode?:'precision'|'area';
  id:UnitId;ownerId:PlayerId;boardId:BoardId;type:UnitType|null;
  cells:Cell[];lifecycle:'unplaced'|'present'|'destroyed'|'unresolved';
  damage:{cells:Cell[];hitsTaken:number|null};

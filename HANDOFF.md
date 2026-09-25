@@ -1,3 +1,17 @@
+# ASSASSIN ADDITION - UNACCEPTED / UNPROMOTED
+
+User-authorized addition to the current pacing candidate: deferred two-stage Assassin reaction, canonical random chain-unit selection, original-attacker core strike/fallback, unrestricted 1x1 placement and outward icon slots. See playtest/ASSASSIN-PHASE1-REPORT.md. No commit/push/merge/deployment. Prior pacing changes are retained.
+
+# PACING PASS PHASE 1 — UNACCEPTED / UNPROMOTED
+
+2026-09-24. Branch `pacing-chaos-scout-phase1`, based directly on accepted commit `5ae0d21dfe0efda1534a2c81c8008b26986f3228`. Candidate is uncommitted; no push, merge or deployment.
+
+Scope: canonical 5–15 Goblin bombs; two Elves whose hit order determines ability (first: five precise choices; second: one 3x3 area scan); settled-chain, once-per-match Chaos Manifestation with at least three surviving seats. New games use `stone-throw-pacing-v1`; retained `stone-throw-v1.427` hosts preserve their rules. MATCH_SCORE_V1 area scouting awards +20 at most once per successful area action. No Registry migration/backfill or private database changes.
+
+See `playtest/PACING-PHASE1-REPORT.md` for implementation, exact changed files, tests, replay compatibility and physical playtest items. Assassin, Profile, AFK policy, Event-panel polish and Battlefield redesign remain out of scope. Original pending work in the separate Stone-Throw checkout remains untouched.
+
+---
+
 # FINAL CHECKPOINT — Score V1 / Monk pair / scroll stability
 
 2026-09-24. Branch `match-score-profile-foundation`, following accepted Score commit `cbc7d15ef9814db8ef8690e29611c89a6cbf71b6`. Scope is frozen to completed tactical Score, the confirmed Monk ring-targeting correction and shared browser scroll anchoring correction. Commit/push only after final verification; NO MERGE / NO DEPLOY.

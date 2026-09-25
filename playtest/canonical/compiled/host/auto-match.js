@@ -39,7 +39,7 @@ export function autoStep(input, execution) { let h = structuredClone(input); con
     else if (d.kind === 'scout') {
         if (!h.pendingPolicyCells.length)
             h.pendingPolicyCells = scoutChoices(h, owner, d.remaining).map(parseKey);
-        cell = h.pendingPolicyCells.shift() || null;
+        cell = h.pendingPolicyCells.shift() || (d.area ? d.legalCells[0] || null : null);
     }
     else
         throw Error('Interactive-only or unsupported policy decision ' + d.kind);

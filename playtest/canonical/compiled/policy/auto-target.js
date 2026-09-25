@@ -79,24 +79,24 @@ function endgame(h, actor, target) { const p = seat(h.state, target), units = h.
     const q = parseKey(k);
     parity[(q.x + q.y) & 1].push(k);
 } return pick(h, parity[0].length >= parity[1].length ? parity[0] : parity[1], 'endgame'); }
-export function autoMatchTarget(h, actor, plagueAware = false) { const target = seat(h.state, actor).reactionTarget.playerId, p = seat(h.state, target), b = brain(h, actor), res = p.resurrection; if (res.searchActive && res.suspects.length) {
+export function autoMatchTarget(h, actor, plagueAware = false) { const target = seat(h.state, actor).reactionTarget.playerId, p = seat(h.state, target), b = brain(h, actor), avoided = new Set(b.scoutKnowledge.filter(c => c.classification === 'special' && unitAt(h.state, p.boardId, c.cell)?.type === 'assassin').map(c => c.cell)), res = p.resurrection; if (res.searchActive && res.suspects.length) {
     const uid = pick(h, res.suspects, 'resurrection-unit'), u = h.state.match.units.find(u => u.id === uid);
     if (u.cells.length)
         return pick(h, u.cells.map(cellKey), 'resurrection-cell');
 } const protectedSet = plagueAware ? protectedCells(h, target) : new Set(), hero = h.state.match.units.find(u => u.ownerId === target && u.type === 'hero')?.hero, heroKey = hero?.currentCell ? cellKey(hero.currentCell) : null; if (heroKey && !p.shots.includes(heroKey) && b.scoutKnowledge.find(c => c.cell === heroKey)?.classification === 'core' && !protectedSet.has(heroKey))
     return heroKey; if (hero?.hitsTaken === 2 && hero.activated && heroKey) {
-    const hunt = b.heroHunt.filter(k => !p.shots.includes(k) && !protectedSet.has(k));
+    const hunt = b.heroHunt.filter(k => !p.shots.includes(k) && !protectedSet.has(k) && !avoided.has(k));
     if (hunt.length)
         return pick(h, hunt, 'hero-hunt');
 } const multi = multiTarget(h, actor, target); if (multi)
-    return multi; const monks = seat(h.state, actor).monkCandidates.filter(k => !p.shots.includes(k) && !protectedSet.has(k)); if (monks.length)
+    return multi; const monks = seat(h.state, actor).monkCandidates.filter(k => !p.shots.includes(k) && !protectedSet.has(k) && !avoided.has(k)); if (monks.length)
     return pick(h, monks, 'monk-clue'); for (const c of b.scoutKnowledge)
     if (c.classification === 'core' && !p.shots.includes(c.cell) && !protectedSet.has(c.cell))
         return c.cell; const ending = endgame(h, actor, target); if (ending && !protectedSet.has(ending))
     return ending; const raw = [], heat = { green: [], blue: [], red: [] }; for (let y = 0; y < h.config.size; y++)
     for (let x = 0; x < h.config.size; x++) {
         const k = x + ',' + y;
-        if (p.shots.includes(k) || protectedSet.has(k))
+        if (p.shots.includes(k) || protectedSet.has(k) || avoided.has(k))
             continue;
         raw.push(k);
         if (hero?.activated && heroKey)

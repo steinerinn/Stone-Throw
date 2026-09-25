@@ -15,7 +15,7 @@ export interface Cell {
     x: number;
     y: number;
 }
-export type UnitType = 'inf' | 'cav' | 'archer' | 'monk' | 'castle' | 'dwarf' | 'goblin' | 'catapult' | 'elf' | 'cleric' | 'demon' | 'dragon' | 'wizard' | 'necro' | 'hero';
+export type UnitType = 'inf' | 'cav' | 'archer' | 'monk' | 'castle' | 'dwarf' | 'goblin' | 'catapult' | 'elf' | 'cleric' | 'demon' | 'dragon' | 'wizard' | 'necro' | 'hero' | 'assassin';
 export interface Player {
     id: PlayerId;
     boardIds: BoardId[];
@@ -41,6 +41,7 @@ export interface HeroState {
     relocationPending: boolean;
 }
 export interface Unit {
+    scoutMode?: 'precision' | 'area';
     id: UnitId;
     ownerId: PlayerId;
     boardId: BoardId;

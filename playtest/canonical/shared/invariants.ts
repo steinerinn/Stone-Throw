@@ -16,14 +16,14 @@ export function assertMatchState(value:unknown):asserts value is MatchState{
  requireThat(JSON.stringify(s.config.playerOrder)===JSON.stringify(s.players.map(p=>p.id)),'Configuration/order mismatch');
  requireThat(JSON.stringify(s.config.boards)===JSON.stringify(s.boards),'Immutable board configuration mismatch');
  requireThat(Object.keys(s.config.initialRosters).sort().join('|')===[...players].sort().join('|'),'Roster ownership mismatch');
- const types=new Set(['inf','cav','archer','monk','castle','dwarf','goblin','catapult','elf','cleric','demon','dragon','wizard','necro','hero']);
+ const types=new Set(['inf','cav','archer','monk','castle','dwarf','goblin','catapult','elf','cleric','demon','dragon','wizard','necro','hero','assassin']);
  for(const r of Object.values(s.config.initialRosters))for(const k of Object.keys(r))requireThat(types.has(k),'Unknown roster unit type');
  for(const p of s.players){unique(p.boardIds,'owned board');requireThat(JSON.stringify([...p.boardIds].sort())===JSON.stringify(s.boards.filter(b=>b.ownerId===p.id).map(b=>b.id).sort()),'Board ownership mismatch');}
  for(const b of s.boards){player(b.ownerId);requireThat(b.width>0&&b.height>0,'Empty board');}
  const occupied=new Set<string>();
  for(const u of s.units){player(u.ownerId);requireThat(board(u.boardId).ownerId===u.ownerId,'Unit/board ownership mismatch');cells(u.boardId,u.cells);cells(u.boardId,u.damage.cells);const shape=new Set(u.cells.map(cellKey));for(const c of u.damage.cells)requireThat(shape.has(cellKey(c)),'Damage outside current geometry');
   if(u.lifecycle==='present'){requireThat(u.cells.length>0,'Present unit without geometry');for(const c of u.cells){const k=u.boardId+':'+cellKey(c);requireThat(!occupied.has(k),'Overlapping present units');occupied.add(k);}}
-  requireThat(u.hero===null||u.type==='hero','Hero state on non-Hero');if(u.hero){for(const c of [u.hero.currentCell,u.hero.originalCell])if(c)cell(u.boardId,c);requireThat(u.hero.currentCell===null||shape.has(cellKey(u.hero.currentCell)),'Hero location mismatch');}
+  requireThat(u.scoutMode===undefined||u.type==='elf','Scout subtype on non-Elf');requireThat(u.hero===null||u.type==='hero','Hero state on non-Hero');if(u.hero){for(const c of [u.hero.currentCell,u.hero.originalCell])if(c)cell(u.boardId,c);requireThat(u.hero.currentCell===null||shape.has(cellKey(u.hero.currentCell)),'Hero location mismatch');}
   unique(u.abilities.map(a=>a.kind),'ability');
  }
  player(s.turn.activePlayerId);player(s.turn.roundStarterId);unique(s.turn.budgets.map(b=>b.playerId),'budget');for(const b of s.turn.budgets)player(b.playerId);

@@ -3,6 +3,37 @@ import * as legality from '../rules/placement.js';
 import * as geometry from '../rules/index.js';
 /** Mechanically isolated compatibility policy; source provenance records each omitted visual statement. */
 export function legacyRandomPlacement(profile, SIZE, roster, rng, STORY_MODE_ACTIVE = false, STORY_BATTLE_NUMBER = 0, fixedCells = []) {
+    if (roster.assassin) {
+        const out = legacyRandomPlacement(profile, SIZE, { ...roster, assassin: 0 }, rng, STORY_MODE_ACTIVE, STORY_BATTLE_NUMBER, fixedCells), occupied = new Set([...fixedCells, ...out.flatMap(u => u.cells)]);
+        for (let i = 0; i < roster.assassin; i++) {
+            const legal = Array.from({ length: SIZE * SIZE }, (_, i) => (i % SIZE) + ',' + Math.floor(i / SIZE)).filter(k => !occupied.has(k));
+            if (!legal.length)
+                throw Error('No Assassin space');
+            const normal = legal.filter(k => { const [x, y] = k.split(',').map(Number); return legality.canPlaceInf({ size: SIZE, occupied }, x, y); }), castleCells = out.filter(u => u.type === 'castle').flatMap(u => u.cells), beside = legal.filter(k => { const [x, y] = k.split(',').map(Number); return castleCells.some(c => { const [cx, cy] = c.split(',').map(Number); return Math.abs(x - cx) + Math.abs(y - cy) === 1; }); }), preferNormal = random(rng, 'placement:assassin-style') < .5, preferred = preferNormal ? normal : beside, other = preferNormal ? beside : normal, pool = preferred.length ? preferred : other.length ? other : legal;
+            const k = pool[Math.floor(random(rng, 'placement:assassin') * pool.length)];
+            out.push({ type: 'assassin', cells: [k] });
+            occupied.add(k);
+        }
+        return out;
+    }
+    // The retained legacy policy has singleton Elf bookkeeping. Extend its legal
+    // placement result rather than misclassifying a second Elf as Infantry.
+    if ((roster.elf || 0) > 1) {
+        const out = legacyRandomPlacement(profile, SIZE, { ...roster, elf: 1 }, rng, STORY_MODE_ACTIVE, STORY_BATTLE_NUMBER, fixedCells), occupied = new Set([...fixedCells, ...out.flatMap(u => u.cells)]);
+        for (let i = 1; i < (roster.elf || 0); i++) {
+            const legal = [];
+            for (let y = 0; y < SIZE; y++)
+                for (let x = 0; x < SIZE; x++)
+                    if (legality.canPlaceInf({ size: SIZE, occupied }, x, y))
+                        legal.push(x + ',' + y);
+            if (!legal.length)
+                throw Error('No legal area Elf placement');
+            const k = legal[Math.floor(random(rng, 'placement:area-elf') * legal.length)];
+            out.push({ type: 'elf', cells: [k] });
+            occupied.add(k);
+        }
+        return out;
+    }
     const nextRandom = () => random(rng, 'placement:' + profile), CASTLE_SIZE = 5;
     const INF_COUNT = roster.inf || 0, CAV_COUNT = roster.cav || 0, ARCHER_COUNT = roster.archer || 0, MONK_COUNT = roster.monk || 0, CASTLE_COUNT = roster.castle || 0, DWARF_COUNT = roster.dwarf || 0, GOBLIN_COUNT = roster.goblin || 0, CATAPULT_COUNT = roster.catapult || 0, ELF_COUNT = roster.elf || 0, CLERIC_COUNT = roster.cleric || 0, DEMON_COUNT = roster.demon || 0, DRAGON_COUNT = roster.dragon || 0, WIZARD_COUNT = roster.wizard || 0, NECRO_COUNT = roster.necro || 0, HERO_COUNT = roster.hero || 0;
     const CURRENT_ENEMY_ROSTER = roster;

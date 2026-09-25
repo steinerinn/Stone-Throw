@@ -39,10 +39,14 @@ export function publicAimAssist(h) {
     if (h.status === 'placement' || h.status === 'complete')
         return [];
     const enemy = h.config.players[1], seat = h.state.seats.find(s => s.playerId === enemy.id), units = h.state.match.units.filter(u => u.ownerId === enemy.id), hero = units.find(u => u.type === 'hero');
+    // Assassin ignores spacing, but does not disable the ordinary-unit spacing hints.
+    // Never subtract its private location from the shaded cells; shots remain legal.
     if (hero?.hero?.activated && hero.hero.currentCell)
         return [];
     const search = enemyResurrectionSearch(h), destroyed = new Set(search.cells.map(c => cellKey(c.cell))), shots = new Set([...seat.shots, ...destroyed]);
     for (const u of units) {
+        if (u.type === 'assassin')
+            continue;
         if (u.type === 'hero') {
             const c = u.hero?.originalCell;
             if (!u.hero?.currentCell && c && shots.has(cellKey(c)))

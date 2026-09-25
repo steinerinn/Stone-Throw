@@ -9,4 +9,10 @@ add({kind:'decision-answered',reason:'catapult-target'});add({kind:'impact',work
 add({kind:'resolution-completed',statistics:{eliminationBoundary:{dead:['c']}}});const g=project(r,0);assert.equal(g.events.at(-1).actor,null);const rows=run(mountBattleLog,{...data.initial.snapshot,groupNarrative:g},[]);assert.ok(rows.some(r=>r.text==='AI 3 was eliminated.'));assert.ok(!rows.some(r=>r.text.includes('eliminated by')));checks++;
 const unchanged=project(r,0);add({kind:'unit-damaged',unitId:'secret',cells:[{x:7,y:8}],statistics:{unitType:'hero',plannedCells:[{x:1,y:2}]}});assert.deepEqual(project(r,0),unchanged);r.seats[1].name='Renamed';assert.equal(project(r,0).events[0].actor,'b');assert.equal(project(r,0).players[1].name,'Renamed');checks++;
 const recreated=createGroupNarrative()(r,0);assert.deepEqual(recreated,project(r,0));r.epoch++;r.host.events=[];assert.deepEqual(project(r,0).events,[]);checks++;
+// Plague destruction uses observer-visible names only, retains owner, and deduplicates replay.
+r.host.events=[];r.epoch++;add({kind:'unit-destroyed',unitId:'private-inf',meta:{source:'plague',targetPlayerId:'c'},cells:[{x:4,y:5}]});
+const visible={...data.initial.snapshot,online:{boards:[{seat:2,cells:[{cell:{x:4,y:5},kind:'inf',observation:'impact'}]}]}};
+const plague=project(r,0,visible);assert.equal(plague.events.length,1);assert.equal(plague.events[0].unit,'inf');assert.ok(!('cell' in plague.events[0]));assert.deepEqual(project(r,0,visible),plague);
+assert.ok(run(mountBattleLog,{...visible,groupNarrative:plague},[]).some(r=>r.text==="The Plague destroyed AI 3's Infantry."));
+visible.online.boards[0].cells[0].kind=null;assert.equal(project(r,0,visible).events[0].unit,null);visible.online.boards[0].cells=[];assert.equal(project(r,0,visible).events.length,0);checks++;
 const out={passed:true,checks,ordinaryAndDuelProseUnchanged:true,specialTypes:true,catapultLaunchDedup:true,unknownAttribution:true,hiddenFactsIgnored:true,namesNotIdentity:true,restoreAndRematch:true};console.log(JSON.stringify(out));

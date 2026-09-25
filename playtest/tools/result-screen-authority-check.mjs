@@ -2,6 +2,8 @@ import assert from 'node:assert/strict';import {execFileSync} from 'node:child_p
 import {createRingService} from '../server/ring-pvp.mjs';import {roster} from '../server/main.mjs';import {prepareStatistics} from '../server/statistics-capture.mjs';
 const repository=fileURLToPath(new URL('../../',import.meta.url));
 let source=execFileSync('git',['show','c008851de246968eda21ae37e50484e3e2ffb7f7:playtest/server/ring-pvp.mjs'],{cwd:repository,encoding:'utf8'});
+// Compare Result behavior under the same explicitly revised gameplay rules.
+source=source.replaceAll("rulesVersion:'stone-throw-v1.427'","rulesVersion:'stone-throw-pacing-v1'");
 source=source.replace(/from '([^']+)'/g,(all,p)=>p.startsWith('.')?"from '"+new URL(p,new URL('../server/ring-pvp.mjs',import.meta.url)).href+"'":all);
 const original=(await import('data:text/javascript;base64,'+Buffer.from(source).toString('base64'))).createRingService;
 const a=original(roster,{seed:42,workers:false,now:()=>100000}),b=createRingService(roster,{seed:42,workers:false,now:()=>100000});

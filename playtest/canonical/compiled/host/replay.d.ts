@@ -17,7 +17,7 @@ export interface ReplayStep {
 }
 export interface HostReplay {
     contract: 'stone-throw-private-replay-v1';
-    rulesVersion: 'stone-throw-v1.427';
+    rulesVersion: HostState['config']['rulesVersion'];
     initial: HostState;
     initialFingerprint: string;
     steps: ReplayStep[];

@@ -1,7 +1,7 @@
 // Read-only accounting over canonical facts. Never use animation or narrative events.
 // These are the ability sources in combat/contracts.ts RuleSource; generic chain
 // contacts require more attribution evidence and are not silently called abilities.
-const abilities=new Set(['archer','monk-deflect','catapult-shot','goblin','dragon','demon-blast','wizard','plague']);
+const abilities=new Set(['archer','monk-deflect','catapult-shot','goblin','dragon','demon-blast','wizard','plague','assassin']);
 const direct=new Set(['direct-human','direct-ai']);
 export function tacticalScoreFacts(d,facts){
  const result=Object.fromEntries(d.participants.map(p=>[p.actor,{scouts:0,plagueCells:0,kills:0,issues:[]} ]));
@@ -14,12 +14,14 @@ export function tacticalScoreFacts(d,facts){
   if(e.kind==='scouted'){
    const scout=s.scout;
    if(!scout?.actorId||!scout.boardId||!Array.isArray(scout.cells)){issue(scout?.actorId,f.index,'scout-success-evidence-unavailable');continue;}
+   let discoveries=0;
    for(const c of scout.cells){
     if(!c.cell||!Object.hasOwn(c,'unitId')){issue(scout.actorId,f.index,'scout-success-evidence-unavailable');continue;}
     const key=scout.actorId+':'+scout.boardId+':'+c.cell.x+','+c.cell.y;
-    if(c.unitId&&!known.has(key)&&eligible(scout.actorId,f.index))result[scout.actorId].scouts++;
+    if(c.unitId&&!known.has(key)&&eligible(scout.actorId,f.index))discoveries++;
     known.add(key);
    }
+   result[scout.actorId].scouts+=e.reason==='area-scout'?Math.min(1,discoveries):discoveries;
   }
   if(e.kind==='impact'){
    if(e.unitId)lastImpact.set(e.unitId,{meta:m,index:f.index});

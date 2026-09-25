@@ -1,3 +1,4 @@
+import { beginChaosBoundary, observeChaosBoundary, settleChaos } from './chaos.js';
 import { processedChainCells } from '../combat/chain-statistics.js';
 import { cloneHost } from '../archives.js';
 import { normalTarget, commitEliminations, syncRing } from './ring.js';
@@ -8,13 +9,14 @@ import { seat, cellKey } from '../combat/access.js';
 import { place } from './initialization.js';
 import { observeResurrectionFeedback, observeRuleEvent, refreshHost } from './refresh.js';
 function root(h, ops, purpose) { if (!h.activePlayerId || h.pendingRoot)
-    throw Error('Root boundary violation'); h.pendingRoot = startResolution(h.state, 'match-root-' + (++h.rootSerial), 'host-root-' + h.rootSerial, h.activePlayerId, ops, h.rng); h.rootEventCursor = 0; h.rootPurpose = purpose; h.status = 'running'; }
+    throw Error('Root boundary violation'); beginChaosBoundary(h); h.pendingRoot = startResolution(h.state, 'match-root-' + (++h.rootSerial), 'host-root-' + h.rootSerial, h.activePlayerId, ops, h.rng); h.rootEventCursor = 0; h.rootPurpose = purpose; h.status = 'running'; }
 function collect(h) {
     const r = h.pendingRoot;
     if (!r)
         return;
     h.state = r.state;
     h.rng = r.rng;
+    observeChaosBoundary(h);
     for (let i = 0; i < r.frames.length; i++) {
         const f = r.frames[i];
         if ((f.kind !== 'wave' && f.kind !== 'interrupt') || h.statisticsFrames.some(s => s.frameId === f.id))
@@ -60,6 +62,7 @@ export function pumpHost(h, maxSteps = 100000, execution) {
                 h.pendingRoot = null;
                 h.rootPurpose = null;
                 const displaced = commitEliminations(h);
+                settleChaos(h);
                 if (h.state.match.outcome.kind !== 'ongoing') {
                     terminal(h, execution);
                     return;
@@ -98,8 +101,8 @@ export function pumpHost(h, maxSteps = 100000, execution) {
         }
         else if (h.turnStep === 'scout') {
             h.turnStep = primary ? 'actions' : 'catapult';
-            if (p.spyLater)
-                root(h, [{ kind: 'turn-scout', ownerId: p.playerId, count: p.spyLater }], 'entry');
+            if (p.spyLater || p.areaScoutLater)
+                root(h, [...(p.spyLater ? [{ kind: 'turn-scout', ownerId: p.playerId, count: p.spyLater }] : []), ...Array.from({ length: p.areaScoutLater || 0 }, () => ({ kind: 'turn-scout', ownerId: p.playerId, count: 1, area: true }))], 'entry');
         }
         else if (h.turnStep === 'catapult') {
             h.turnStep = primary ? 'resurrection' : 'budget';

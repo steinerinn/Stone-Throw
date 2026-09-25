@@ -1,0 +1,13 @@
+import assert from 'node:assert/strict';
+import fs from 'node:fs';import os from 'node:os';import path from 'node:path';
+import {startServer} from '../server/main.mjs';
+const {launch}=await import(process.env.ST_BROWSER_HARNESS||'playwright');
+const app=await startServer({port:0,registryDir:fs.mkdtempSync(path.join(os.tmpdir(),'lore-check-')),playtestSnapshotOnly:true,logger:()=>{}}),browser=await launch();let checks=0;
+try{for(const width of [1440,390]){
+ const page=await browser.newPage({viewport:{width,height:950}});await page.goto(app.origin);await page.locator('#stStartupEnter').click();await page.waitForFunction(()=>document.documentElement.dataset.localHost==='connected');await page.locator('#stLoadingScreen').waitFor({state:'hidden'});
+ await page.locator('#stMenuUnitLore').click();assert.equal(await page.locator('[data-unit-lore]').count(),16);assert.match(await page.locator('[data-unit-lore=assassin]').innerText(),/ACTIVATES A CHAIN UNIT/);assert.equal(await page.locator('[data-unit-lore=assassin] img').evaluate(img=>img.complete&&img.naturalWidth>0),true);checks++;
+ for(const type of ['inf','cav','archer']){await page.locator('[data-unit-lore='+type+']').click();assert.equal(await page.locator('.st-unit-lore-detail').count(),1);await page.getByRole('button',{name:'BACK TO UNIT LORE',exact:true}).click();checks++;}
+ for(const type of ['castle','catapult','dwarf','elf','goblin','necro','cleric','monk','dragon','demon','wizard','hero']){await page.locator('[data-unit-lore='+type+']').click();assert.match(await page.locator('#stMenuDialogBody').innerText(),/Unlock more information through story progression/);assert.equal(await page.locator('.st-unit-lore-detail').count(),0);await page.getByRole('button',{name:'OK',exact:true}).click();assert.equal(await page.locator('[data-unit-lore]').count(),16);checks++;}
+ await page.evaluate(()=>window.__stoneThrowRecordStoryUnitDiscovery('castle'));await page.locator('[data-unit-lore=castle]').click();assert.equal(await page.locator('.st-unit-lore-detail').count(),1);await page.getByRole('button',{name:'BACK TO UNIT LORE',exact:true}).click();checks++;
+ await page.evaluate(()=>localStorage.setItem(window.__stoneThrowStoryStorageKey?.('stoneThrow.storyFinished.v1')||'stoneThrow.storyFinished.v1','1'));await page.locator('[data-unit-lore=hero]').click();assert.equal(await page.locator('.st-unit-lore-detail').count(),1);checks++;await page.close();
+}console.log(JSON.stringify({passed:true,checks,widths:[1440,390],allSummaries:true,baseDetails:true,storyGating:true,finishedStory:true,assassinPortrait:true}));}finally{await browser.close();await app.close();}

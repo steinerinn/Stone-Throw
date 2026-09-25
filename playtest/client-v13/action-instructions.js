@@ -27,7 +27,7 @@ let hostSide='player',id='stActionBlast',cls='hero-action',title='',lines=[],art
 else if(kind==='hero-any'){hostSide='enemy';id='stHeroActionBlast';title='MOVE YOUR HERO!';lines=['MOVE TO ANY LOCATION'];artType='hero';}
 else if(kind==='hero-adjacent'){hostSide='enemy';id='stHeroActionBlast';title='MOVE YOUR HERO!';lines=['MOVE TO AN ADJACENT CELL'];artType='hero';}
 else if(kind==='resurrect'){hostSide='enemy';id='stResurrectionActionBlast';cls='resurrection-action';title='RESURRECTION!';lines=['CHOOSE A UNIT'];artType='cleric';}
-else if(kind==='scout'){hostSide='player';id='stScoutActionBlast';cls='scout';title='SCOUTING PHASE!';artType='elf';}
+else if(kind==='scout'||kind==='scout-area'){hostSide='player';id='stScoutActionBlast';cls='scout';title=kind==='scout-area'?'AREA SCOUT!':'SCOUTING PHASE!';lines=kind==='scout-area'?['CHOOSE ONE CENTER CELL','SCANS A 3x3 AREA']:[];artType='elf';}
 else return;const host=document.getElementById(hostSide==='player'?'stPlayerGridHost':'stEnemyGridHost');if(!host)return;const el=stEnsureSalesBlast(id,host,cls);if(!el)return;el.style.visibility='';el.style.opacity='';el.innerHTML=stBlastMarkup(title,lines,artType);stRestartSalesBlast(el);
 }
 function clearPersistentActionInstruction(immediate=false){

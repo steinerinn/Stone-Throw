@@ -2,7 +2,7 @@ import type { Id, MatchState, PlayerId, BoardId, UnitId, Cell } from '../model.j
 export type ResolutionId = Id<'resolution'>;
 export type WorkId = Id<'rule-work'>;
 export type RuleDecisionId = Id<'rule-decision'>;
-export type RuleSource = 'direct-human' | 'direct-ai' | 'chain' | 'archer' | 'monk-deflect' | 'catapult-shot' | 'goblin' | 'dragon' | 'demon-blast' | 'wizard' | 'plague';
+export type RuleSource = 'direct-human' | 'direct-ai' | 'chain' | 'archer' | 'monk-deflect' | 'catapult-shot' | 'goblin' | 'dragon' | 'demon-blast' | 'wizard' | 'plague' | 'assassin';
 export type Timing = 'immediate-interrupt' | 'attack-remainder' | 'after-attack' | 'next-wave' | 'same-turn' | 'turn-boundary' | 'future-turn';
 export interface SourceMetadata {
     actorId: PlayerId;
@@ -50,6 +50,9 @@ export interface CombatSeat {
     catapultLater: number;
     elfNow: boolean;
     spyLater: number;
+    areaScoutLater?: number;
+    areaScoutNow?: number;
+    scoutHitCount?: number;
     clericNow: boolean;
     clericLater: boolean;
     releaseNow: boolean;
@@ -83,6 +86,12 @@ export interface CompatPlague {
 }
 export interface CombatState {
     ring?: {
+        chaos?: {
+            livingBeforeRoot: boolean;
+            pending: boolean;
+            used: boolean;
+            triggered: boolean;
+        };
         order: PlayerId[];
         eliminated: PlayerId[];
         knowledge: Record<string, {
@@ -139,6 +148,7 @@ export type Operation = {
     kind: 'turn-scout';
     ownerId: PlayerId;
     count: number;
+    area?: boolean;
 } | {
     kind: 'direct-after';
     meta: SourceMetadata;
@@ -214,6 +224,7 @@ export interface AttackFrame {
     stage: 'body' | 'finish';
 }
 export interface PendingRuleDecision {
+    area?: boolean;
     id: RuleDecisionId;
     rootId: ResolutionId;
     workId: WorkId;
@@ -230,7 +241,7 @@ export interface PendingRuleDecision {
         unitId: UnitId | null;
     } | null;
 }
-export type EventKind = 'attack-started' | 'impact' | 'repeat-ignored' | 'unit-damaged' | 'unit-destroyed' | 'ability-spent' | 'reaction-generated' | 'benefit-scheduled' | 'plague-held' | 'plague-scheduled' | 'plague-contained' | 'hero-activated' | 'hero-moved' | 'hero-killed' | 'resurrection' | 'resurrection-discovered' | 'suspect-eliminated' | 'scouted' | 'monk-clue' | 'monk-duel' | 'decision-required' | 'decision-answered' | 'decision-cancelled' | 'work-started' | 'work-finished' | 'compatibility-truncation' | 'outcome' | 'resolution-completed';
+export type EventKind = 'chaos-manifestation' | 'attack-started' | 'impact' | 'repeat-ignored' | 'unit-damaged' | 'unit-destroyed' | 'ability-spent' | 'reaction-generated' | 'benefit-scheduled' | 'plague-held' | 'plague-scheduled' | 'plague-contained' | 'hero-activated' | 'hero-moved' | 'hero-killed' | 'resurrection' | 'resurrection-discovered' | 'suspect-eliminated' | 'scouted' | 'monk-clue' | 'monk-duel' | 'decision-required' | 'decision-answered' | 'decision-cancelled' | 'work-started' | 'work-finished' | 'compatibility-truncation' | 'outcome' | 'resolution-completed';
 /** Internal/private facts only. Public projection is deliberately a later adapter. */
 export interface InternalRuleEvent {
     statistics?: Record<string, unknown>;
@@ -252,6 +263,11 @@ export interface ResolutionContext {
     activePlayerId: PlayerId;
     compatibility: 'golden-v1.427';
     status: 'running' | 'awaiting-decision' | 'complete';
+    assassinPending?: {
+        meta: SourceMetadata;
+        unitId: UnitId;
+        stage: 'activate' | 'strike';
+    }[];
     state: CombatState;
     rng: ExplicitRng;
     frames: AttackFrame[];

@@ -13,7 +13,7 @@ function apply(host, action) { if (action.kind === 'policy-step')
  * rather than injected through an unvalidated command-side entropy gap. */
 export function recordReplayStep(replay, host, action) { if (hostFingerprint(host) !== replay.finalFingerprint)
     throw Error('Replay append diverged before step ' + (replay.steps.length + 1)); const next = apply(host, action); assertMatchState(next.state.match); const fingerprint = hostFingerprint(next); replay.steps.push({ action: structuredClone(action), accepted: next.history.slice(host.history.length).map(r => structuredClone(r.command)), rngBefore: host.rng.cursor, rngAfter: next.rng.cursor, fingerprint }); replay.finalFingerprint = fingerprint; return next; }
-export function replayPrivate(record) { if (record.contract !== 'stone-throw-private-replay-v1' || record.rulesVersion !== 'stone-throw-v1.427' || record.initial.config.rulesVersion !== record.rulesVersion)
+export function replayPrivate(record) { if (record.contract !== 'stone-throw-private-replay-v1' || !['stone-throw-v1.427', 'stone-throw-pacing-v1'].includes(record.rulesVersion) || record.initial.config.rulesVersion !== record.rulesVersion)
     throw Error('Unsupported replay version'); let host = structuredClone(record.initial); assertMatchState(host.state.match); if (hostFingerprint(host) !== record.initialFingerprint)
     throw Error('Replay initial state diverged'); for (const [index, step] of record.steps.entries()) {
     const prefix = 'Replay divergence at step ' + (index + 1) + ': ';

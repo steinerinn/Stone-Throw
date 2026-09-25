@@ -9,7 +9,7 @@ export function anyConflictsSingle(ctx, targetKey, ignoreKeys = new Set()) {
     for (const c of around) {
         if (ignoreKeys.has(c))
             continue;
-        if (ctx.occupied.has(c))
+        if (ctx.occupied.has(c) && !ctx.spacingExempt?.has(c))
             offenders.push(c);
     }
     return offenders;
@@ -22,7 +22,7 @@ export function anyConflictsMulti(ctx, targetKeys, ignoreKeys = new Set()) {
     for (const c of around) {
         if (ignoreKeys.has(c))
             continue;
-        if (ctx.occupied.has(c) && !targetKeys.includes(c))
+        if (ctx.occupied.has(c) && !ctx.spacingExempt?.has(c) && !targetKeys.includes(c))
             offenders.push(c);
     }
     return offenders;
@@ -56,7 +56,7 @@ export function canPlaceCastleShape(ctx, cells) {
     for (const k of around) {
         if (cellSet.has(k))
             continue;
-        if (ctx.occupied.has(k))
+        if (ctx.occupied.has(k) && !ctx.spacingExempt?.has(k))
             offenders.push(k);
     }
     return { ok: offenders.length === 0, offenders: [...new Set(offenders)] };
@@ -94,7 +94,7 @@ export function validCastleExpansionCells(ctx, castle) {
             for (const ak of around) {
                 if (own.has(ak))
                     continue;
-                if (ctx.occupied.has(ak)) {
+                if (ctx.occupied.has(ak) && !ctx.spacingExempt?.has(ak)) {
                     blocked = true;
                     break;
                 }

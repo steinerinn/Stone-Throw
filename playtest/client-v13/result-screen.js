@@ -26,7 +26,7 @@ export function buildResultScreen(data,{view,rematch,menu}){
  }
  panel.append(podium);
  if(data.awards.length){const heading=el('h2','cs-award-title','MATCH AWARDS'),awards=el('div','cs-awards');const emblems=['✦','◈','⌖','⚔','⛓','✧'];for(const a of data.awards){const card=el('article','cs-award'),symbol=el('span','cs-award-seal');symbol.append(emblem(a.name));card.dataset.award=a.name;symbol.setAttribute('aria-hidden','true');card.append(symbol,el('h3','',a.name),el('p','cs-award-winner',a.winners.map(i=>data.players.find(p=>p.seat===i)?.name).join(' · ')),el('p','cs-award-value',a.unit==='accuracy'?Math.round(a.value*100)+'% accuracy':a.value+' '+a.unit));awards.append(card);}panel.append(heading,awards);}
- const actions=el('footer','cs-result-actions');for(const [text,fn]of [['VIEW BATTLEFIELD',view],['REMATCH',rematch],['MAIN MENU',menu]]){const b=el('button','cs-result-button',text);b.type='button';b.onclick=fn;actions.append(b);}panel.append(actions);return panel;
+ const actions=el('footer','cs-result-actions');for(const [text,fn]of [['VIEW BATTLEFIELD',view],['REMATCH',rematch],['LEAVE MATCH',menu]]){const b=el('button','cs-result-button',text);b.type='button';if(text==='LEAVE MATCH')b.dataset.leaveMatch='1';b.onclick=fn;actions.append(b);}panel.append(actions);return panel;
 }
 export function mountGroupResult(){
  const css=el('link');css.rel='stylesheet';css.href='/styles-result-screen.css';document.head.append(css);

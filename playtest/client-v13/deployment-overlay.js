@@ -15,6 +15,15 @@ export function paintDeployment(meta,snapshot){
  if(!overlay){overlay=document.createElement('section');overlay.id='csDeployment';overlay.setAttribute('aria-label','Deployment readiness');document.body.append(overlay);const observer=new ResizeObserver(positionPanel);for(const el of [document.querySelector('.st-main > .st-left-stack'),document.querySelector('.st-topbar'),document.getElementById('playerGrid')])if(el)observer.observe(el);}
  overlay.hidden=!meta||snapshot?.phase!=='placement'||meta.closed;
  if(overlay.hidden)return;overlay.replaceChildren();const title=document.createElement('h3');title.textContent='DEPLOYMENT';overlay.append(title);remaining=meta.deployment?.deadline==null?null:Math.max(0,meta.deployment.deadline-meta.deployment.serverNow);synced=performance.now();const timer=document.createElement('p');timer.className='cs-deployment-clock';overlay.append(timer);clock();
+ // The room banner is hidden; keep the host's invitation code in the visible staging panel.
+ if(meta.self===(meta.hostSeat??0)&&meta.code&&!String(meta.code).startsWith('local-')){
+  const invite=document.createElement('div');invite.id='csDeploymentInvite';
+  const label=document.createElement('span');label.textContent='GAME CODE: ';
+  const code=document.createElement('strong');code.id='csDeploymentCode';code.textContent=meta.code;
+  const copy=document.createElement('button');copy.type='button';copy.className='st-btn';copy.textContent='COPY';copy.setAttribute('aria-label','Copy game code');
+  copy.onclick=async()=>{try{await navigator.clipboard.writeText(meta.code);copy.textContent='COPIED';}catch{const range=document.createRange();range.selectNodeContents(code);const selection=getSelection();selection.removeAllRanges();selection.addRange(range);copy.textContent='SELECTED';}};
+  invite.append(label,code,copy);overlay.append(invite);
+ }
  const rows=document.createElement('div');rows.className='cs-deployment-seats';overlay.append(rows);
  for(let i=0;i<meta.names.length;i++){
   if(meta.controllers[i]==='empty')continue;

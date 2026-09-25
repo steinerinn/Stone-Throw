@@ -1,6 +1,6 @@
 /** Public presentation protocol. No imports of canonical or private host types. */
 export type Side = 'self' | 'opponent';
-export type UnitKind = 'inf' | 'cav' | 'archer' | 'monk' | 'castle' | 'dwarf' | 'goblin' | 'catapult' | 'elf' | 'cleric' | 'demon' | 'dragon' | 'wizard' | 'necro' | 'hero';
+export type UnitKind = 'inf' | 'cav' | 'archer' | 'monk' | 'castle' | 'dwarf' | 'goblin' | 'catapult' | 'elf' | 'cleric' | 'demon' | 'dragon' | 'wizard' | 'necro' | 'hero' | 'assassin';
 export interface Cell {
     x: number;
     y: number;
@@ -33,7 +33,7 @@ export interface SeenCell {
     castleMask?: number;
 }
 export interface PublicEvent {
-    source?: 'direct' | 'archer' | 'catapult' | 'goblin' | 'wizard' | 'dragon' | 'demon' | 'plague' | 'monk';
+    source?: 'direct' | 'archer' | 'catapult' | 'goblin' | 'wizard' | 'dragon' | 'demon' | 'plague' | 'monk' | 'assassin';
     position: number;
     kind: 'impact' | 'miss' | 'unit-disclosed' | 'resurrection-announced' | 'hero-moved' | 'plague-observed' | 'resurrection-rejected' | 'resurrection-found';
     side: Side;
@@ -41,6 +41,7 @@ export interface PublicEvent {
     unitKind: UnitKind | null;
 }
 export interface Choice {
+    area?: true;
     handle: string;
     kind: 'hero-relocation' | 'resurrection' | 'catapult-target' | 'catapult-roll' | 'scout';
     side: Side;
@@ -98,6 +99,7 @@ export interface PublicStatistics {
     strength: StrengthSample[];
 }
 export interface Snapshot {
+    monkDuelSequence?: number;
     scoutFootprints?: {
         side: Side;
         cell: Cell;

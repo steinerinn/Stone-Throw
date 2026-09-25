@@ -79,7 +79,7 @@ export function normalEnemyStep(input, m, observePresentationStep) {
         else if (d.kind === 'scout') {
             if (!m.scoutQueue.length)
                 m.scoutQueue = policy.scout(d.remaining || 0);
-            k = m.scoutQueue.shift() || null;
+            k = m.scoutQueue.shift() || (d.area && d.legalCells[0] ? cellKey(d.legalCells[0]) : null);
         }
         else if (d.kind === 'catapult-target') {
             k = normalCatapultChoice(h, m);

@@ -42,6 +42,17 @@ export function answerDecision(ctx, command) {
                 throw Error('Hero identity missing');
             moveHero(ctx, unit(ctx.state, d.unitId), command.cell);
         }
+        else if (d.kind === 'scout' && d.area) {
+            const board = ctx.state.match.boards.find(b => b.id === d.boardId), cells = [];
+            for (let y = Math.max(0, command.cell.y - 1); y <= Math.min(board.height - 1, command.cell.y + 1); y++)
+                for (let x = Math.max(0, command.cell.x - 1); x <= Math.min(board.width - 1, command.cell.x + 1); x++)
+                    cells.push({ x, y });
+            const known = targetKnowledge(ctx.state, d.actorId, board.ownerId).scouted;
+            for (const cell of cells)
+                addUnique(known, cellKey(cell));
+            emit(ctx, 'scouted', null, null, cells, 1, 'area-scout');
+            d.remaining = 0;
+        }
         else if (d.kind === 'scout') {
             addUnique(targetKnowledge(ctx.state, d.actorId, ctx.state.match.boards.find(b => b.id === d.boardId).ownerId).scouted, cellKey(command.cell));
             emit(ctx, 'scouted', null, null, [command.cell]);

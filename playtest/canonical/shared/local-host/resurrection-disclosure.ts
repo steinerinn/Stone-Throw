@@ -29,9 +29,11 @@ export function maskResurrectionChoices(cells:Cell[],search:ResurrectionSearch,s
 export function publicAimAssist(h:HostState):Cell[]{
  if(h.status==='placement'||h.status==='complete')return [];
  const enemy=h.config.players[1]!,seat=h.state.seats.find(s=>s.playerId===enemy.id)!,units=h.state.match.units.filter(u=>u.ownerId===enemy.id),hero=units.find(u=>u.type==='hero');
+ // Assassin ignores spacing, but does not disable the ordinary-unit spacing hints.
+ // Never subtract its private location from the shaded cells; shots remain legal.
  if(hero?.hero?.activated&&hero.hero.currentCell)return [];
  const search=enemyResurrectionSearch(h),destroyed=new Set(search.cells.map(c=>cellKey(c.cell))),shots=new Set([...seat.shots,...destroyed]);
- for(const u of units){if(u.type==='hero'){const c=u.hero?.originalCell;if(!u.hero?.currentCell&&c&&shots.has(cellKey(c)))destroyed.add(cellKey(c));continue;}if(u.cells.length&&u.cells.every(c=>shots.has(cellKey(c))))for(const c of u.cells)destroyed.add(cellKey(c));}
+ for(const u of units){if(u.type==='assassin')continue;if(u.type==='hero'){const c=u.hero?.originalCell;if(!u.hero?.currentCell&&c&&shots.has(cellKey(c)))destroyed.add(cellKey(c));continue;}if(u.cells.length&&u.cells.every(c=>shots.has(cellKey(c))))for(const c of u.cells)destroyed.add(cellKey(c));}
  const impossible=new Set<string>();for(const k of destroyed){const [x,y]=k.split(',').map(Number);for(let dx=-1;dx<=1;dx++)for(let dy=-1;dy<=1;dy++){const nx=x!+dx,ny=y!+dy,n=nx+','+ny;if(nx>=0&&ny>=0&&nx<h.config.size&&ny<h.config.size&&!destroyed.has(n)&&!shots.has(n))impossible.add(n);}}
  return [...impossible].map(k=>{const [x,y]=k.split(',').map(Number);return {x:x!,y:y!};}).sort((a,b)=>a.y-b.y||a.x-b.x);
 }

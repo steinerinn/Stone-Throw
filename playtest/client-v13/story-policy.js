@@ -3,9 +3,9 @@
 export function installStoryPolicy({window,document,getComputedStyle,requestAnimationFrame,cancelAnimationFrame,configure,restorePopupPreference,status}){
 let phase='place';const playerGrid=document.getElementById('playerGrid'),enemyGrid=document.getElementById('enemyGrid'),pHdrRow=document.getElementById('pHdrRow'),eHdrRow=document.getElementById('eHdrRow'),pHdrCol=document.getElementById('pHdrCol'),eHdrCol=document.getElementById('eHdrCol');
 function setup(){return configure(configuration());}function restoreStoryPopupPreference(){restorePopupPreference();}function setStatus(text){status(text);}
-let SIZE=15;const PLAGUE_ROUNDS=5;const PLAGUE_SINGLE_PCT=40;const PLAGUE_DOUBLE_PCT=60;const PLAGUE_TRIPLE_PCT=0;const PLAGUE_START_COUNT=1;let INF_COUNT=5;let CAV_COUNT=3;let ARCHER_COUNT=3;let MONK_COUNT=1;let CASTLE_COUNT=2;const CASTLE_SIZE=5;const ARCHER_WEIGHTS=[5,15,40,15,7,6,5,4,2,1];let DWARF_COUNT=1;let GOBLIN_COUNT=1;let CATAPULT_COUNT=2;let ELF_COUNT=1;let CLERIC_COUNT=1;let DEMON_COUNT=1;let DRAGON_COUNT=1;let WIZARD_COUNT=1;let NECRO_COUNT=2;let HERO_COUNT=1;const FULL_GAME_CONFIG={
+let SIZE=15;const PLAGUE_ROUNDS=5;const PLAGUE_SINGLE_PCT=40;const PLAGUE_DOUBLE_PCT=60;const PLAGUE_TRIPLE_PCT=0;const PLAGUE_START_COUNT=1;let INF_COUNT=5;let CAV_COUNT=3;let ARCHER_COUNT=3;let MONK_COUNT=1;let CASTLE_COUNT=2;const CASTLE_SIZE=5;const ARCHER_WEIGHTS=[5,15,40,15,7,6,5,4,2,1];let DWARF_COUNT=1;let GOBLIN_COUNT=1;let CATAPULT_COUNT=2;let ELF_COUNT=2;let CLERIC_COUNT=1;let DEMON_COUNT=1;let DRAGON_COUNT=1;let WIZARD_COUNT=1;let NECRO_COUNT=2;let HERO_COUNT=1;const FULL_GAME_CONFIG={
 size:15,inf:5,cav:3,archer:3,monk:1,castle:2,dwarf:1,goblin:1,
-catapult:2,elf:1,cleric:1,demon:1,dragon:1,wizard:1,necro:2,hero:1
+catapult:2,elf:2,cleric:1,demon:1,dragon:1,wizard:1,necro:2,hero:1,assassin:1
 };const STORY_BATTLE_1_CONFIG={
 size:5,inf:1,cav:1,archer:1,monk:0,castle:0,dwarf:0,goblin:0,
 catapult:0,elf:0,cleric:0,demon:0,dragon:0,wizard:0,necro:0,hero:0
@@ -70,11 +70,11 @@ function storyPhase2Rosters(battle,previousPlayerWon=null){
 const base={...STORY_PHASE2_BASE};if(battle>=6)base.size=10;
 if(battle===4)return {player:{...base},enemy:{...base}};
 if(battle===5){const loserPlayer=previousPlayerWon===false;return {player:{...base,dwarf:loserPlayer?1:0},enemy:{...base,dwarf:loserPlayer?0:1}};}
-if(battle===6){const synced={...base,dwarf:1};const loserPlayer=previousPlayerWon===false;return {player:{...synced,elf:loserPlayer?1:0},enemy:{...synced,elf:loserPlayer?0:1}};}
-if(battle===7){const synced={...base,dwarf:1,elf:1};const loserPlayer=previousPlayerWon===false;return {player:{...synced,goblin:loserPlayer?1:0},enemy:{...synced,goblin:loserPlayer?0:1}};}
-const synced={...base,dwarf:1,elf:1,goblin:1};return {player:{...synced},enemy:{...synced}};
+if(battle===6){const synced={...base,dwarf:1};const loserPlayer=previousPlayerWon===false;return {player:{...synced,elf:loserPlayer?2:0},enemy:{...synced,elf:loserPlayer?0:2}};}
+if(battle===7){const synced={...base,dwarf:1,elf:2};const loserPlayer=previousPlayerWon===false;return {player:{...synced,goblin:loserPlayer?1:0},enemy:{...synced,goblin:loserPlayer?0:1}};}
+const synced={...base,dwarf:1,elf:2,goblin:1};return {player:{...synced},enemy:{...synced}};
 }
-const STORY_PHASE3_BASE={size:11,inf:2,cav:2,archer:2,monk:0,castle:1,dwarf:1,goblin:1,catapult:1,elf:1,cleric:0,demon:0,dragon:0,wizard:0,necro:0,hero:0};
+const STORY_PHASE3_BASE={size:11,inf:2,cav:2,archer:2,monk:0,castle:1,dwarf:1,goblin:1,catapult:1,elf:2,cleric:0,demon:0,dragon:0,wizard:0,necro:0,hero:0};
 function storyPhase3Battle9Rosters(previousPlayerWon){
 const base={...STORY_PHASE3_BASE};const playerGetsNecro=previousPlayerWon===false;return {
 player:playerGetsNecro?{...base,necro:2}:{...base,inf:base.inf+2},
@@ -90,16 +90,16 @@ if(battle===8)return {player:{...STORY_PHASE3_BASE},enemy:{...STORY_PHASE3_BASE}
 if(battle===9)return storyPhase3Battle9Rosters(previousPlayerWon);
 if(battle===10)return storyPhase3Battle10Rosters(necroOwnerSide);
 throw new Error(`Unsupported Story Phase 3 battle: ${battle}`);}
-const STORY_PHASE4_BASE={size:11,inf:3,cav:2,archer:2,monk:0,castle:1,dwarf:1,goblin:1,catapult:1,elf:1,cleric:0,demon:0,dragon:0,wizard:0,necro:2,hero:0};
+const STORY_PHASE4_BASE={size:11,inf:3,cav:2,archer:2,monk:0,castle:1,dwarf:1,goblin:1,catapult:1,elf:2,cleric:0,demon:0,dragon:0,wizard:0,necro:2,hero:0};
 function storyPhase4BaseRosters(){const player={...STORY_PHASE4_BASE},enemy={...STORY_PHASE4_BASE};if(storyClericUnlocked('player'))player.cleric=1;if(storyClericUnlocked('enemy'))enemy.cleric=1;return {player,enemy};}
 function storyPhase4ApplyNewClerics(r,plagueTargets=[]){for(const side of new Set(Array.isArray(plagueTargets)?plagueTargets:[])){if((side!=='player'&&side!=='enemy')||storyClericUnlocked(side))continue;r[side]={...r[side],inf:Math.max(0,(r[side].inf||0)-1),cleric:1};unlockStoryCleric(side);}return r;}
 function storyPhase4Rosters(battle,previousPlayerWon=null,plagueTargets=[]){const r=storyPhase4BaseRosters();if(previousPlayerWon===null)return storyPhase4ApplyNewClerics(r,plagueTargets);const loserSide=previousPlayerWon===false?'player':'enemy';r[loserSide]={...r[loserSide],monk:1};return storyPhase4ApplyNewClerics(r,plagueTargets);}
-const STORY_PHASE5_BASE={size:12,inf:3,cav:2,archer:2,monk:1,castle:1,dwarf:1,goblin:1,catapult:1,elf:1,cleric:0,demon:0,dragon:0,wizard:0,necro:2,hero:0};
+const STORY_PHASE5_BASE={size:12,inf:3,cav:2,archer:2,monk:1,castle:1,dwarf:1,goblin:1,catapult:1,elf:2,cleric:0,demon:0,dragon:0,wizard:0,necro:2,hero:0};
 function storyPhase5BaseRosters(size=12){const player={...STORY_PHASE5_BASE,size},enemy={...STORY_PHASE5_BASE,size};const p=storyClericUnlocked('player'),e=storyClericUnlocked('enemy');if(p&&e){player.cleric=1;enemy.cleric=1;}else if(p){player.cleric=1;player.inf=Math.max(0,player.inf-1);}else if(e){enemy.cleric=1;enemy.inf=Math.max(0,enemy.inf-1);}return {player,enemy};}
 function storyPhase5AdvanceClericsFromPreviousBattle(){const pHad=(CURRENT_PLAYER_ROSTER.cleric||0)>0,eHad=(CURRENT_ENEMY_ROSTER.cleric||0)>0;if(pHad!==eHad&&(storyClericUnlocked('player')||storyClericUnlocked('enemy')))syncStoryClerics();}
 function storyPhase5ApplyNewClerics(r,plagueTargets=[]){for(const side of new Set(Array.isArray(plagueTargets)?plagueTargets:[])){if((side!=='player'&&side!=='enemy')||storyClericUnlocked(side))continue;r[side]={...r[side],inf:Math.max(0,(r[side].inf||0)-1),cleric:1};unlockStoryCleric(side);}return r;}
 function storyPhase5Rosters(stage,previousPlayerWon=null,plagueTargets=[]){if(stage>0)storyPhase5AdvanceClericsFromPreviousBattle();const size=stage<2?12:13;const r=storyPhase5BaseRosters(size);storyPhase5ApplyNewClerics(r,plagueTargets);if(stage===0)return r;const loserSide=previousPlayerWon===false?'player':'enemy';if(stage===1){r[loserSide]={...r[loserSide],dragon:1};return r;}if(stage===2){r.player.dragon=1;r.enemy.dragon=1;r[loserSide]={...r[loserSide],demon:1};return r;}if(stage===3){r.player.dragon=1;r.enemy.dragon=1;r.player.demon=1;r.enemy.demon=1;r[loserSide]={...r[loserSide],wizard:1};return r;}throw new Error(`Unsupported Story Dragon/Demon/Wizard stage: ${stage}`);}
-const STORY_PHASE6_BASE={size:14,inf:4,cav:2,archer:1,monk:1,castle:2,dwarf:1,goblin:1,catapult:2,elf:1,cleric:0,demon:1,dragon:1,wizard:1,necro:2,hero:0};
+const STORY_PHASE6_BASE={size:14,inf:4,cav:2,archer:1,monk:1,castle:2,dwarf:1,goblin:1,catapult:2,elf:2,cleric:0,demon:1,dragon:1,wizard:1,necro:2,hero:0};
 function storyPhase6BaseRosters(){const player={...STORY_PHASE6_BASE},enemy={...STORY_PHASE6_BASE};const p=storyClericUnlocked('player'),e=storyClericUnlocked('enemy');if(p&&e){player.cleric=1;enemy.cleric=1;}else if(p){player.cleric=1;player.inf=Math.max(0,player.inf-1);}else if(e){enemy.cleric=1;enemy.inf=Math.max(0,enemy.inf-1);}return {player,enemy};}
 function storyPhase6AdvanceClericsFromPreviousBattle(){const pHad=(CURRENT_PLAYER_ROSTER.cleric||0)>0,eHad=(CURRENT_ENEMY_ROSTER.cleric||0)>0;if(pHad!==eHad&&(storyClericUnlocked('player')||storyClericUnlocked('enemy')))syncStoryClerics();}
 function storyPhase6ApplyNewClerics(r,plagueTargets=[]){for(const side of new Set(Array.isArray(plagueTargets)?plagueTargets:[])){if((side!=='player'&&side!=='enemy')||storyClericUnlocked(side))continue;r[side]={...r[side],inf:Math.max(0,(r[side].inf||0)-1),cleric:1};unlockStoryCleric(side);}return r;}

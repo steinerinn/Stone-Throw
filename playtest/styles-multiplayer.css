@@ -52,3 +52,23 @@
 body:has(> #csDeployment:not([hidden])) #stStatus{display:block!important}
 
 body.st-multiplayer-mode #stLocalLeave,body.st-main-menu-mode #stLocalLeave{display:none!important}
+
+/* Fit the desktop staging cards into the existing overlay, without moving boards. */
+@media(min-width:651px){#csDeployment h3,.cs-deployment-clock{flex-shrink:0}#csDeployment .cs-deployment-seats{flex:1;min-height:0;flex-wrap:nowrap}#csDeployment .cs-deployment-seat{min-height:0;gap:3px;padding:4px 6px}#csDeployment .cs-deployment-avatar,#csDeployment .cs-deployment-placeholder{min-height:0;flex-shrink:1}#csDeployment .cs-deployment-name,#csDeployment .cs-deployment-ready{flex-shrink:0}}
+
+body.st-multiplayer-mode #stLocalNewGame,body.st-main-menu-mode #stLocalNewGame,#stLocalNewGame[hidden]{display:none!important}
+
+dialog.st-game-confirm{position:fixed;inset:0;margin:auto;width:min(460px,calc(100vw - 32px));border:1px solid #927341;background:linear-gradient(180deg,#192126,#0c1317);box-shadow:0 0 0 3px #0b1014,0 0 0 4px #594927,0 18px 60px #000b;text-align:center}dialog.st-game-confirm::backdrop{background:rgba(0,0,0,.72)}.st-game-confirm .st-mp-actions{justify-content:center;margin-top:22px}.st-game-confirm .st-btn:focus-visible{outline:2px solid #e3c77d;outline-offset:3px}
+
+/* Shared action buttons across local/Online headers and dialogs. */
+body :is(.st-actions,.result-actions,.st-mp-actions,.st-menu-dialog-actions,.hero-confirm-actions) button:not(#stBetaGameLog):not([data-beta-log]){box-sizing:border-box;min-height:44px;padding:10px 16px;border:1px solid #98743c;border-radius:4px;background:linear-gradient(#293137,#121b20);box-shadow:inset 0 0 0 1px #d4ad5426;color:#f1d18b;font:700 13px/20px Georgia,serif;letter-spacing:.04em;white-space:nowrap;cursor:pointer}
+body :is(.st-actions,.result-actions,.st-mp-actions,.st-menu-dialog-actions,.hero-confirm-actions) button:not(#stBetaGameLog):not([data-beta-log]):hover:not(:disabled){background:linear-gradient(#384249,#1b272e);border-color:#d9b56b}
+body :is(.st-actions,.result-actions,.st-mp-actions,.st-menu-dialog-actions,.hero-confirm-actions) button:focus-visible{outline:2px solid #f1d18b;outline-offset:3px}
+body :is(.st-actions,.result-actions,.st-mp-actions,.st-menu-dialog-actions,.hero-confirm-actions) button:disabled{opacity:.45;cursor:default}
+.st-actions{align-items:center;flex-wrap:nowrap}
+body:not(.st-multiplayer-mode) .st-actions{display:grid;grid-template-columns:repeat(4,max-content) 44px;justify-content:end;gap:8px}
+body:not(.st-multiplayer-mode) .st-actions>button{grid-row:2}
+body:not(.st-multiplayer-mode) .st-actions>#stBetaGameLog{grid-row:1;grid-column:1/-1;justify-self:end}
+@media(min-width:1001px){.st-topbar{grid-template-columns:minmax(180px,1fr) auto max-content}}
+@media(max-width:650px){body:not(.st-multiplayer-mode) .st-actions{grid-template-columns:repeat(4,minmax(0,1fr)) 36px;width:100%;gap:4px}body .st-actions button:not(#stBetaGameLog){padding:6px 4px;font-size:10px;letter-spacing:0;white-space:normal}body .st-actions #stGear{width:36px;min-width:36px;padding:6px 0}}
+body .st-actions #stGear{width:44px;min-width:44px;padding:10px}

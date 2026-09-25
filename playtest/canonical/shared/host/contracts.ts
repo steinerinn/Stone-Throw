@@ -1,7 +1,7 @@
 import type {PlayerId,BoardId,UnitId,UnitType,Cell,MatchId,MatchConfiguration} from '../model.js';
 import type {CombatState,ResolutionContext,ExplicitRng,DecisionCommand,InternalRuleEvent} from '../combat/contracts.js';
-export interface HostConfiguration {matchId:MatchId;rulesVersion:'stone-throw-v1.427';size:number;players:{id:PlayerId;boardId:BoardId;roster:Partial<Record<UnitType,number>>;decisionMode:'interactive'|'policy'}[];story:boolean;seed:number}
-export interface Placement {unitId:UnitId;ownerId:PlayerId;boardId:BoardId;type:UnitType;cells:Cell[]}
+export interface HostConfiguration {matchId:MatchId;rulesVersion:'stone-throw-v1.427'|'stone-throw-pacing-v1';size:number;players:{id:PlayerId;boardId:BoardId;roster:Partial<Record<UnitType,number>>;decisionMode:'interactive'|'policy'}[];story:boolean;seed:number}
+export interface Placement {scoutMode?:'precision'|'area';unitId:UnitId;ownerId:PlayerId;boardId:BoardId;type:UnitType;cells:Cell[]}
 export interface PolicyMemory {playerId:PlayerId;knownHits:string[];scoutKnowledge:{cell:string;classification:'empty'|'core'|'special'}[];heroHunt:string[]}
 export interface MatchCounters {playerId:PlayerId;shots:number;directHits:number;cellsAffected:number;biggestAttack:number;longestChain:number}
 export type HostCommand={id:string;kind:'place';placement:Placement}|{id:string;kind:'start'}|{id:string;kind:'advance-turn'}|{id:string;kind:'shoot';actorId:PlayerId;boardId:BoardId;cell:Cell}|{id:string;kind:'answer';answer:DecisionCommand};

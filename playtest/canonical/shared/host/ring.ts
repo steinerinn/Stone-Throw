@@ -20,13 +20,13 @@ export function commitEliminations(h:HostState){const s=h.state,ring=s.ring;if(!
  const before=[...ring.order],dead=before.filter(id=>!survives(s,id));if(!dead.length)return false;
  const last=h.events.at(-1);if(last){h.events=mutableRows(h.events);h.events[h.events.length-1]={...last,event:{...last.event,statistics:{...last.event.statistics,eliminationBoundary:{dead:[...dead],survivors:before.length-dead.length}}}};}
  ring.eliminated.push(...dead);ring.order=before.filter(id=>!dead.includes(id));
- for(const id of dead){const p=seat(s,id);p.ordinaryShots=0;p.nextShots=0;p.currentChainBonus=0;p.dwarfNow=0;p.catapultNow=0;p.catapultLater=0;p.elfNow=false;p.spyLater=0;p.clericNow=false;p.clericLater=false;p.releaseNow=false;}
+ for(const id of dead){const p=seat(s,id);p.ordinaryShots=0;p.nextShots=0;p.currentChainBonus=0;p.dwarfNow=0;p.catapultNow=0;p.catapultLater=0;p.elfNow=false;p.spyLater=0;if(p.areaScoutLater!==undefined)p.areaScoutLater=0;if(p.areaScoutNow!==undefined)p.areaScoutNow=0;p.clericNow=false;p.clericLater=false;p.releaseNow=false;}
  // Approved Plague rule: only elimination of the infected board cancels its outbreak.
  s.plagues=s.plagues.filter(p=>!dead.includes(p.targetPlayerId));
  // Keep the original source/credit and remaining steps. An orphaned outbreak advances
  // on its surviving target's turns, since its original mover no longer has turns.
  for(const p of s.plagues)if(!ring.order.includes(p.moveOnPlayerId))p.moveOnPlayerId=p.targetPlayerId;
- syncRing(s);if(ring.order.length<=1)for(const p of s.seats){p.catapultNow=0;p.catapultLater=0;p.elfNow=false;p.spyLater=0;}
+ syncRing(s);if(ring.order.length<=1)for(const p of s.seats){p.catapultNow=0;p.catapultLater=0;p.elfNow=false;p.spyLater=0;if(p.areaScoutLater!==undefined)p.areaScoutLater=0;if(p.areaScoutNow!==undefined)p.areaScoutNow=0;}
  if(ring.order.length<=1)s.match.outcome=ring.order.length?{kind:'win',winnerIds:[...ring.order],eliminatedIds:[...ring.eliminated]}:{kind:'draw'};
  if(h.activePlayerId&&dead.includes(h.activePlayerId)&&ring.order.length>1){const i=before.indexOf(h.activePlayerId),next=[...before.slice(i+1),...before.slice(0,i)].find(id=>ring.order.includes(id))!;h.activePlayerId=next;h.turnIndex++;h.turnStep='enter';h.status='awaiting-turn';h.guards.turnActions=0;return true;}
  return false;

@@ -14,7 +14,7 @@ export function firstHeroRelocation(h:HostState,owner:PlayerId,legal:string[]):s
  const adjacent=(cells:{x:number,y:number}[])=>{const near=new Set(cells.flatMap(c=>neighbors8({size:h.config.size},c.x,c.y)));return pool.filter(k=>near.has(k));};
  const hit=adjacent(units.filter(u=>u.cells.some(c=>p.shots.includes(cellKey(c))||revealed.has(cellKey(c)))||(u.damage.hitsTaken||0)>0).flatMap(u=>u.cells));
  let bait:string[]=[];
- for(const type of ['demon','dragon','wizard','necro','goblin']){
+ for(const type of ['demon','dragon','wizard','necro','goblin','assassin']){
   bait=adjacent(units.filter(u=>u.type===type&&u.lifecycle!=='destroyed'&&u.cells.length&&u.cells.every(c=>!p.shots.includes(cellKey(c)))).flatMap(u=>u.cells));
   if(bait.length)break;
  }

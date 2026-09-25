@@ -8,7 +8,7 @@ export function rational(n=0,d=1){n=BigInt(n);d=BigInt(d);if(d<=0n)throw Error('
 export const add=(a,b)=>rational(BigInt(a.n)*BigInt(b.d)+BigInt(b.n)*BigInt(a.d),BigInt(a.d)*BigInt(b.d));
 export const numeric=a=>Number(a.n)/Number(a.d);
 export const completed=p=>p.kind!=='ai'&&p.reliability==='Full'&&p.cutoff===undefined;
-const special=new Set(['dwarf','goblin','catapult','elf','cleric','necro','wizard','demon','dragon']);
+const special=new Set(['dwarf','goblin','catapult','elf','cleric','necro','wizard','demon','dragon','assassin']);
 
 // Historical ranks are accepted only when elimination evidence resolves them.
 export function scorePlacements(d,facts){

@@ -47,6 +47,10 @@ export function commitEliminations(h) {
         p.catapultLater = 0;
         p.elfNow = false;
         p.spyLater = 0;
+        if (p.areaScoutLater !== undefined)
+            p.areaScoutLater = 0;
+        if (p.areaScoutNow !== undefined)
+            p.areaScoutNow = 0;
         p.clericNow = false;
         p.clericLater = false;
         p.releaseNow = false;
@@ -65,6 +69,10 @@ export function commitEliminations(h) {
             p.catapultLater = 0;
             p.elfNow = false;
             p.spyLater = 0;
+            if (p.areaScoutLater !== undefined)
+                p.areaScoutLater = 0;
+            if (p.areaScoutNow !== undefined)
+                p.areaScoutNow = 0;
         }
     if (ring.order.length <= 1)
         s.match.outcome = ring.order.length ? { kind: 'win', winnerIds: [...ring.order], eliminatedIds: [...ring.eliminated] } : { kind: 'draw' };

@@ -30,7 +30,7 @@ export function assertResolution(value) {
     plain(value);
     ensure(value && typeof value === 'object', 'Expected resolution');
     const ctx = value;
-    exact(ctx, ['contract', 'scope', 'id', 'acceptedActionId', 'activePlayerId', 'compatibility', 'status', 'state', 'rng', 'frames', 'future', 'decisions', 'events', 'generated', 'nextWork', 'nextDecision', 'completedAtEvent', 'externalEntropy']);
+    exact(ctx, ['contract', 'scope', 'id', 'acceptedActionId', 'activePlayerId', 'compatibility', 'status', 'state', 'rng', 'frames', 'future', 'decisions', 'events', 'generated', 'nextWork', 'nextDecision', 'completedAtEvent', 'externalEntropy', ...(ctx.assassinPending !== undefined ? ['assassinPending'] : [])]);
     ensure(['accepted-action', 'boundary-comparison'].includes(ctx.scope), 'Unknown resolution scope');
     ensure(ctx.contract === 'stone-throw-resolution-v1' && ctx.compatibility === 'golden-v1.427', 'Unknown rules contract');
     ensure(['running', 'awaiting-decision', 'complete'].includes(ctx.status), 'Invalid resolution status');
@@ -38,7 +38,11 @@ export function assertResolution(value) {
     ensure(typeof ctx.acceptedActionId === 'string' && ctx.acceptedActionId.length > 0, 'Missing action ID');
     exact(ctx.state, ['match', 'seats', 'heroQueue', 'plagues', 'monkDuelActive', 'monkDuelHasHappened', 'storyMode', 'storyPlagueTargets', ...(ctx.state.ring ? ['ring'] : [])]);
     if (ctx.state.ring) {
-        exact(ctx.state.ring, ['order', 'eliminated', 'knowledge']);
+        exact(ctx.state.ring, ['order', 'eliminated', 'knowledge', ...(ctx.state.ring.chaos ? ['chaos'] : [])]);
+        if (ctx.state.ring.chaos) {
+            exact(ctx.state.ring.chaos, ['livingBeforeRoot', 'pending', 'used', 'triggered']);
+            ensure(Object.values(ctx.state.ring.chaos).every(v => typeof v === 'boolean'), 'Invalid Chaos state');
+        }
         for (const [key, value] of Object.entries(ctx.state.ring.knowledge)) {
             ensure(typeof key === 'string', 'Invalid ring knowledge key');
             exact(value, ['scouted', 'monkCandidates']);
@@ -55,7 +59,10 @@ export function assertResolution(value) {
     ensure(players.has(ctx.activePlayerId), 'Unknown active player');
     ensure(state.seats.length === players.size && new Set(state.seats.map(p => p.playerId)).size === players.size, 'Seat identity mismatch');
     for (const p of state.seats) {
-        exact(p, ['playerId', 'boardId', 'reactionTarget', 'decisionMode', 'sameTurnBonusTarget', 'releasePriority', 'releaseRevivesPendingFirst', 'occupied', 'shots', 'scouted', 'monkCandidates', 'nextShots', 'ordinaryShots', 'currentChainBonus', 'dwarfNow', 'catapultNow', 'catapultLater', 'elfNow', 'spyLater', 'clericNow', 'clericLater', 'releaseNow', 'resurrection', 'plagueExcluded']);
+        exact(p, ['playerId', 'boardId', 'reactionTarget', 'decisionMode', 'sameTurnBonusTarget', 'releasePriority', 'releaseRevivesPendingFirst', 'occupied', 'shots', 'scouted', 'monkCandidates', 'nextShots', 'ordinaryShots', 'currentChainBonus', 'dwarfNow', 'catapultNow', 'catapultLater', 'elfNow', 'spyLater', 'clericNow', 'clericLater', 'releaseNow', 'resurrection', 'plagueExcluded', ...(p.areaScoutLater !== undefined ? ['areaScoutLater'] : []), ...(p.areaScoutNow !== undefined ? ['areaScoutNow'] : []), ...(p.scoutHitCount !== undefined ? ['scoutHitCount'] : [])]);
+        for (const n of [p.areaScoutLater, p.areaScoutNow, p.scoutHitCount])
+            if (n !== undefined)
+                ensure(integer(n), 'Invalid area benefit');
         ensure(players.has(p.playerId) && boards.get(p.boardId)?.ownerId === p.playerId, 'Seat ownership mismatch');
         ensure(players.has(p.reactionTarget.playerId) && boards.get(p.reactionTarget.boardId)?.ownerId === p.reactionTarget.playerId, 'Reaction target mismatch');
         ensure(['interactive', 'policy'].includes(p.decisionMode) && ['ordinary', 'chain'].includes(p.sameTurnBonusTarget), 'Unknown compatibility profile');
@@ -68,8 +75,16 @@ export function assertResolution(value) {
             }
         }
     }
-    const meta = (m) => { exact(m, ['actorId', 'ownerId', 'targetPlayerId', 'targetBoardId', 'sourceUnitId', 'source', 'origin']); ensure(players.has(m.actorId) && players.has(m.ownerId) && players.has(m.targetPlayerId), 'Unknown rule actor'); ensure(boards.get(m.targetBoardId)?.ownerId === m.targetPlayerId, 'Target board mismatch'); ensure(m.sourceUnitId === null || units.has(m.sourceUnitId), 'Unknown rule source unit'); ensure(['direct-human', 'direct-ai', 'chain', 'archer', 'monk-deflect', 'catapult-shot', 'goblin', 'dragon', 'demon-blast', 'wizard', 'plague'].includes(m.source), 'Unknown rule source'); };
-    const op = (o) => { ensure(o && typeof o === 'object', 'Invalid operation'); const fields = { impact: ['meta', 'cell', 'deferReactions'], attack: ['entry'], 'flush-reactions': [], 'monk-continuation': ['meta'], 'scheduled-benefit': ['ownerId', 'benefit', 'amount', 'meta', 'accounting'], 'direct-shot': ['meta', 'cell'], 'host-direct-shot': ['meta', 'cell'], 'turn-resurrection': ['ownerId'], 'turn-scout': ['ownerId', 'count'], 'direct-after': ['meta', 'cell'], 'direct-finish': ['meta'], wave: ['entries', 'terminalCheck'], 'hero-queue': [], 'same-turn-effects': [], catapult: ['meta', 'cell', 'impact', 'generated'], 'catapult-resume': ['meta', 'impact', 'generated', 'decisionId'], 'catapult-series': ['ownerId', 'remaining'], 'plague-step': ['targetBoardId', 'plagueId'], 'plague-progress': ['targetBoardId', 'plagueId', 'outbreakIndex', 'parentIndex', 'childIndex', 'wanted', 'oldFrontier', 'nextFrontier', 'reserved', 'stage'], 'terminal-check': ['reason'] }; ensure(Object.hasOwn(fields, o.kind), 'Unknown operation kind'); exact(o, ['kind', ...fields[o.kind].filter(k => k !== 'plagueId' || 'plagueId' in o)]); if ('plagueId' in o)
+    const meta = (m) => { exact(m, ['actorId', 'ownerId', 'targetPlayerId', 'targetBoardId', 'sourceUnitId', 'source', 'origin']); ensure(players.has(m.actorId) && players.has(m.ownerId) && players.has(m.targetPlayerId), 'Unknown rule actor'); ensure(boards.get(m.targetBoardId)?.ownerId === m.targetPlayerId, 'Target board mismatch'); ensure(m.sourceUnitId === null || units.has(m.sourceUnitId), 'Unknown rule source unit'); ensure(['direct-human', 'direct-ai', 'chain', 'archer', 'monk-deflect', 'catapult-shot', 'goblin', 'dragon', 'demon-blast', 'wizard', 'plague', 'assassin'].includes(m.source), 'Unknown rule source'); };
+    if (ctx.assassinPending) {
+        ensure(Array.isArray(ctx.assassinPending), 'Invalid Assassin queue');
+        for (const p of ctx.assassinPending) {
+            exact(p, ['meta', 'unitId', 'stage']);
+            meta(p.meta);
+            ensure(units.has(p.unitId) && state.match.units.some(u => u.id === p.unitId && u.type === 'assassin') && ['activate', 'strike'].includes(p.stage), 'Invalid Assassin continuation');
+        }
+    }
+    const op = (o) => { ensure(o && typeof o === 'object', 'Invalid operation'); const fields = { impact: ['meta', 'cell', 'deferReactions'], attack: ['entry'], 'flush-reactions': [], 'monk-continuation': ['meta'], 'scheduled-benefit': ['ownerId', 'benefit', 'amount', 'meta', 'accounting'], 'direct-shot': ['meta', 'cell'], 'host-direct-shot': ['meta', 'cell'], 'turn-resurrection': ['ownerId'], 'turn-scout': ['ownerId', 'count', ...('area' in o ? ['area'] : [])], 'direct-after': ['meta', 'cell'], 'direct-finish': ['meta'], wave: ['entries', 'terminalCheck'], 'hero-queue': [], 'same-turn-effects': [], catapult: ['meta', 'cell', 'impact', 'generated'], 'catapult-resume': ['meta', 'impact', 'generated', 'decisionId'], 'catapult-series': ['ownerId', 'remaining'], 'plague-step': ['targetBoardId', 'plagueId'], 'plague-progress': ['targetBoardId', 'plagueId', 'outbreakIndex', 'parentIndex', 'childIndex', 'wanted', 'oldFrontier', 'nextFrontier', 'reserved', 'stage'], 'terminal-check': ['reason'] }; ensure(Object.hasOwn(fields, o.kind), 'Unknown operation kind'); exact(o, ['kind', ...fields[o.kind].filter(k => k !== 'plagueId' || 'plagueId' in o)]); if ('plagueId' in o)
         ensure(typeof o.plagueId === 'string' && o.plagueId.length > 0, 'Invalid outbreak identity'); if ('meta' in o)
         meta(o.meta); if (o.kind === 'attack')
         meta(o.entry.meta); if ('entries' in o)
@@ -123,7 +138,9 @@ export function assertResolution(value) {
     ensure(rngWord === ctx.rng.state, 'RNG state mismatch');
     const decisionIds = new Set();
     for (const d of ctx.decisions) {
-        exact(d, ['id', 'rootId', 'workId', 'actorId', 'boardId', 'unitId', 'kind', 'legalCells', 'legalUnitIds', 'remaining', 'status', 'answer']);
+        exact(d, ['id', 'rootId', 'workId', 'actorId', 'boardId', 'unitId', 'kind', 'legalCells', 'legalUnitIds', 'remaining', 'status', 'answer', ...(d.area !== undefined ? ['area'] : [])]);
+        if (d.area !== undefined)
+            ensure(d.kind === 'scout' && d.area === true, 'Invalid area decision');
         ensure(['hero-relocation', 'resurrection', 'catapult-target', 'catapult-roll', 'scout', 'policy-target'].includes(d.kind), 'Unknown decision kind');
         for (const c of d.legalCells) {
             exact(c, ['x', 'y']);

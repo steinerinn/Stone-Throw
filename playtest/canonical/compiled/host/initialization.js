@@ -2,7 +2,7 @@ import { id } from '../model.js';
 import { createRuleRng } from '../combat/rng.js';
 import { canPlaceInf, canPlaceCav, canPlaceCastleShape, castleCellsConnected } from '../rules/placement.js';
 export function createHost(config) {
-    if (config.rulesVersion !== 'stone-throw-v1.427')
+    if (!['stone-throw-v1.427', 'stone-throw-pacing-v1'].includes(config.rulesVersion))
         throw Error('Unsupported rules version');
     if (typeof config.story !== 'boolean' || config.players.some(p => !['interactive', 'policy'].includes(p.decisionMode)))
         throw Error('Invalid host mode');
@@ -19,7 +19,7 @@ export function createHost(config) {
         id(p.id);
         id(p.boardId);
         for (const [kind, count] of Object.entries(p.roster)) {
-            if (!['inf', 'cav', 'archer', 'monk', 'castle', 'dwarf', 'goblin', 'catapult', 'elf', 'cleric', 'demon', 'dragon', 'wizard', 'necro', 'hero'].includes(kind))
+            if (!['inf', 'cav', 'archer', 'monk', 'castle', 'dwarf', 'goblin', 'catapult', 'elf', 'cleric', 'demon', 'dragon', 'wizard', 'necro', 'hero', 'assassin'].includes(kind))
                 throw Error('Unknown roster unit');
             if (!Number.isInteger(count) || count < 0)
                 throw Error('Invalid roster');
@@ -34,12 +34,12 @@ export function place(host, p) { if (host.status !== 'placement')
     throw Error('Wrong placement owner/board'); if (host.state.match.units.some(u => u.id === p.unitId))
     throw Error('Duplicate unit ID'); if (host.state.match.units.filter(u => u.ownerId === p.ownerId && u.type === p.type).length >= (own.roster[p.type] || 0))
     throw Error('Roster slot exhausted'); const cells = p.cells.map(c => ({ ...c })); if (cells.some(c => !Number.isInteger(c.x) || !Number.isInteger(c.y)))
-    throw Error('Noninteger placement'); const keys = cells.map(c => c.x + ',' + c.y), seat = host.state.seats.find(s => s.playerId === p.ownerId), ctx = { size: host.config.size, occupied: new Set(seat.occupied) }; let legal = false; if (p.type === 'cav' && cells.length === 2) {
+    throw Error('Noninteger placement'); const keys = cells.map(c => c.x + ',' + c.y), seat = host.state.seats.find(s => s.playerId === p.ownerId), ctx = { size: host.config.size, occupied: new Set(seat.occupied), spacingExempt: new Set(host.state.match.units.filter(u => u.ownerId === p.ownerId && u.type === 'assassin').flatMap(u => u.cells.map(c => c.x + ',' + c.y))) }; let legal = false; if (p.type === 'cav' && cells.length === 2) {
     const a = cells[0], b = cells[1], orientation = b.x === a.x + 1 && b.y === a.y ? 'H' : b.x === a.x && b.y === a.y + 1 ? 'V' : null;
     legal = !!orientation && canPlaceCav(ctx, a.x, a.y, orientation).ok;
 }
 else if (p.type === 'castle')
     legal = cells.length === 5 && canPlaceCastleShape(ctx, keys).ok && castleCellsConnected(ctx, new Set(keys));
 else
-    legal = cells.length === 1 && canPlaceInf(ctx, cells[0].x, cells[0].y); if (!legal)
-    throw Error('Illegal placement'); const u = { id: p.unitId, ownerId: p.ownerId, boardId: p.boardId, type: p.type, cells, lifecycle: 'present', damage: { cells: [], hitsTaken: p.type === 'hero' ? 0 : null }, hero: p.type === 'hero' ? { activated: false, hitsTaken: 0, originalCell: { ...cells[0] }, currentCell: { ...cells[0] }, relocationPending: false } : null, abilities: ['archer', 'monk'].includes(p.type) ? [{ kind: p.type, spent: false }] : [], resurrectionCount: 0 }; host.state.match.units.push(u); seat.occupied.push(...keys); host.placements.push(structuredClone(p)); }
+    legal = cells.length === 1 && (p.type === 'assassin' ? cells[0].x >= 0 && cells[0].y >= 0 && cells[0].x < ctx.size && cells[0].y < ctx.size && !ctx.occupied.has(keys[0]) : canPlaceInf(ctx, cells[0].x, cells[0].y)); if (!legal)
+    throw Error('Illegal placement'); const u = { id: p.unitId, ownerId: p.ownerId, boardId: p.boardId, type: p.type, cells, lifecycle: 'present', damage: { cells: [], hitsTaken: p.type === 'hero' ? 0 : null }, hero: p.type === 'hero' ? { activated: false, hitsTaken: 0, originalCell: { ...cells[0] }, currentCell: { ...cells[0] }, relocationPending: false } : null, abilities: ['archer', 'monk'].includes(p.type) ? [{ kind: p.type, spent: false }] : [], resurrectionCount: 0 }; host.state.match.units.push(u); seat.occupied.push(...keys); host.placements.push({ ...structuredClone(p) }); }

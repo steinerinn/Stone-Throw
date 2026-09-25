@@ -2,7 +2,7 @@ import type { PlayerId, BoardId, UnitId, UnitType, Cell, MatchId } from '../mode
 import type { CombatState, ResolutionContext, ExplicitRng, DecisionCommand, InternalRuleEvent } from '../combat/contracts.js';
 export interface HostConfiguration {
     matchId: MatchId;
-    rulesVersion: 'stone-throw-v1.427';
+    rulesVersion: 'stone-throw-v1.427' | 'stone-throw-pacing-v1';
     size: number;
     players: {
         id: PlayerId;
@@ -14,6 +14,7 @@ export interface HostConfiguration {
     seed: number;
 }
 export interface Placement {
+    scoutMode?: 'precision' | 'area';
     unitId: UnitId;
     ownerId: PlayerId;
     boardId: BoardId;

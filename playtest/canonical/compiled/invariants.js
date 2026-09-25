@@ -20,7 +20,7 @@ export function assertMatchState(value) {
     requireThat(JSON.stringify(s.config.playerOrder) === JSON.stringify(s.players.map(p => p.id)), 'Configuration/order mismatch');
     requireThat(JSON.stringify(s.config.boards) === JSON.stringify(s.boards), 'Immutable board configuration mismatch');
     requireThat(Object.keys(s.config.initialRosters).sort().join('|') === [...players].sort().join('|'), 'Roster ownership mismatch');
-    const types = new Set(['inf', 'cav', 'archer', 'monk', 'castle', 'dwarf', 'goblin', 'catapult', 'elf', 'cleric', 'demon', 'dragon', 'wizard', 'necro', 'hero']);
+    const types = new Set(['inf', 'cav', 'archer', 'monk', 'castle', 'dwarf', 'goblin', 'catapult', 'elf', 'cleric', 'demon', 'dragon', 'wizard', 'necro', 'hero', 'assassin']);
     for (const r of Object.values(s.config.initialRosters))
         for (const k of Object.keys(r))
             requireThat(types.has(k), 'Unknown roster unit type');
@@ -49,6 +49,7 @@ export function assertMatchState(value) {
                 occupied.add(k);
             }
         }
+        requireThat(u.scoutMode === undefined || u.type === 'elf', 'Scout subtype on non-Elf');
         requireThat(u.hero === null || u.type === 'hero', 'Hero state on non-Hero');
         if (u.hero) {
             for (const c of [u.hero.currentCell, u.hero.originalCell])

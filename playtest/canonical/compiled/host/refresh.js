@@ -117,7 +117,7 @@ export function observeRuleEvent(host, event) {
         if (d) {
             const b = host.brains.find(b => b.playerId === d.actorId);
             for (const c of event.cells) {
-                const key = cellKey(c), u = unitAt(host.state, d.boardId, key), classification = !u ? 'empty' : u.type === 'hero' ? (u.hero?.activated ? 'core' : 'special') : ['dwarf', 'goblin', 'catapult', 'elf', 'cleric', 'necro', 'wizard', 'demon', 'dragon'].includes(u.type || '') ? 'special' : 'core';
+                const key = cellKey(c), u = unitAt(host.state, d.boardId, key), classification = !u ? 'empty' : u.type === 'hero' ? (u.hero?.activated ? 'core' : 'special') : ['dwarf', 'goblin', 'catapult', 'elf', 'cleric', 'necro', 'wizard', 'demon', 'dragon', 'assassin'].includes(u.type || '') ? 'special' : 'core';
                 if (!b.scoutKnowledge.some(k => k.cell === key))
                     b.scoutKnowledge.push({ cell: key, classification });
             }
