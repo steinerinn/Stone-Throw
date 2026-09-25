@@ -45,7 +45,7 @@
 /* No room banner: retain only actionable setup/error/consent controls. */
 #stLanStatus{display:contents}
 #stLanStatus>*,#stLanStatus>.st-mp-actions{display:none}
-#stLanStatus>#stGroupRematchSetup,#stLanStatus>#stGroupError:not(:empty),#stLanStatus>#stGroupQuickAccept,#stLanStatus>#stGroupQuickDecline{display:block}
+#stLanStatus>#stGroupError:not(:empty),#stLanStatus>#stGroupQuickAccept,#stLanStatus>#stGroupQuickDecline{display:block}
 #stLanStatus:has(#stGroupQuickAccept)>p:not(#stGroupTurn):not(:empty){display:block}
 
 /* Keep the deployment header height stable when Random enables READY. */

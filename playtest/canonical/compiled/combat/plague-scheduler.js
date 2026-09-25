@@ -1,4 +1,4 @@
-import { seat, boardSize, cellKey, parseKey, emit } from './access.js';
+import { attackBlockedCells, seat, boardSize, cellKey, parseKey, emit } from './access.js';
 import { neighbors8 } from '../rules/coordinates.js';
 import { plagueBranchCount, plagueWeightedChoice, plagueWholeEdgeCandidates } from './units/plague.js';
 import { work } from './scheduling.js';
@@ -21,7 +21,7 @@ export function plagueProgress(ctx, op) {
         nextOutbreak();
         return;
     }
-    const target = seat(ctx.state, p.targetPlayerId), shots = new Set(target.shots), reserved = new Set(op.reserved), size = boardSize(ctx.state, p.targetBoardId);
+    const target = seat(ctx.state, p.targetPlayerId), shots = attackBlockedCells(ctx.state, p.targetPlayerId), reserved = new Set(op.reserved), size = boardSize(ctx.state, p.targetBoardId);
     const impact = (k) => { const meta = { actorId: p.triggerPlayerId, ownerId: p.ownerId, targetPlayerId: p.targetPlayerId, targetBoardId: p.targetBoardId, sourceUnitId: null, source: 'plague', origin: p.origin }; if (!outbreak.infected.includes(k))
         outbreak.infected.push(k); return { kind: 'impact', meta, cell: parseKey(k), deferReactions: false }; };
     if (op.stage === 'start') {

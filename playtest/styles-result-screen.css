@@ -43,3 +43,5 @@
 }
 
 .cs-result-heading .cs-match-score{margin:3px 0;font-size:14px;line-height:1.25;letter-spacing:.02em;color:#f0e3c8;text-shadow:0 2px 3px #000}
+
+.cs-place{margin-bottom:48px}.cs-place-scores{position:absolute;top:100%;left:0;right:0;z-index:4;text-align:center;color:#f4d68c;font-size:14px;text-shadow:0 2px 3px #000}.cs-participant-score{margin:4px 0;overflow-wrap:anywhere}.cs-crowded-place{margin-bottom:90px}

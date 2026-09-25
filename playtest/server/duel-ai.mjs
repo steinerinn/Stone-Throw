@@ -1,3 +1,4 @@
+import {areaScoutChoice} from '../canonical/compiled/policy/area-scout.js';
 import {firstHeroRelocation} from '../canonical/compiled/policy/first-hero-relocation.js';
 import {acceptCommand,pumpHost} from '../canonical/compiled/host/lifecycle.js';
 import {heroRelocation,heroLocalEscape} from '../canonical/compiled/policy/special-decisions.js';
@@ -19,6 +20,7 @@ import {neighbors8} from '../canonical/compiled/rules/coordinates.js';
   let cell=null,unitId=null;
   if(d.kind==='resurrection')unitId=d.legalUnitIds[Math.floor(random(h.rng,'resurrection')*d.legalUnitIds.length)];
   else if(d.kind==='hero-relocation'){const local=h.state.match.units.find(u=>u.id===d.unitId)?.hero?.hitsTaken===2,k=local?heroLocalEscape(h,owner.id,d.legalCells.map(cellKey)):firstHeroRelocation(h,owner.id,d.legalCells.map(cellKey));cell=k?parseKey(k):null;}
+  else if(d.kind==='scout'&&d.area){memory.scoutQueue=[];cell=areaScoutChoice(h,d.actorId,d.boardId,d.legalCells);}
   else if(d.kind==='scout'){if(!memory.scoutQueue.length)memory.scoutQueue=policy.scout(d.remaining);const k=memory.scoutQueue.shift();cell=k?parseKey(k):null;}
   else if(d.kind==='catapult-target'){const k=normalCatapultChoice(v,memory);cell=k?parseKey(k):null;}
   else if(d.kind==='catapult-roll'){const k=policy.roll(d.legalCells.map(cellKey),true);cell=k?parseKey(k):null;}

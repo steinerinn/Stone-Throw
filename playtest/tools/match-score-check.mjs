@@ -17,7 +17,7 @@ eq(component(calculateScores(d,fs),'directSpecialPenalty'),-20);
 // With a single ordinary miss per participant, Blind One and Chain Master tie.
 for(const n of [2,3,4]){d=descriptor(n);fs=Array.from({length:n},(_,i)=>shot(i,{actor:'p'+i}));eq(component(calculateScores(d,fs),'awardBonus'),20/n);}
 d=descriptor(2);fs=[shot(0)];eq(component(calculateScores(d,fs),'awardBonus'),20);
-d=descriptor();d.finalResult.placements={p0:1,p1:1,p2:2};eq(calculateScores(d,[]).scores.map(s=>s.placement),[1,1]);
+d=descriptor();d.finalResult.placements={p0:1,p1:1,p2:2};eq(calculateScores(d,[]).scores.map(s=>s.placement),[1,1,2]);
 for(const reliability of ['Quit','Disconnect','Kick']){d=descriptor();Object.assign(d.participants[0],{reliability,cutoff:1});fs=[shot(0,{hit:true}),shot(1,{hit:true,type:'catapult',root:'r0'}),shot(2,{hit:true,type:'catapult'})];const r=calculateScores(d,fs);for(const k of ['completion','placement','fewerShots','awardBonus','directSpecialPenalty'])eq(component(r,k),0);eq(component(r,'biggestChain'),1);eq(component(r,'efficiency'),100);eq(r.scores[0].participation,'Disconnect/Abandon');}
 d=descriptor();d.reliabilityEvents=[{kind:'disconnected'},{kind:'rejoined'}];eq(component(calculateScores(d,[]),'completion'),500);
 for(const [n,human]of [[2,1],[3,1],[3,2],[4,1],[4,2],[4,3]])for(const winner of ['player','ai']){d=descriptor(n,Array.from({length:n},(_,i)=>i<human?'account':'ai'));d.finalResult.placements=Object.fromEntries(d.participants.map((p,i)=>[p.actor,i===(winner==='player'?0:human)?1:2]));const f=calculateScores(d,[]).faction;eq(f[winner==='player'?'playerUnits':'aiUnits'],6*n/(winner==='player'?human:n-human));}
@@ -30,4 +30,6 @@ const high=calculateScores(descriptor(),chain).scores[0];high.exact=rational(100
 d=descriptor(2,['account','ai']);d.mode='Story';eq(calculateScores(d,[]).faction.qualifying,false);d.mode='Single Player';d.endedAt=null;eq(calculateScores(d,[]).faction.qualifying,false);eq(calculateScores(d,[]).scores[0].score,null);
 d=descriptor();fs=[shot(0,{hit:true,type:'catapult'}),{...shot(1,{hit:true,type:'catapult'}),eventId:'event0'}];eq(component(calculateScores(d,fs),'directSpecialPenalty'),-10);
 eq(numeric(calculateScores(d,[]).scores[1].components.fewerShots),0);
+// Guest and AI scores use the same performance components, with no AI career identity.
+d=descriptor(2,['guest','ai']);fs=[shot(0,{actor:'p1',hit:true,type:'catapult',source:'direct-ai'})];const aiResult=calculateScores(d,fs);eq(aiResult.scores.length,2);eq(numeric(aiResult.scores[1].components.efficiency),100);eq(numeric(aiResult.scores[1].components.directSpecialPenalty),-10);eq(numeric(aiResult.scores[1].components.completion),500);eq(numeric(aiResult.scores[1].components.fewerShots),0);eq(aiResult.scores[0].issues,[]);
 console.log(JSON.stringify({passed:true,checks}));

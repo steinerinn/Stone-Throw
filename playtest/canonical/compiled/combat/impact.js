@@ -32,17 +32,19 @@ export function unitReaction(ctx, u, meta, cell) {
  * unitReaction; interrupts and completion checks belong to the root scheduler. */
 export function resolveImpact(ctx, meta, cell, deferReactions = false) {
     const p = seat(ctx.state, meta.targetPlayerId), k = cellKey(cell), u = unitAt(ctx.state, meta.targetBoardId, k), plague = meta.source === 'plague';
-    if (p.shots.includes(k) && !plague) {
+    if (p.shots.includes(k)) {
         if (p.resurrection.searchActive) {
             const suspect = p.resurrection.suspects.find(id => unit(ctx.state, id).cells.some(c => cellKey(c) === k));
             if (suspect) {
                 p.resurrection.suspects = p.resurrection.suspects.filter(id => id !== suspect);
                 emit(ctx, 'suspect-eliminated', meta, suspect, [cell]);
-                return { type: null, unitId: null, reaction: null, repeat: true, deferred: null };
+                return { type: null, unitId: null, reaction: null, repeat: false, deferred: null };
             }
         }
-        emit(ctx, 'repeat-ignored', meta, u?.id || null, [cell]);
-        return { type: u?.type || null, unitId: u?.id || null, reaction: null, repeat: true, deferred: null };
+        if (!plague) {
+            emit(ctx, 'repeat-ignored', meta, u?.id || null, [cell]);
+            return { type: u?.type || null, unitId: u?.id || null, reaction: null, repeat: true, deferred: null };
+        }
     }
     consumeCompatibilityEntropy(ctx);
     addUnique(p.shots, k);
@@ -74,9 +76,7 @@ export function resolveImpact(ctx, meta, cell, deferReactions = false) {
             targetKnowledge(ctx.state, p.reactionTarget.playerId, p.playerId).monkCandidates = [];
         emit(ctx, 'ability-spent', meta, u.id);
     }
-    // Archer deliberately omits resurrected-unit discovery in its own hit path.
-    if (meta.source !== 'archer')
-        discoverResurrection(ctx, meta, k);
+    discoverResurrection(ctx, meta, k);
     if (plague && u.type && ['cav', 'archer', 'monk'].includes(u.type) && destroyed(ctx.state, u)) {
         for (const c of u.type === 'cav' ? u.cells : [cell])
             addUnique(p.plagueExcluded, cellKey(c));

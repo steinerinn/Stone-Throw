@@ -4,7 +4,7 @@ import { normalTarget, survives } from '../host/ring.js';
 import { catapultImpact, catapultSeries } from './catapult.js';
 import { plagueProgress } from './plague-scheduler.js';
 import { id } from '../model.js';
-import { targetKnowledge, ruleTurn, seat, unit, unitAt, boardSize, cellKey, parseKey, available, destroyed, emit } from './access.js';
+import { attackBlockedCells, targetKnowledge, ruleTurn, seat, unit, unitAt, boardSize, cellKey, parseKey, available, destroyed, emit } from './access.js';
 import { createRuleRng, random } from './rng.js';
 import { pushFrame, work, waveOperations, complete, terminalTruncate } from './scheduling.js';
 import { requireDecision } from './decisions.js';
@@ -46,7 +46,7 @@ function attack(ctx, entry) {
         }
         emit(ctx, 'ability-spent', meta, u?.id || null);
         const count = archerShotCount(ctx.rng);
-        layers = [archerTargets(size, meta.origin, new Set(seat(ctx.state, meta.targetPlayerId).shots), count, ctx.rng)];
+        layers = [archerTargets(size, meta.origin, attackBlockedCells(ctx.state, meta.targetPlayerId), count, ctx.rng)];
         defer = true;
     }
     else if (entry.kind === 'goblin')

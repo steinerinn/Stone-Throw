@@ -1,3 +1,4 @@
+import { areaScoutChoice } from '../policy/area-scout.js';
 import { firstHeroRelocation } from '../policy/first-hero-relocation.js';
 import { normalExecution } from './demon-entropy.js';
 import { normalCatapultChoice } from './normal-catapult.js';
@@ -75,6 +76,11 @@ export function normalEnemyStep(input, m, observePresentationStep) {
         let k = null;
         if (d.kind === 'hero-relocation' && h.state.match.units.find(u => u.id === d.unitId)?.hero?.hitsTaken === 1) {
             k = firstHeroRelocation(h, enemy.id, d.legalCells.map(cellKey));
+        }
+        else if (d.kind === 'scout' && d.area) {
+            m.scoutQueue = [];
+            const chosen = areaScoutChoice(h, d.actorId, d.boardId, d.legalCells);
+            k = chosen ? cellKey(chosen) : null;
         }
         else if (d.kind === 'scout') {
             if (!m.scoutQueue.length)

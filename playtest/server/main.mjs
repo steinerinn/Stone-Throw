@@ -48,7 +48,7 @@ export async function startServer({registryDir=registryDirectory(),port=3211,bet
  async function save(){return measuredAsync('persistence',saveInner);}
  async function saveInner(){
   detachFormerPlayers();const captures=[];
-  for(const e of sessions.values())for(const slot of Object.values(slots(e)))await slot.session.visitStatistics((h,epoch,gaveUp)=>{const progress=completedStory(slot,h,epoch,gaveUp);if(progress){getRegistry().completeStory(slot.storyOwnerId,progress,slot.storyRunId||'legacy');slot.storyCapturedEpoch=epoch;}const d=prepareStatistics(slot,h,epoch,{mode:'Single Player',build,now,gaveUp,participants:slot.session.participants?slot.session.participants.map((p,i)=>i===0?{...p,identity:slot.statIdentity||p.identity}:p):[{controller:'human',identity:slot.statIdentity||null},{controller:'ai'}]});if(d)captures.push([d,h]);});
+  for(const e of sessions.values())for(const slot of Object.values(slots(e)))await slot.session.visitStatistics((h,epoch,gaveUp)=>{const progress=completedStory(slot,h,epoch,gaveUp);if(progress){getRegistry().completeStory(slot.storyOwnerId,progress,slot.storyRunId||'legacy');slot.storyCapturedEpoch=epoch;}const d=prepareStatistics(slot,h,epoch,{mode:'Single Player',build,now,gaveUp,participants:slot.session.participants?slot.session.participants.map((p,i)=>i===0?{...p,identity:slot.statIdentity||p.identity}:p):[{controller:'human',identity:slot.statIdentity||null},{controller:'ai',name:slot.configuration.singlePlayer?.npcNames?.[0]||'AI'}]});if(d)captures.push([d,h]);});
   for(const r of pvp.rooms.values()){const d=prepareStatistics(r,r.host,r.epoch,{mode:r.seats.length===2?'Duel':r.seats.length+' Players',build,now,participants:r.seats,news:r.news,closed:r.closed});if(d)captures.push([d,r.host]);}
   if(store){const local=[];for(const [token,e]of sessions){const savedSlots={};for(const [mode,slot]of Object.entries(slots(e)))savedSlots[mode]={configuration:slot.configuration,checkpoint:await slot.session.serializePrivate(),matchStatistics:slot.matchStatistics,statIdentity:slot.statIdentity,storyOwnerId:slot.storyOwnerId,storyRunId:slot.storyRunId,storyContext:slot.storyContext,storyCapturedEpoch:slot.storyCapturedEpoch};local.push({token,guestIdentity:e.guestIdentity||null,seatToken:e.seatToken||null,recoveryNotice:e.recoveryNotice||null,localRecoveryToken:e.localRecoveryToken||null,unavailableLocalRecoveryToken:e.unavailableLocalRecoveryToken||null,configuration:e.configuration,checkpoint:await e.session.serializePrivate(),mode:e.mode||modeOf(e.configuration),slots:savedSlots});}store.write({local,multiplayer:pvp.exportState(true)});}
   // Commit facts only after the durable game snapshot. Recovery retries safely by Match ID.
@@ -63,7 +63,8 @@ export async function startServer({registryDir=registryDirectory(),port=3211,bet
   if(e.mode==='multiplayer'){const r=[...pvp.rooms.values()].find(r=>r.seats.some(x=>x?.token===cookies.st12seat&&x.binding===cookies.st11sid));const seat=r?.seats.findIndex(x=>x?.token===cookies.st12seat);d=r?.matchStatistics;participant=d?.participants.find(p=>p.seat===seat);}
   else if(e.mode!=='story'&&!e.configuration.story){d=slots(e).single?.matchStatistics;participant=d?.participants[0];}
   if(!d?.endedAt||!participant)return body;const score=getRegistry().statistics.matchResultScore(d.id,participant.actor);if(!score)return body;
-  const update={...u,snapshot:{...s,matchScore:score,...(s.groupResult?{groupResult:{...s.groupResult,matchScore:score}}:{})}};return body===u?update:{...body,update};
+  const participantScores=d.participants.map(p=>({seat:p.seat,name:p.displayName,ai:p.kind==='ai',matchScore:getRegistry().statistics.matchResultScore(d.id,p.actor)}));
+  const update={...u,snapshot:{...s,matchScore:score,participantScores,...(s.groupResult?{groupResult:{...s.groupResult,matchScore:score,players:s.groupResult.players.map(p=>({...p,matchScore:participantScores.find(q=>q.seat===p.seat)?.matchScore||null}))}}:{})}};return body===u?update:{...body,update};
  }
  function restoreEntry(e){
   const restore=(c,checkpoint,metadata={})=>{const saved=JSON.parse(checkpoint);let session;if(saved.contract==='local-group-session-v1'){session=localSession(c,checkpoint);}else{saved.epoch=randomInt(1,2**48);saved.revision++;saved.unitHandles=[];saved.choiceHandles=[];saved.presentation=[];session=createLocalSession(configuration(c,0),JSON.stringify(saved),development);}const epoch=session.epoch??saved.epoch;return {...metadata,configuration:c,session,matchStatistics:metadata.matchStatistics?{...metadata.matchStatistics,epoch}:null,storyCapturedEpoch:metadata.storyCapturedEpoch===JSON.parse(checkpoint).epoch?epoch:undefined};};
@@ -111,6 +112,20 @@ let body;try{body=JSON.parse(req.intake||Buffer.alloc(0));if(!body||typeof body!
    }
    if(['/api/pvp/identity','/api/single/identity'].includes(url.pathname)){if(url.pathname==='/api/pvp/identity'&&!lan)return reply(403,{error:'lan-disabled'});if(!entry)return reply(404,{error:'unknown-session'});if(Object.keys(body).length)return reply(400,{error:'malformed-request'});return reply(200,{identity:onlineIdentity()});}
    detachFormerPlayers();
+   // Reload resumes live games only. Finalized results remain in Registry, not a return prompt.
+   if(entry&&['/api/open','/api/pvp/return-status'].includes(url.pathname)&&Object.keys(body).length===0){
+    const completedRoom=[...pvp.rooms.values()].find(r=>r.host?.status==='complete'&&r.seats.some(s=>s?.binding===token&&((s.token&&s.token===(entry.seatToken||seatToken))||(entry.recoveryNotice?.noticeId&&s.takeover?.id===entry.recoveryNotice.noticeId))));
+    if(completedRoom){
+     await save();const own=completedRoom.seats.find(s=>s?.binding===token&&((s.token&&s.token===(entry.seatToken||seatToken))||(entry.recoveryNotice?.noticeId&&s.takeover?.id===entry.recoveryNotice.noticeId)));
+     if(own?.token&&!own.left&&own.controller!=='ai')await pvp.route(own.token,token,'leave');
+     entry.seatToken=null;entry.recoveryNotice=null;entry.mode='main-menu';res.setHeader('Set-Cookie','st12seat='+cookieFlags+'; Max-Age=0');
+     if(url.pathname==='/api/pvp/return-status')return reply(200,{mainMenu:true});
+    }
+    if(url.pathname==='/api/open')for(const [mode,slot]of Object.entries(slots(entry))){
+     const snapshot=(await slot.session.client.read()).snapshot;if(snapshot.phase!=='finished'||snapshot.online&&!snapshot.online.complete)continue;
+     await save();delete slots(entry)[mode];if(entry.session===slot.session){entry.configuration=initial();entry.session=localSession(entry.configuration);if(entry.mode!=='multiplayer')entry.mode='main-menu';}
+    }
+   }
    if(entry?.recoveryNotice&&['/api/open','/api/pvp/return-status'].includes(url.pathname)){res.setHeader('Set-Cookie','st12seat='+cookieFlags+'; Max-Age=0');return reply(200,{returning:true,rejoin:entry.recoveryNotice});}
    if(entry?.recoveryNotice&&['/api/read','/api/command','/api/configure'].includes(url.pathname))return reply(409,{error:'seat-handed-to-ai'});
    if(url.pathname==='/api/leave-match'){

@@ -30,7 +30,7 @@ export function backfillScores(db,{apply=false}={}){
 
 // Read persisted values only. The result's cohort is bounded by its finalization time.
 export function matchResultScore(db,matchId,actor){
- const row=db.prepare(`SELECT p.match_score,p.score_formula_version,p.score_components,m.descriptor,m.ended_at FROM stat_participants p JOIN stat_matches m ON m.id=p.match_id WHERE m.id=? AND p.actor=? AND m.finalized=1 AND p.kind!='ai'`).get(matchId,actor);
+ const row=db.prepare(`SELECT p.match_score,p.score_formula_version,p.score_components,m.descriptor,m.ended_at FROM stat_participants p JOIN stat_matches m ON m.id=p.match_id WHERE m.id=? AND p.actor=? AND m.finalized=1`).get(matchId,actor);
  if(!row||row.match_score===null||row.score_formula_version!=='MATCH_SCORE_V1')return null;
  const stored=JSON.parse(row.score_components||'null');if(!stored)return null;
  const c=JSON.parse(row.descriptor).classification;let comparison=null;

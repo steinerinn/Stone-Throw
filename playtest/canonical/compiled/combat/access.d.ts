@@ -13,6 +13,8 @@ export declare function emit(ctx: ResolutionContext, kind: EventKind, meta?: Sou
 export declare function destroyed(state: CombatState, u: Unit): boolean;
 export declare function syncDamage(state: CombatState, u: Unit): void;
 export declare function reactionMeta(state: CombatState, u: Unit, source: SourceMetadata['source'], origin: Cell): SourceMetadata;
+/** Previously hit resurrection suspects are unknown again for attack selection. */
+export declare function attackBlockedCells(state: CombatState, ownerId: PlayerId): Set<string>;
 export declare function available(state: CombatState, boardId: BoardId, ownerId: PlayerId): string[];
 /** Original Plague scheduling retains its triggering turn tag independently of its later mover. */
 export declare function ruleTurn(ctx: ResolutionContext): PlayerId;

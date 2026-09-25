@@ -16,7 +16,9 @@ export function emit(ctx:ResolutionContext,kind:EventKind,meta:SourceMetadata|nu
 export function destroyed(state:CombatState,u:Unit):boolean {return u.cells.length>0&&u.cells.every(c=>shot(state,u.ownerId,cellKey(c)));}
 export function syncDamage(state:CombatState,u:Unit){u.damage.cells=u.cells.filter(c=>shot(state,u.ownerId,cellKey(c))).map(c=>({...c}));u.lifecycle=u.hero?(u.hero.currentCell?'present':'destroyed'):destroyed(state,u)?'destroyed':'present';}
 export function reactionMeta(state:CombatState,u:Unit,source:SourceMetadata['source'],origin:Cell):SourceMetadata {const p=seat(state,u.ownerId);return {actorId:u.ownerId,ownerId:u.ownerId,targetPlayerId:p.reactionTarget.playerId,targetBoardId:p.reactionTarget.boardId,sourceUnitId:u.id,source,origin:{...origin}};}
-export function available(state:CombatState,boardId:BoardId,ownerId:PlayerId):string[]{const n=boardSize(state,boardId),out:string[]=[];for(let y=0;y<n;y++)for(let x=0;x<n;x++){const k=key(x,y);if(!shot(state,ownerId,k))out.push(k);}return out;}
+/** Previously hit resurrection suspects are unknown again for attack selection. */
+export function attackBlockedCells(state:CombatState,ownerId:PlayerId):Set<string>{const p=seat(state,ownerId),blocked=new Set(p.shots);if(p.resurrection.searchActive)for(const id of p.resurrection.suspects)for(const c of unit(state,id).cells)blocked.delete(cellKey(c));return blocked;}
+export function available(state:CombatState,boardId:BoardId,ownerId:PlayerId):string[]{const n=boardSize(state,boardId),out:string[]=[],blocked=attackBlockedCells(state,ownerId);for(let y=0;y<n;y++)for(let x=0;x<n;x++){const k=key(x,y);if(!blocked.has(k))out.push(k);}return out;}
 
 /** Original Plague scheduling retains its triggering turn tag independently of its later mover. */
 export function ruleTurn(ctx:ResolutionContext):PlayerId{return ctx.frames.at(-1)?.compatibilityTurnId||ctx.activePlayerId;}

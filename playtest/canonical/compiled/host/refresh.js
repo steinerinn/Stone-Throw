@@ -46,6 +46,8 @@ export function observeRuleEvent(host, event) {
             board.clues = [...board.clues.filter(c => c.kind !== 'monk-candidates'), { kind: 'monk-candidates', cells: updateMonkEvidence(host.config.size, prior, meta.origin, event.reason === 'positive') }];
         }
     }
+    if (event.kind === 'suspect-eliminated' && meta && event.cells[0])
+        observeResurrectionFeedback(host, meta.targetBoardId, event.cells[0], false);
     if (event.kind === 'resurrection-discovered' && meta && event.cells[0])
         observeResurrectionFeedback(host, meta.targetBoardId, event.cells[0], true);
     if (event.kind === 'attack-started') {

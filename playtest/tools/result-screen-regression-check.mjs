@@ -20,13 +20,13 @@ if(seats<4){
  if(seats===2){await pages[0].waitForFunction(()=>document.getElementById('playAgainBtn')?.textContent==='REMATCH'&&getComputedStyle(document.getElementById('resultOverlay')).display!=='none');await pages[0].locator('#playAgainBtn').click();}else{await pages[0].locator('.cs-results').waitFor();await pages[0].locator('.cs-results button').filter({hasText:'REMATCH'}).click();}
  if(seats===2){await pages[1].waitForFunction(()=>document.getElementById('playAgainBtn')?.textContent==='REMATCH');await pages[1].locator('#playAgainBtn').click();await pages[0].waitForFunction(()=>window.__stoneThrowViewState?.().phase==='place');}
  else{
- await pages[0].locator('#stGroupRematchSetup').waitFor();await pages[1].locator('.cs-results').waitFor().catch(async e=>{console.log('RESULT DEBUG',await pages[1].evaluate(()=>({body:document.body.className,text:document.body.innerText.slice(-1500),state:window.__stoneThrowViewState?.(),panels:document.querySelectorAll('.cs-results').length})));throw e;});await pages[1].locator('.cs-results button').filter({hasText:'REMATCH'}).click();
- await pages[0].waitForFunction(()=>document.querySelector('[data-rematch-seat="1"]')?.disabled);assert.equal(await pages[0].locator('#stGroupConfigure').isEnabled(),true);
+ await pages[0].locator('#csDeployment').waitFor();assert.equal(await pages[0].locator('#stGroupRematchSetup').count(),0);await pages[1].locator('.cs-results').waitFor().catch(async e=>{console.log('RESULT DEBUG',await pages[1].evaluate(()=>({body:document.body.className,text:document.body.innerText.slice(-1500),state:window.__stoneThrowViewState?.(),panels:document.querySelectorAll('.cs-results').length})));throw e;});await pages[1].locator('.cs-results button').filter({hasText:'REMATCH'}).click();
+ await pages[0].waitForFunction(()=>document.querySelectorAll('#csDeployment .cs-deployment-placeholder').length===1);assert.equal(await pages[0].locator('#stGroupConfigure').count(),0);
  assert.equal((await post(contexts[0],'read')).lan.joined[1],true);
  // Joined Humans remain protected by server validation as well as disabled controls.
  const denied=await contexts[0].request.post(app.origin+'/api/pvp/configure',{headers:{Origin:app.origin},data:{seats:3,controllers:['human','ai','ai']}});assert.equal(denied.status(),400);
- await pages[0].getByLabel('Rematch player count').selectOption('4');await pages[0].locator('#stGroupConfigure').click();await pages[0].waitForTimeout(500);
- assert.deepEqual((await post(contexts[0],'read')).lan.controllers,['human','human','human','human']);
+ await pages[0].waitForTimeout(500);
+ assert.deepEqual((await post(contexts[0],'read')).lan.controllers,['human','human','human']);
  }
  for(let i=0;i<2;i++){assert.equal(await pages[i].evaluate(()=>performance.timeOrigin),docs[i]);assert.equal(await pages[i].locator('#playerGrid .cell').count(),225);await pages[i].close();}
  // No new completed match or changes to previous accounting from rematch.

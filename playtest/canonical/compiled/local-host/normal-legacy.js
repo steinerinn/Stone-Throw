@@ -107,7 +107,7 @@ export function createNormalPolicy(env, nextRandom) {
                     continue;
                 let forbidden = false;
                 for (const [sk, type] of enemyScoutKnowledge) {
-                    if (type !== 'special')
+                    if (type !== 'special' || env.heroSpacingExemptCells?.has(sk))
                         continue;
                     const { x: sx, y: sy } = parseKey(sk);
                     if (neighbors8(sx, sy).includes(k)) {
@@ -168,7 +168,7 @@ export function createNormalPolicy(env, nextRandom) {
                     continue;
                 let forbidden = false;
                 for (const [sk, type] of enemyScoutKnowledge) {
-                    if (type !== 'special')
+                    if (type !== 'special' || env.heroSpacingExemptCells?.has(sk))
                         continue;
                     const { x: sx, y: sy } = parseKey(sk);
                     if (neighbors8(sx, sy).includes(k)) {
@@ -270,7 +270,7 @@ export function createNormalPolicy(env, nextRandom) {
                     continue;
                 let forbidden = false;
                 for (const [sk, type] of enemyScoutKnowledge) {
-                    if (type !== 'special')
+                    if (type !== 'special' || env.heroSpacingExemptCells?.has(sk))
                         continue;
                     const { x: sx, y: sy } = parseKey(sk);
                     if (neighbors8(sx, sy).includes(k)) {
@@ -313,6 +313,8 @@ export function createNormalPolicy(env, nextRandom) {
         return fallback[Math.floor(nextRandom() * fallback.length)];
     }
     function enemyHitShouldForbidNeighbors(k) {
+        if (env.heroSpacingExemptCells?.has(k))
+            return false;
         const castle = sideCastleByCell('player', k);
         if (castle && !castleDestroyed('player', castle))
             return false;

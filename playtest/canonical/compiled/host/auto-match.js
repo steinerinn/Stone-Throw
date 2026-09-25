@@ -1,3 +1,4 @@
+import { areaScoutChoice } from '../policy/area-scout.js';
 import { acceptCommand, pumpHost } from './lifecycle.js';
 import { seat, parseKey, cellKey } from '../combat/access.js';
 import { autoMatchTarget, scoutChoices } from '../policy/auto-target.js';
@@ -35,6 +36,10 @@ export function autoStep(input, execution) { let h = structuredClone(input); con
     else if (d.kind === 'catapult-roll') {
         const chosen = bestCatapult(h, owner, d.legalCells.map(cellKey));
         cell = chosen ? parseKey(chosen) : null;
+    }
+    else if (d.kind === 'scout' && d.area) {
+        h.pendingPolicyCells = [];
+        cell = areaScoutChoice(h, owner, d.boardId, d.legalCells);
     }
     else if (d.kind === 'scout') {
         if (!h.pendingPolicyCells.length)

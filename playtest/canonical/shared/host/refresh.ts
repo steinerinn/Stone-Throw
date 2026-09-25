@@ -12,6 +12,7 @@ export function observeRuleEvent(host:HostState,event:InternalRuleEvent):void {(
  // Public deflection/absence evidence; never copy private compatibility candidates.
  if(event.kind==='monk-clue'&&meta?.origin){const board=m.knowledge[meta.ownerId]?.boards[meta.targetPlayerId];if(board){const prior=board.clues.find(c=>c.kind==='monk-candidates')?.cells??[];board.clues=[...board.clues.filter(c=>c.kind!=='monk-candidates'),{kind:'monk-candidates',cells:updateMonkEvidence(host.config.size,prior,meta.origin,event.reason==='positive')}];}}
 
+ if(event.kind==='suspect-eliminated'&&meta&&event.cells[0])observeResurrectionFeedback(host,meta.targetBoardId,event.cells[0],false);
  if(event.kind==='resurrection-discovered'&&meta&&event.cells[0])observeResurrectionFeedback(host,meta.targetBoardId,event.cells[0],true);
  if(event.kind==='attack-started'){const f=host.statisticsFrames.find(f=>f.frameId===event.workId);if(f)f.count++;}
  if((event.kind==='impact'||event.kind==='suspect-eliminated')&&meta&&!meta.source.startsWith('direct-')&&meta.source!=='plague'){let actor:typeof meta.actorId|null=meta.actorId;if(meta.source==='monk-deflect'){actor=null;for(const frame of [...(host.pendingRoot?.frames||[])].reverse()){if(frame.kind!=='attack')continue;const impact=frame.current.map(w=>w.operation).find(o=>o.kind==='impact');if(impact?.kind==='impact'&&impact.meta.source!=='monk-deflect'){actor=impact.meta.actorId;break;}}}const counter=host.counters.find(c=>c.playerId===actor);if(counter)counter.cellsAffected++;}

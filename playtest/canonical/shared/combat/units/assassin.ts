@@ -22,13 +22,13 @@ export function settleAssassin(ctx:ResolutionContext):boolean {
  let cells=available(ctx.state,target.boardId,attacker);
  if(pending.stage==='strike'){
   const eligible=new Set(ctx.state.match.units.filter(u=>u.ownerId===attacker&&(u.type==='hero'?!!u.hero?.activated&&!!u.hero.currentCell:['inf','cav','archer','monk','castle'].includes(u.type||''))).flatMap(u=>u.cells.map(cellKey)));
-  cells=cells.filter(k=>eligible.has(k));if(!cells.length)return true;
+  cells=cells.filter(k=>eligible.has(k)&&!target.shots.includes(k));if(!cells.length)return true;
   cells=[cells[Math.floor(random(ctx.rng,'assassin-core-cell')*cells.length)]!];
  }else{
   // Use the same destroyed-footprint spacing evidence as aim assist, never
   // filter misses by secret occupancy. Assassin/active Hero can occupy that space.
   const units=ctx.state.match.units.filter(u=>u.ownerId===attacker),freePlacement=units.some(u=>u.type==='assassin'&&u.cells.some(c=>!target.shots.includes(cellKey(c)))||u.type==='hero'&&u.hero?.activated&&u.hero.currentCell);
-  if(!freePlacement){const dead=units.filter(u=>u.type!=='assassin'&&u.cells.length&&u.cells.every(c=>target.shots.includes(cellKey(c)))).flatMap(u=>u.cells);cells=cells.filter(k=>{const c=parseKey(k);return !dead.some(d=>Math.abs(d.x-c.x)<=1&&Math.abs(d.y-c.y)<=1);});}
+  if(!freePlacement){const dead=units.filter(u=>!(target.resurrection.searchActive&&target.resurrection.suspects.includes(u.id))&&u.type!=='assassin'&&u.cells.length&&u.cells.every(c=>target.shots.includes(cellKey(c)))).flatMap(u=>u.cells);cells=cells.filter(k=>{const c=parseKey(k);return !dead.some(d=>Math.abs(d.x-c.x)<=1&&Math.abs(d.y-c.y)<=1);});}
   shuffle(cells,ctx.rng,'assassin-fallback');cells=cells.slice(0,3);
  }
  const selected=cells.map(parseKey);const event=emit(ctx,'attack-started',meta,assassin.id,[],null,'assassin');if(event.statistics)event.statistics.plannedCells=selected;

@@ -1,19 +1,19 @@
 import { normalTarget, survives } from '../host/ring.js';
-import { seat, unitAt, available, parseKey, cellKey, boardSize } from './access.js';
+import { attackBlockedCells, seat, unitAt, available, parseKey, cellKey, boardSize } from './access.js';
 import { resolveImpact } from './impact.js';
 import { neighbors8 } from '../rules/coordinates.js';
 import { random } from './rng.js';
 import { pushFrame, work } from './scheduling.js';
 import { requireDecision } from './decisions.js';
 function finish(ctx, generated) { const operations = [{ kind: 'hero-queue' }, ...generated.map(entry => ({ kind: 'wave', entries: [entry], terminalCheck: true })), { kind: 'terminal-check', reason: 'catapult-sibling' }]; pushFrame(ctx, 'catapult', operations); }
-export function catapultImpact(ctx, meta, cell, impact, generated) { const p = seat(ctx.state, meta.targetPlayerId), k = cellKey(cell); if (p.shots.includes(k)) {
+export function catapultImpact(ctx, meta, cell, impact, generated) { const p = seat(ctx.state, meta.targetPlayerId), k = cellKey(cell); if (attackBlockedCells(ctx.state, meta.targetPlayerId).has(k)) {
     finish(ctx, generated);
     return;
 } const type = unitAt(ctx.state, meta.targetBoardId, k)?.type, result = resolveImpact(ctx, meta, cell); if (result.reaction)
     generated.push(result.reaction); if (type === 'castle' || impact === 4) {
     finish(ctx, generated);
     return;
-} const next = neighbors8({ size: boardSize(ctx.state, meta.targetBoardId) }, cell.x, cell.y).filter(k => !p.shots.includes(k)); if (!next.length) {
+} const next = neighbors8({ size: boardSize(ctx.state, meta.targetBoardId) }, cell.x, cell.y).filter(k => !attackBlockedCells(ctx.state, meta.targetPlayerId).has(k)); if (!next.length) {
     finish(ctx, generated);
     return;
 } if (seat(ctx.state, meta.ownerId).decisionMode === 'interactive') {

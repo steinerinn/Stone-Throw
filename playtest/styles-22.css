@@ -93,7 +93,12 @@
    Keep the user viewport fixed without changing focus, layout or manual scrolling. */
 .st-main{overflow-anchor:none}
 
-.st-chaos-news{position:fixed;z-index:11000;top:20%;left:50%;transform:translateX(-50%);padding:16px 28px;background:#140c10ed;border:1px solid #bd9750;color:#ffdc8a;font:bold 24px Georgia;text-align:center;pointer-events:none}
+.st-chaos-news{position:fixed;z-index:11000;transform:translate(-50%,-50%);width:min(98vw,1280px);color:#ff9564;font:900 clamp(50px,7.8vw,112px)/.94 "Arial Black",Arial,sans-serif;text-align:center;letter-spacing:.065em;-webkit-text-stroke:2px #5c210d;paint-order:stroke fill;text-shadow:0 1px 0 #fff3df,0 4px 0 #70240a9e,0 0 16px #ff733798,0 9px 16px #000c;pointer-events:none;animation:stChaosSalesBlastIn .34s cubic-bezier(.12,1.45,.28,1) forwards}
+.st-chaos-news.out{animation:stChaosSalesBlastOut .34s cubic-bezier(.55,.02,.95,.45) forwards}
+.st-chaos-news strong,.st-chaos-news span{display:block}.st-chaos-news strong{font-size:1em;letter-spacing:.085em;margin-bottom:.14em}.st-chaos-news span{white-space:nowrap}
+@media(max-width:600px){.st-chaos-news{width:96vw;font-size:clamp(34px,9vw,44px);letter-spacing:.025em}.st-chaos-news span{white-space:normal}}
+@keyframes stChaosSalesBlastIn{0%{opacity:0;transform:translate(-50%,-50%) scale(.42) rotate(-7deg)}58%{opacity:1;transform:translate(-50%,-50%) scale(1.11) rotate(1.5deg)}78%{transform:translate(-50%,-50%) scale(.96) rotate(-1deg)}100%{opacity:1;transform:translate(-50%,-50%) scale(1) rotate(0)}}
+@keyframes stChaosSalesBlastOut{0%{opacity:1;transform:translate(-50%,-50%) scale(1) rotate(0)}36%{opacity:1;transform:translate(-50%,-50%) scale(1.16) rotate(1deg)}100%{opacity:0;transform:translate(-50%,-50%) scale(1.72) rotate(-3deg)}}
 .st-chaos-shake{animation:st-chaos-shake .35s ease-in-out 2}
 @keyframes st-chaos-shake{0%,100%{translate:0 0}25%{translate:-3px 1px}75%{translate:3px -1px}}
 @media(prefers-reduced-motion:reduce){.st-chaos-shake{animation:none}}
