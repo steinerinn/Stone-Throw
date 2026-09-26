@@ -36,7 +36,7 @@ export function summarizeMatch(descriptor,facts){
 }
 export function reliabilityAccounting(previous,classification,matchId){
  const r=structuredClone(previous||{Full:0,Quit:0,Disconnect:0,Kick:0,AFK:0,forgiven:0,cleanStreak:0,forgiveness:[]});if(!['Full','Quit','Disconnect','Kick','AFK'].includes(classification))throw Error('Unknown reliability class');r[classification]++;
- if(classification==='AFK')r.cleanStreak=0;
+ if(classification!=='Full')r.cleanStreak=0;
  else if(classification==='Full'){r.cleanStreak=Math.min(10,r.cleanStreak+1);if(r.cleanStreak===10){if(r.AFK>r.forgiven){r.forgiven++;r.forgiveness.push({matchId,count:1});}r.cleanStreak=0;}}
  const total=r.Full+r.Quit+r.Disconnect+r.Kick+r.AFK;r.effectiveFull=r.Full+r.forgiven;r.activeAFK=r.AFK-r.forgiven;r.total=total;r.consistency=total?r.effectiveFull/total:null;return r;
 }

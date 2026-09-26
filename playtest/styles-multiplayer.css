@@ -72,3 +72,9 @@ body:not(.st-multiplayer-mode) .st-actions>#stBetaGameLog{grid-row:1;grid-column
 @media(min-width:1001px){.st-topbar{grid-template-columns:minmax(180px,1fr) auto max-content}}
 @media(max-width:650px){body:not(.st-multiplayer-mode) .st-actions{grid-template-columns:repeat(4,minmax(0,1fr)) 36px;width:100%;gap:4px}body .st-actions button:not(#stBetaGameLog){padding:6px 4px;font-size:10px;letter-spacing:0;white-space:normal}body .st-actions #stGear{width:36px;min-width:36px;padding:6px 0}}
 body .st-actions #stGear{width:44px;min-width:44px;padding:10px}
+
+/* Prominent, click-through warning for the player whose input is required. */
+.st-afk-own-warning .st-mp-dialog{position:fixed;transform:translate(-50%,-50%);width:min(580px,calc(100vw - 32px));text-align:center;border:3px solid #f6c65b;background:rgba(20,12,8,.96);box-shadow:0 0 28px #e9973870,0 8px 30px #000c;padding:24px;pointer-events:none}
+.st-afk-own-warning .st-mp-dialog h2{font-size:clamp(26px,3.2vw,44px);line-height:1.15;color:#ffe19b;text-shadow:0 2px 3px #000;margin-bottom:18px}
+.st-afk-own-warning [role=timer]{font-size:clamp(20px,2vw,28px);font-weight:bold;color:#fff0cf;margin:0}
+.st-afk-own-warning .st-mp-actions:empty,.st-afk-own-warning [role=alert]:empty{display:none}
