@@ -30,13 +30,13 @@ export function assertResolution(value) {
     plain(value);
     ensure(value && typeof value === 'object', 'Expected resolution');
     const ctx = value;
-    exact(ctx, ['contract', 'scope', 'id', 'acceptedActionId', 'activePlayerId', 'compatibility', 'status', 'state', 'rng', 'frames', 'future', 'decisions', 'events', 'generated', 'nextWork', 'nextDecision', 'completedAtEvent', 'externalEntropy', ...(ctx.assassinPending !== undefined ? ['assassinPending'] : [])]);
+    exact(ctx, ['contract', 'scope', 'id', 'acceptedActionId', 'activePlayerId', 'compatibility', 'status', 'state', 'rng', 'frames', 'future', 'decisions', 'events', 'generated', 'nextWork', 'nextDecision', 'completedAtEvent', 'externalEntropy', ...(ctx.environmental ? ['environmental'] : []), ...(ctx.assassinPending !== undefined ? ['assassinPending'] : [])]);
     ensure(['accepted-action', 'boundary-comparison'].includes(ctx.scope), 'Unknown resolution scope');
     ensure(ctx.contract === 'stone-throw-resolution-v1' && ctx.compatibility === 'golden-v1.427', 'Unknown rules contract');
     ensure(['running', 'awaiting-decision', 'complete'].includes(ctx.status), 'Invalid resolution status');
     ensure(/^[A-Za-z][A-Za-z0-9_-]{0,47}$/.test(ctx.id), 'Invalid root ID');
     ensure(typeof ctx.acceptedActionId === 'string' && ctx.acceptedActionId.length > 0, 'Missing action ID');
-    exact(ctx.state, ['match', 'seats', 'heroQueue', 'plagues', 'monkDuelActive', 'monkDuelHasHappened', 'storyMode', 'storyPlagueTargets', ...(ctx.state.ring ? ['ring'] : [])]);
+    exact(ctx.state, ['match', 'seats', 'heroQueue', 'plagues', 'monkDuelActive', 'monkDuelHasHappened', 'storyMode', 'storyPlagueTargets', ...(ctx.state.revolt ? ['revolt'] : []), ...(ctx.state.ring ? ['ring'] : [])]);
     if (ctx.state.ring) {
         exact(ctx.state.ring, ['order', 'eliminated', 'knowledge', ...(ctx.state.ring.chaos ? ['chaos'] : [])]);
         if (ctx.state.ring.chaos) {
@@ -59,7 +59,7 @@ export function assertResolution(value) {
     ensure(players.has(ctx.activePlayerId), 'Unknown active player');
     ensure(state.seats.length === players.size && new Set(state.seats.map(p => p.playerId)).size === players.size, 'Seat identity mismatch');
     for (const p of state.seats) {
-        exact(p, ['playerId', 'boardId', 'reactionTarget', 'decisionMode', 'sameTurnBonusTarget', 'releasePriority', 'releaseRevivesPendingFirst', 'occupied', 'shots', 'scouted', 'monkCandidates', 'nextShots', 'ordinaryShots', 'currentChainBonus', 'dwarfNow', 'catapultNow', 'catapultLater', 'elfNow', 'spyLater', 'clericNow', 'clericLater', 'releaseNow', 'resurrection', 'plagueExcluded', ...(p.areaScoutLater !== undefined ? ['areaScoutLater'] : []), ...(p.areaScoutNow !== undefined ? ['areaScoutNow'] : []), ...(p.scoutHitCount !== undefined ? ['scoutHitCount'] : [])]);
+        exact(p, ['playerId', 'boardId', 'reactionTarget', 'decisionMode', 'sameTurnBonusTarget', 'releasePriority', 'releaseRevivesPendingFirst', 'occupied', 'shots', 'scouted', 'monkCandidates', 'nextShots', 'ordinaryShots', 'currentChainBonus', 'dwarfNow', 'catapultNow', 'catapultLater', 'elfNow', 'spyLater', 'clericNow', 'clericLater', 'releaseNow', 'resurrection', 'plagueExcluded', ...(p.heldDoublePlague !== undefined ? ['heldDoublePlague'] : []), ...(p.areaScoutLater !== undefined ? ['areaScoutLater'] : []), ...(p.areaScoutNow !== undefined ? ['areaScoutNow'] : []), ...(p.scoutHitCount !== undefined ? ['scoutHitCount'] : [])]);
         for (const n of [p.areaScoutLater, p.areaScoutNow, p.scoutHitCount])
             if (n !== undefined)
                 ensure(integer(n), 'Invalid area benefit');
@@ -75,7 +75,27 @@ export function assertResolution(value) {
             }
         }
     }
-    const meta = (m) => { exact(m, ['actorId', 'ownerId', 'targetPlayerId', 'targetBoardId', 'sourceUnitId', 'source', 'origin']); ensure(players.has(m.actorId) && players.has(m.ownerId) && players.has(m.targetPlayerId), 'Unknown rule actor'); ensure(boards.get(m.targetBoardId)?.ownerId === m.targetPlayerId, 'Target board mismatch'); ensure(m.sourceUnitId === null || units.has(m.sourceUnitId), 'Unknown rule source unit'); ensure(['direct-human', 'direct-ai', 'chain', 'archer', 'monk-deflect', 'catapult-shot', 'goblin', 'dragon', 'demon-blast', 'wizard', 'plague', 'assassin'].includes(m.source), 'Unknown rule source'); };
+    if (state.revolt) {
+        const r = state.revolt;
+        exact(r, ['qualifying', 'rounds', 'level', 'waiting', 'started', ...(r.pulse ? ['pulse'] : [])]);
+        ensure(typeof r.qualifying === 'boolean' && integer(r.rounds) && integer(r.level), 'Invalid Revolt ledger');
+        for (const ids of [r.waiting, r.started])
+            ensure(Array.isArray(ids) && new Set(ids).size === ids.length && ids.every(id => players.has(id)), 'Invalid Revolt round seats');
+        if (r.pulse) {
+            exact(r.pulse, ['resumeStep', 'level', 'players', 'scores']);
+            ensure(['enter', 'finish'].includes(r.pulse.resumeStep), 'Invalid post-Revolt continuation');
+            ensure(r.pulse.level === r.level && r.level > 0 && r.pulse.players.length >= 2 && new Set(r.pulse.players).size === r.pulse.players.length && r.pulse.players.every(id => players.has(id)), 'Invalid Revolt pulse');
+            for (const id of r.pulse.players) {
+                const score = r.pulse.scores[id];
+                ensure(score && /^-?\d+$/.test(score.n) && /^\d+$/.test(score.d) && BigInt(score.d) > 0n, 'Invalid pre-Revolt score');
+            }
+        }
+    }
+    if (ctx.environmental) {
+        exact(ctx.environmental, ['kind', 'level']);
+        ensure(ctx.environmental.kind === 'peasant-revolt' && integer(ctx.environmental.level) && ctx.environmental.level > 0, 'Invalid environmental root');
+    }
+    const meta = (m) => { exact(m, ['actorId', 'ownerId', 'targetPlayerId', 'targetBoardId', 'sourceUnitId', 'source', 'origin']); ensure(((m.actorId === null && m.ownerId === null && !!ctx.environmental) || (m.actorId !== null && m.ownerId !== null && players.has(m.actorId) && players.has(m.ownerId))) && players.has(m.targetPlayerId), 'Unknown rule actor'); ensure(boards.get(m.targetBoardId)?.ownerId === m.targetPlayerId, 'Target board mismatch'); ensure(m.sourceUnitId === null || units.has(m.sourceUnitId), 'Unknown rule source unit'); ensure(['direct-human', 'direct-ai', 'chain', 'archer', 'monk-deflect', 'catapult-shot', 'goblin', 'dragon', 'demon-blast', 'wizard', 'plague', 'assassin', 'revolt'].includes(m.source), 'Unknown rule source'); };
     if (ctx.assassinPending) {
         ensure(Array.isArray(ctx.assassinPending), 'Invalid Assassin queue');
         for (const p of ctx.assassinPending) {
@@ -84,7 +104,7 @@ export function assertResolution(value) {
             ensure(units.has(p.unitId) && state.match.units.some(u => u.id === p.unitId && u.type === 'assassin') && ['activate', 'strike'].includes(p.stage), 'Invalid Assassin continuation');
         }
     }
-    const op = (o) => { ensure(o && typeof o === 'object', 'Invalid operation'); const fields = { impact: ['meta', 'cell', 'deferReactions'], attack: ['entry'], 'flush-reactions': [], 'monk-continuation': ['meta'], 'scheduled-benefit': ['ownerId', 'benefit', 'amount', 'meta', 'accounting'], 'direct-shot': ['meta', 'cell'], 'host-direct-shot': ['meta', 'cell'], 'turn-resurrection': ['ownerId'], 'turn-scout': ['ownerId', 'count', ...('area' in o ? ['area'] : [])], 'direct-after': ['meta', 'cell'], 'direct-finish': ['meta'], wave: ['entries', 'terminalCheck'], 'hero-queue': [], 'same-turn-effects': [], catapult: ['meta', 'cell', 'impact', 'generated'], 'catapult-resume': ['meta', 'impact', 'generated', 'decisionId'], 'catapult-series': ['ownerId', 'remaining'], 'plague-step': ['targetBoardId', 'plagueId'], 'plague-progress': ['targetBoardId', 'plagueId', 'outbreakIndex', 'parentIndex', 'childIndex', 'wanted', 'oldFrontier', 'nextFrontier', 'reserved', 'stage'], 'terminal-check': ['reason'] }; ensure(Object.hasOwn(fields, o.kind), 'Unknown operation kind'); exact(o, ['kind', ...fields[o.kind].filter(k => k !== 'plagueId' || 'plagueId' in o)]); if ('plagueId' in o)
+    const op = (o) => { ensure(o && typeof o === 'object', 'Invalid operation'); const fields = { 'revolt-pulse': ['level'], impact: ['meta', 'cell', 'deferReactions'], attack: ['entry'], 'flush-reactions': [], 'monk-continuation': ['meta'], 'scheduled-benefit': ['ownerId', 'benefit', 'amount', 'meta', 'accounting'], 'direct-shot': ['meta', 'cell'], 'host-direct-shot': ['meta', 'cell'], 'turn-resurrection': ['ownerId'], 'turn-scout': ['ownerId', 'count', ...('area' in o ? ['area'] : [])], 'direct-after': ['meta', 'cell'], 'direct-finish': ['meta'], wave: ['entries', 'terminalCheck'], 'hero-queue': [], 'same-turn-effects': [], catapult: ['meta', 'cell', 'impact', 'generated'], 'catapult-resume': ['meta', 'impact', 'generated', 'decisionId'], 'catapult-series': ['ownerId', 'remaining'], 'plague-step': ['targetBoardId', 'plagueId'], 'plague-progress': ['targetBoardId', 'plagueId', 'outbreakIndex', 'parentIndex', 'childIndex', 'wanted', 'oldFrontier', 'nextFrontier', 'reserved', 'stage'], 'terminal-check': ['reason'] }; ensure(Object.hasOwn(fields, o.kind), 'Unknown operation kind'); exact(o, ['kind', ...fields[o.kind].filter(k => k !== 'plagueId' || 'plagueId' in o)]); if ('plagueId' in o)
         ensure(typeof o.plagueId === 'string' && o.plagueId.length > 0, 'Invalid outbreak identity'); if ('meta' in o)
         meta(o.meta); if (o.kind === 'attack')
         meta(o.entry.meta); if ('entries' in o)
@@ -95,7 +115,7 @@ export function assertResolution(value) {
         ensure(players.has(frame.compatibilityTurnId), 'Invalid compatibility turn');
         if (frame.detachedPlague) {
             ensure(frame.kind === 'plague' && players.has(frame.detachedPlague.triggerPlayerId) && boards.has(frame.detachedPlague.targetBoardId), 'Invalid detached Plague');
-            exact(frame.detachedPlague, ['triggerPlayerId', 'ownerId', 'targetPlayerId', 'targetBoardId', 'moveOnPlayerId', 'origin', 'outbreaks', 'announced']);
+            exact(frame.detachedPlague, ['triggerPlayerId', 'ownerId', 'targetPlayerId', 'targetBoardId', 'moveOnPlayerId', 'origin', 'outbreaks', 'announced', ...(frame.detachedPlague.doublePlague !== undefined ? ['doublePlague'] : [])]);
         }
         exact(frame, ['detachedPlague', 'compatibilityTurnId', 'id', 'kind', 'current', 'next', 'deferred', 'cursor', 'terminalCheck', 'stage']);
         ensure(!ids.has(frame.id), 'Duplicate frame ID');

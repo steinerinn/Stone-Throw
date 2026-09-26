@@ -76,6 +76,16 @@ function enemyPlagueProtectedCells() {
     }
     return protectedCells;
 }
+// A relocated Hero may sit beside damaged units, where placement spacing no longer applies.
+function prioritizeHeroSearch(legal) {
+    const nearHits = new Set();
+    for (const hit of enemyKnownHits) {
+        const {x, y} = parseKey(hit);
+        for (const k of neighbors8(x, y)) nearHits.add(k);
+    }
+    const nearby = legal.filter(k => nearHits.has(k));
+    return nearby.length ? nearby : legal;
+}
 function enemyChoosePlagueSafeSearchTarget() {
     const unfinishedMultiTarget = enemyOldestUnfinishedMultiHitTarget(env.groupPlagueFinalCoreCell ? enemyPlagueProtectedCells() : null);
     if (unfinishedMultiTarget)
@@ -87,14 +97,23 @@ function enemyChoosePlagueSafeSearchTarget() {
             return cells[Math.floor(nextRandom() * cells.length)];
     }
     const protectedCells = enemyPlagueProtectedCells();
-    if (heroKey && !enemyShots.has(heroKey) &&
+    if ((!heroActivated || env.heroOnlyCore) && heroKey && !enemyShots.has(heroKey) &&
         enemyScoutedPlayerCells.has(heroKey) && !protectedCells.has(heroKey)) {
         return heroKey;
     }
-    if (playerHeroHitsTaken === 2 && heroActivated && heroKey) {
+    if (env.heroOnlyCore && playerHeroHitsTaken === 2 && heroActivated && heroKey) {
         const heroHunt = [...enemyHeroHuntCandidates].filter(k => !enemyShots.has(k) && !protectedCells.has(k));
         if (heroHunt.length)
             return heroHunt[Math.floor(nextRandom() * heroHunt.length)];
+    }
+    if (env.heroOnlyCore && heroActivated && heroKey) {
+        const pool = [];
+        for (let y = 0; y < SIZE; y++) for (let x = 0; x < SIZE; x++) {
+            const k = key(x, y);
+            if (!enemyShots.has(k) && !protectedCells.has(k)) pool.push(k);
+        }
+        const preferred = prioritizeHeroSearch(pool);
+        return preferred.length ? preferred[Math.floor(nextRandom() * preferred.length)] : null;
     }
     const heatPools = { green: [], blue: [], red: [] };
     for (let y = 0; y < SIZE; y++) {
@@ -146,7 +165,7 @@ function enemyChoosePlagueSafeSearchTarget() {
     return pool[Math.floor(nextRandom() * pool.length)];
 }
 function enemyEndgameEliminationTarget() {
-    if (heroActivated && heroKey)
+    if (env.heroOnlyCore && heroActivated && heroKey)
         return null;
     const infantryGone = playerInfHits() >= INF_COUNT;
     const archersGone = playerArcherHitCount() >= ARCHER_COUNT;
@@ -224,10 +243,10 @@ function enemyChooseTarget() {
         if (cells.length)
             return cells[Math.floor(nextRandom() * cells.length)];
     }
-    if (heroKey && !enemyShots.has(heroKey) && enemyScoutedPlayerCells.has(heroKey)) {
+    if ((!heroActivated || env.heroOnlyCore) && heroKey && !enemyShots.has(heroKey) && enemyScoutedPlayerCells.has(heroKey)) {
         return heroKey;
     }
-    if (playerHeroHitsTaken === 2 && heroActivated && heroKey) {
+    if (env.heroOnlyCore && playerHeroHitsTaken === 2 && heroActivated && heroKey) {
         const hunt = [...enemyHeroHuntCandidates].filter(k => !enemyShots.has(k));
         if (hunt.length)
             return hunt[Math.floor(nextRandom() * hunt.length)];
@@ -239,13 +258,13 @@ function enemyChooseTarget() {
     if (monkTargets.length)
         return monkTargets[Math.floor(nextRandom() * monkTargets.length)];
     for (const [k, type] of enemyScoutKnowledge) {
-        if (type === 'core' && !enemyShots.has(k))
+        if (type === 'core' && !enemyShots.has(k) && (env.heroOnlyCore || k !== heroKey))
             return k;
     }
     const endgameTarget = enemyEndgameEliminationTarget();
     if (endgameTarget)
         return endgameTarget;
-    if (heroActivated && heroKey) {
+    if (env.heroOnlyCore && heroActivated && heroKey) {
         const heroSearchPool = [];
         for (let y = 0; y < SIZE; y++) {
             for (let x = 0; x < SIZE; x++) {
@@ -255,7 +274,8 @@ function enemyChooseTarget() {
             }
         }
         if (heroSearchPool.length) {
-            return heroSearchPool[Math.floor(nextRandom() * heroSearchPool.length)];
+            const preferred = prioritizeHeroSearch(heroSearchPool);
+            return preferred[Math.floor(nextRandom() * preferred.length)];
         }
         return null;
     }

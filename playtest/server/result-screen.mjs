@@ -1,3 +1,4 @@
+import {compareScore} from '../canonical/compiled/host/revolt.js';
 import {randomInt} from 'node:crypto';
 import {AI_AVATARS,avatarById,DEFAULT_AVATAR} from '../assets/avatars/catalog.mjs';
 import {summarizeMatch} from './statistics-metrics.mjs';
@@ -10,17 +11,18 @@ export function assignNpc(seats,seat,choose=randomInt){
  seat.npc=available[choose(available.length)];seat.name=seat.npc;
 }
 export function assignNpcs(seats){for(const seat of seats)if(seat?.controller==='ai')assignNpc(seats,seat);}
-export function publicIdentity(seat){const a=avatarById(seat.npc?AI_AVATARS[seat.npc]:seat.identity?.avatarId)||avatarById(DEFAULT_AVATAR);return {name:seat.name,avatar:a.assetPath,ai:seat.controller==='ai',country:seat.npc?null:seat.identity?.country||null};}
+export function publicIdentity(seat){const a=avatarById(seat.npc?AI_AVATARS[seat.npc]:seat.identity?.avatarId)||avatarById(DEFAULT_AVATAR);return {playerId:seat.identity?.kind==='account'?seat.identity.playerId:null,name:seat.name,avatar:a.assetPath,ai:seat.controller==='ai',country:seat.npc?null:seat.identity?.country||null};}
 
 // Rank equal elimination boundaries together, then compress to dense places.
 // Surviving winner(s), including a final draw, occupy the shared top platform.
 export function finalPlacements(host){
  const eliminated=new Map();let boundary=0;
- for(const row of host.events){const b=row.event.statistics?.eliminationBoundary;if(!b)continue;for(const id of b.dead)if(!eliminated.has(id))eliminated.set(id,boundary);boundary++;}
+ for(const row of host.events){const b=row.event.statistics?.eliminationBoundary;if(!b)continue;for(const id of b.dead)if(!eliminated.has(id))eliminated.set(id,{boundary,score:b.revoltScores?.[id]||null});boundary++;}
  const outcome=host.state.match.outcome;
- const values=host.config.players.map(p=>outcome.kind==='win'&&outcome.winnerIds.includes(p.id)?Infinity:eliminated.get(p.id)??Infinity);
- const ranks=[...new Set(values)].sort((a,b)=>b-a);
- return values.map(v=>ranks.indexOf(v)+1);
+ const values=host.config.players.map(p=>outcome.kind==='win'&&outcome.winnerIds.includes(p.id)?{boundary:Infinity,score:null}:eliminated.get(p.id)||{boundary:Infinity,score:null});
+ const compare=(a,b)=>a.boundary!==b.boundary?(a.boundary>b.boundary?1:-1):a.score&&b.score?compareScore(a.score,b.score):0;
+ const sorted=[...values].sort((a,b)=>compare(b,a)),ranks=[];for(const v of sorted)if(!ranks.length||compare(v,ranks.at(-1))!==0)ranks.push(v);
+ return values.map(v=>ranks.findIndex(r=>compare(v,r)===0)+1);
 }
 const awardFields=[['Lucky Shooter','bestHitStreak','hit streak'],['The Blind One','bestMissStreak','miss streak'],['Eagle Eye','accuracy','accuracy'],['Most Fierce','unitsKilled','units destroyed'],['Chain Master','biggestChain','cell chain'],['Purple Death','plagueCells','Plague cells']];
 const cache=new WeakMap();

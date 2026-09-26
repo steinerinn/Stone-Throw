@@ -4,7 +4,7 @@ export type UnitKind='inf'|'cav'|'archer'|'monk'|'castle'|'dwarf'|'goblin'|'cata
 export interface Cell {x:number;y:number}
 export interface OwnUnit {handle:string;kind:UnitKind;cells:Cell[];damaged:Cell[];destroyed:boolean;hero:{active:boolean;hits:number}|null;spent:boolean}
 export interface SeenCell {unitPresentation?:{hit:boolean;scouted:boolean;scoutArt:boolean};cell:Cell;observation:'miss'|'impact'|'occupied'|'empty'|'uncertain';kind:UnitKind|null;knownDestroyed?:boolean;corePresentation?:'unidentified'|'identified';scouted?:boolean;scoutVisual?:boolean;castleMask?:number}
-export interface PublicEvent {source?:'direct'|'archer'|'catapult'|'goblin'|'wizard'|'dragon'|'demon'|'plague'|'monk'|'assassin';position:number;kind:'impact'|'miss'|'unit-disclosed'|'resurrection-announced'|'hero-moved'|'plague-observed'|'resurrection-rejected'|'resurrection-found';side:Side;cell:Cell|null;unitKind:UnitKind|null}
+export interface PublicEvent {offscreen?:boolean;environmental?:boolean;revoltLevel?:number;source?:'revolt'|'direct'|'archer'|'catapult'|'goblin'|'wizard'|'dragon'|'demon'|'plague'|'monk'|'assassin';position:number;kind:'impact'|'miss'|'unit-disclosed'|'resurrection-announced'|'hero-moved'|'plague-observed'|'resurrection-rejected'|'resurrection-found';side:Side;cell:Cell|null;unitKind:UnitKind|null}
 export interface Choice {area?:true;handle:string;kind:'hero-relocation'|'resurrection'|'catapult-target'|'catapult-roll'|'scout';side:Side;cells:Cell[];units:string[];remaining:number|null}
 export interface PublicDemonRunes {sequence:number;side:Side;runes:{cell:Cell;glyph:string;rotation:number}[]}
 export interface LossReveal {cell:Cell;kind:UnitKind;castleMask:number|null}

@@ -18,7 +18,7 @@ export function mountCombatFeedback(memory={}){
   memory.monkDuelSequence=duelSequence;
   if(!memory.started&&s.phase!=='placement'){memory.started=true;memory.rows[0].text=s.active==='opponent'?'The enemy starts the battle.':'You start the battle.';}
   log.consume({...update,events:update.events.filter(e=>e.position>memory.position)});
-  for(const e of update.events){if(e.position<=memory.position)continue;memory.position=e.position;if(update.restored)continue;
+  for(const e of update.events){if(e.position<=memory.position)continue;memory.position=e.position;if(update.restored||e.environmental&&e.offscreen)continue;
    const observed=e.cell&&(e.side==='self'?s.owned.find(u=>u.cells.some(c=>same(c,e.cell))):s.opponent.find(c=>same(c.cell,e.cell)));
    // In particular, never infer type from rosters, geometry, or a later private outcome.
    const hero=e.cell&&s.heroPresentation?.some(m=>m.side===e.side&&same(m.cell,e.cell)&&['hit','wounded','dead'].includes(m.state));const label=hero?'Hero':observed?.kind?(names[observed.kind]||'Unit'):observed?.corePresentation==='unidentified'?'Unidentified core unit':e.source==='plague'?'Plague hit':'Unknown';   if(e.cell&&['impact','unit-disclosed'].includes(e.kind)&&!update.events.some(q=>q.kind==='resurrection-found'&&q.side===e.side&&q.cell&&same(q.cell,e.cell))){const grid=document.getElementById(e.side==='self'?'playerGrid':'enemyGrid'),cell=grid?.children[e.cell.y*s.size+e.cell.x];if(cell)window.__stoneThrowCombatCallout?.(cell,{kind:e.kind==='unit-disclosed'?'scout':e.source==='plague'?'plague':e.source==='catapult'?'rock':e.source&&e.source!=='direct'?'unit':'target',source:e.source,text:label});}if(e.cell&&e.kind==='impact')beep(true);

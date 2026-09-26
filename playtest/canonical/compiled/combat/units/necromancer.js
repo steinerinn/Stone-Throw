@@ -10,9 +10,24 @@ export function schedulePlague(ctx, ownerId, origin) {
     emit(ctx, 'plague-scheduled', null, null, origin ? [origin] : [], null, origin ? 'necro-threshold' : 'zero-necro-empty-origin');
 }
 export function releaseHeldPlague(ctx, clericOwnerId) { const order = ctx.state.ring?.order, owner = order ? order[(order.indexOf(clericOwnerId) + 1) % order.length] : seat(ctx.state, clericOwnerId).reactionTarget.playerId, total = ctx.state.match.config.initialRosters[owner]?.necro || 0; if (necroHits(ctx, owner) !== total)
-    return; const list = necromancers(ctx, owner), last = [...list].reverse().find(u => u.cells.some(c => shot(ctx.state, owner, cellKey(c)))) || list.at(-1); schedulePlague(ctx, owner, last?.cells[0] || null); }
-export function necromancerRule(ctx, meta, origin) { const owner = meta.targetPlayerId, total = ctx.state.match.config.initialRosters[owner]?.necro || 0; if (necroHits(ctx, owner) < total)
-    return; const target = seat(ctx.state, owner).reactionTarget.playerId, cleric = ctx.state.match.units.find(u => u.ownerId === target && u.type === 'cleric'), hasCleric = (ctx.state.match.config.initialRosters[target]?.cleric || 0) > 0; if (hasCleric && cleric && cleric.cells.some(c => !shot(ctx.state, target, cellKey(c)))) {
+    return; const list = necromancers(ctx, owner), last = [...list].reverse().find(u => u.cells.some(c => shot(ctx.state, owner, cellKey(c)))) || list.at(-1); const held = seat(ctx.state, owner).heldDoublePlague; if (held) {
+    delete seat(ctx.state, owner).heldDoublePlague;
+    scheduleDoublePlague(ctx, owner, held);
+}
+else
+    schedulePlague(ctx, owner, last?.cells[0] || null); }
+export function necromancerRule(ctx, meta, origin, freshHit = true) { const owner = meta.targetPlayerId, total = ctx.state.match.config.initialRosters[owner]?.necro || 0; if (necroHits(ctx, owner) < total)
+    return; const list = necromancers(ctx, owner), other = list.find(u => !u.cells.some(c => cellKey(c) === cellKey(origin))), double = meta.source === 'plague' && freshHit && list.length === 2 && other && other.cells.some(c => shot(ctx.state, owner, cellKey(c))) ? [other.cells[0], origin] : null; const target = seat(ctx.state, owner).reactionTarget.playerId, cleric = ctx.state.match.units.find(u => u.ownerId === target && u.type === 'cleric'), hasCleric = (ctx.state.match.config.initialRosters[target]?.cleric || 0) > 0; if (hasCleric && cleric && cleric.cells.some(c => !shot(ctx.state, target, cellKey(c)))) {
+    if (double)
+        seat(ctx.state, owner).heldDoublePlague = double.map(c => ({ ...c }));
     emit(ctx, 'plague-held', meta, cleric.id);
     return;
-} schedulePlague(ctx, owner, origin); }
+} if (double)
+    scheduleDoublePlague(ctx, owner, double);
+else
+    schedulePlague(ctx, owner, origin); }
+// Two ordinary schedules keep canonical ownership, RNG, credit and spread.
+function scheduleDoublePlague(ctx, owner, origins) { const group = ctx.id + '-double-' + ctx.events.length; for (const origin of origins) {
+    schedulePlague(ctx, owner, origin);
+    ctx.state.plagues.at(-1).doublePlague = group;
+} }

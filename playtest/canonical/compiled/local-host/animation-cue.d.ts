@@ -2,7 +2,11 @@ import type { HostState } from '../host/contracts.js';
 import type { InternalRuleEvent } from '../combat/contracts.js';
 import type { Side, Cell } from '../client-contract/public.js';
 export interface AnimationCue {
-    kind: 'enemy-shot' | 'catapult' | 'wizard' | 'archer' | 'goblin' | 'demon' | 'dragon' | 'assassin';
+    targetSeat?: number;
+    level?: number;
+    pulseId?: string;
+    ownerPlayerId?: string;
+    kind: 'revolt' | 'double-plague' | 'enemy-shot' | 'catapult' | 'wizard' | 'archer' | 'goblin' | 'demon' | 'dragon' | 'assassin';
     side: Side;
     ownerSide: Side;
     origin: Cell;

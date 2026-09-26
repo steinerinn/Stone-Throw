@@ -36,9 +36,10 @@ export function buildReplay(d,facts,checkpoints=[]){
  const checkpoint=cursor=>{const value=byCursor.get(cursor);if(value)timeline.push({kind:'checkpoint',...value});};checkpoint(0);
  for(const f of facts){const e=f.event,m=e.meta||{},s=e.statistics||{};
   if(Number.isInteger(f.turnIndex)&&f.turnIndex!==lastTurn){lastTurn=f.turnIndex;timeline.push({kind:'turn',turn:lastTurn});}
+  if(e.kind==='peasant-revolt')timeline.push({kind:'announcement',name:'peasant-revolt',level:e.amount});
   if(['impact','repeat-ignored','suspect-eliminated'].includes(e.kind)&&board(m.targetBoardId)>=0){
    const cells=e.cells.filter(c=>validCell(c,size)).map(c=>({x:c.x,y:c.y}));
-   if(cells.length)timeline.push({kind:m.source==='plague'?'plague':['direct-human','direct-ai'].includes(m.source)?'shot':m.source==='catapult-shot'?'catapult':'contact',actor:seat(m.ownerId),board:board(m.targetBoardId),observation:e.kind==='impact'?(e.unitId?'hit':'miss'):'repeat',cells});
+   if(cells.length)timeline.push({kind:m.source==='revolt'?'revolt':m.source==='plague'?'plague':['direct-human','direct-ai'].includes(m.source)?'shot':m.source==='catapult-shot'?'catapult':'contact',actor:seat(m.ownerId),board:board(m.targetBoardId),observation:e.kind==='impact'?(e.unitId?'hit':'miss'):'repeat',cells});
   }
   if(e.kind==='attack-started'&&['archer','catapult-shot','monk-deflect','goblin','dwarf','wizard','demon','dragon'].includes(e.reason))timeline.push({kind:'special',name:e.reason,actor:seat(m.ownerId)});
   // Announcement only: resurrection/Hero coordinates can still be secret.

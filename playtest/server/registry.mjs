@@ -1,3 +1,4 @@
+import {profileReadModel} from './profile-read-model.mjs';
 import {migrateReplays} from './replay-store.mjs';
 import {storyUnlocks,mergeStoryUnlocks} from './story-progress.mjs';
 import {DEFAULT_AVATAR,avatarById} from '../assets/avatars/catalog.mjs';
@@ -49,6 +50,7 @@ export function openRegistry(directory,{now=Date.now}={}){
  const saveRun=(id,state)=>run('INSERT INTO story_runs VALUES(?,?,?,?) ON CONFLICT(player_id) DO UPDATE SET run_id=excluded.run_id,progress_json=excluded.progress_json,lifetime_json=excluded.lifetime_json',id,state.runId,JSON.stringify(state.progress),JSON.stringify(state.lifetime));
  return {file,statistics,migrationBackup,storyProgress,storyState,completeStory:(id,progress,runId='legacy')=>tx(()=>{if(!q('SELECT id FROM accounts WHERE id=? AND status=?',id,'active'))return;const current=storyState(id);if(current.runId!==runId)return;saveRun(id,{...current,progress:!current.progress||progress.battle>=current.progress.battle?progress:current.progress,lifetime:mergeStoryUnlocks(current.lifetime,storyUnlocks(progress))});run('INSERT INTO story_progress VALUES(?,?,?,?) ON CONFLICT(player_id) DO UPDATE SET battle=excluded.battle,progress_json=excluded.progress_json,updated_at=excluded.updated_at WHERE excluded.battle>=story_progress.battle',id,progress.battle,JSON.stringify(progress),now());refreshAvatar(id);}),close:()=>db.close(),publicAccount,identity:token=>multiplayerIdentity(session(token)),identityById:id=>multiplayerIdentity(q('SELECT * FROM accounts WHERE id=? AND status=?',id,'active')),
  async handle(action,b,{token,browser,ip}){
+  if(action==='profile-view')return profileReadModel(db,statistics,session(token)?.id,b);
   if(action==='story-restart'){if(Object.keys(b).length)fail('Invalid Story restart request.');const a=session(token);if(!a)fail('Log in to restart account Story.',401);return tx(()=>{const state={...storyState(a.id),runId:randomUUID(),progress:null};saveRun(a.id,state);return {playerId:a.id,...state};});}
   if(action==='story-progress'){if(Object.keys(b).length)fail('Invalid Story progress request.');const a=session(token);return {playerId:a?.id||null,...(a?storyState(a.id):{progress:null,lifetime:null,runId:null})};}
   if(action==='me'){const a=session(token);return a?streak(a.id):{account:null};}

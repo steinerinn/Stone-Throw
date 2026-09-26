@@ -105,7 +105,7 @@ export interface HostState {
         startCells: number;
         biggest: boolean;
     }[];
-    rootPurpose: 'shot' | 'entry' | 'exit' | null;
+    rootPurpose: 'shot' | 'entry' | 'exit' | 'revolt' | null;
     lastProbeSkippedPlague: boolean;
     plagueAwareAtTurnStart: boolean;
 }

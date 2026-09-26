@@ -1,3 +1,4 @@
+import { beginRevoltPulse } from './revolt.js';
 import { settleAssassin } from './units/assassin.js';
 import { cloneCombat, cloneRng } from '../archives.js';
 import { normalTarget, survives } from '../host/ring.js';
@@ -21,10 +22,10 @@ export function startResolution(state, rootId, acceptedActionId, activePlayerId,
     throw Error('Invalid resolution ID'); if (!state.ring && (state.match.players.length !== 2 || state.match.config.format !== 'legacy-1v1'))
     throw Error('N-player resolution requires an explicit active ring'); if (state.seats.some(p => boardSize(state, p.boardId) !== boardSize(state, state.seats[0].boardId)))
     throw Error('Legacy geometry requires equal square boards'); if (state.match.outcome.kind !== 'ongoing')
-    throw Error('Cannot accept action after outcome'); const ctx = { contract: 'stone-throw-resolution-v1', scope, id: id(rootId), acceptedActionId, activePlayerId, compatibility: 'golden-v1.427', status: 'running', externalEntropy: [], state: cloneCombat(state), rng: cloneRng(rng), frames: [], future: [], decisions: [], events: [], generated: [], nextWork: 1, nextDecision: 1, completedAtEvent: null }; seat(ctx.state, activePlayerId); pushFrame(ctx, 'root', operations); return ctx; }
+    throw Error('Cannot accept action after outcome'); const ctx = { contract: 'stone-throw-resolution-v1', ...(operations[0]?.kind === 'revolt-pulse' ? { environmental: { kind: 'peasant-revolt', level: operations[0].level } } : {}), scope, id: id(rootId), acceptedActionId, activePlayerId, compatibility: 'golden-v1.427', status: 'running', externalEntropy: [], state: cloneCombat(state), rng: cloneRng(rng), frames: [], future: [], decisions: [], events: [], generated: [], nextWork: 1, nextDecision: 1, completedAtEvent: null }; seat(ctx.state, activePlayerId); pushFrame(ctx, 'root', operations); return ctx; }
 export function living(ctx, ownerId) { const p = seat(ctx.state, ownerId); if (p.resurrection.searchActive && p.resurrection.actualUnitId)
     return true; return ctx.state.match.units.some(u => u.ownerId === ownerId && (u.type === 'hero' ? !!u.hero?.activated && !!u.hero.currentCell : ['inf', 'cav', 'archer', 'monk', 'castle'].includes(u.type || '') && !destroyed(ctx.state, u) && u.cells.length > 0)); }
-export function checkTerminal(ctx, reason) { if (ctx.state.ring || ctx.assassinPending?.length)
+export function checkTerminal(ctx, reason) { if (ctx.environmental || ctx.state.ring || ctx.assassinPending?.length)
     return false; const dead = ctx.state.seats.filter(p => !living(ctx, p.playerId)).map(p => p.playerId); if (!dead.length)
     return false; ctx.state.match.outcome = dead.length === ctx.state.seats.length ? { kind: 'draw' } : { kind: 'win', winnerIds: ctx.state.seats.filter(p => !dead.includes(p.playerId)).map(p => p.playerId), eliminatedIds: dead }; emit(ctx, 'outcome', null, null, [], null, ctx.state.match.outcome.kind); terminalTruncate(ctx, reason); return true; }
 function attack(ctx, entry) {
@@ -88,6 +89,8 @@ function heroes(ctx, deferLocalPolicy = false) { while (ctx.state.heroQueue.leng
     const ev = ctx.state.heroQueue.shift(), u = unit(ctx.state, ev.unitId);
     if (ev.kind === 'third') {
         killHero(ctx, u, 'third-hit-queue-return');
+        if (ctx.environmental)
+            continue;
         return;
     }
     if (ev.kind === 'first') {
@@ -97,6 +100,8 @@ function heroes(ctx, deferLocalPolicy = false) { while (ctx.state.heroQueue.leng
     const legal = heroDestinations(ctx, u, ev.kind === 'second'), p = seat(ctx.state, u.ownerId);
     if (ev.kind === 'second' && !legal.length) {
         killHero(ctx, u, 'trapped-queue-return');
+        if (ctx.environmental)
+            continue;
         return;
     }
     if (p.decisionMode === 'policy' && ev.kind === 'second' && !deferLocalPolicy) {
@@ -224,7 +229,10 @@ export function stepResolution(ctx, options = {}) {
     const current = frame.current[frame.cursor++];
     emit(ctx, 'work-started', null, null, [], null, current.operation.kind);
     const op = current.operation;
-    if (op.kind === 'impact') {
+    if (op.kind === 'revolt-pulse') {
+        beginRevoltPulse(ctx, op.level);
+    }
+    else if (op.kind === 'impact') {
         const result = resolveImpact(ctx, op.meta, op.cell, op.deferReactions);
         if (result.deferred)
             frame.deferred.push(result.deferred);

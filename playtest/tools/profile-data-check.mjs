@@ -1,0 +1,33 @@
+import assert from 'node:assert/strict';import fs from 'node:fs';import os from 'node:os';import path from 'node:path';import {DatabaseSync} from 'node:sqlite';
+import {profileFixture} from './profile-fixture.mjs';
+const directory=fs.mkdtempSync(path.join(os.tmpdir(),'cs-profile-data-')), {registry,users}=await profileFixture(directory),db=new DatabaseSync(registry.file);let checks=0;
+const owner=users[0],other=users[1],id=owner.account.playerId;
+const read=(body={},token=owner.token)=>registry.handle('profile-view',body,{token,browser:'a'.repeat(48),ip:'test'});
+try{
+ const before=db.prepare('SELECT total_changes() n').get().n;
+ const snapshot=()=>JSON.stringify(['accounts','stat_matches','stat_participants','stat_career','stat_replays','stat_facts'].map(t=>db.prepare('SELECT * FROM '+t+' ORDER BY rowid').all()));const original=snapshot();
+ const profile=await read();assert.equal(profile.owner,true);assert.equal(profile.core.games,13);assert.equal(profile.core.wins+profile.core.losses+profile.core.draws,13);assert.equal(profile.core.winRate,100*profile.core.wins/13);checks++;
+ const summary=registry.statistics.profileSummary(id);assert.equal(profile.core.lifetimeScore,summary.lifetimeTotalScore);assert.equal(profile.core.highestScore,summary.highestMatchScore);assert.equal(profile.core.millennial,summary.thousandPlusCount);const scores=db.prepare('SELECT match_score,score_components FROM stat_participants WHERE player_id=?').all(id);const completed=scores.filter(s=>JSON.parse(s.score_components)?.completed);assert.equal(profile.core.averageScore,completed.reduce((n,s)=>n+s.match_score,0)/completed.length);checks++;
+ assert.equal(profile.reliability.outstandingAFK,2);assert.equal(profile.reliability.cleanStreak,7);assert.equal(profile.reliability.gamesUntilForgiveness,3);assert.equal(profile.reliability.finished,10);checks++;
+ assert.equal(profile.friend.playerId,other.account.playerId);assert.equal(profile.friend.battles,13);assert.equal(profile.hof.length,18);assert.ok(profile.hof.some(h=>h.rank!==null));checks++;
+ assert.equal(profile.recent.length,5);assert.ok(profile.recent.every(b=>b.resultAvailable&&b.replayAvailable));assert.equal(profile.rewardCoverage.available,13);assert.equal(profile.core.rewards,Object.values(profile.rewards).reduce((a,b)=>a+b,0));assert.ok(profile.core.rewards>0);checks++;
+ const publicView=await read({playerId:id},other.token);assert.equal(publicView.owner,false);assert.deepEqual(Object.keys(publicView.reliability).sort(),['games','percent']);assert.ok(!('avatarUnlocked'in publicView));for(const b of publicView.recent)assert.ok(!('matchId'in b)&&!('replayAvailable'in b));assert.ok(!/password_hash|email|initialPlacements|reliabilityFacts|cutoff|token|username/.test(JSON.stringify(publicView)));checks++;
+ for(const section of ['result','replay'])await assert.rejects(read({playerId:id,section,matchId:profile.recent[0].matchId},other.token),e=>e.status===403);checks++;
+ const result=await read({section:'result',matchId:profile.recent[0].matchId});assert.ok(result.players.every(p=>p.matchScore));assert.deepEqual(await read({section:'result',matchId:profile.recent[0].matchId}),result);const replay=await read({section:'replay',matchId:profile.recent[0].matchId});assert.equal(replay.replayVersion,'CHAIN_SIEGE_PUBLIC_REPLAY_V1');checks++;
+ const p2=await read({section:'battles',page:2});assert.equal(p2.pages,3);assert.equal(p2.battles.length,3);assert.ok(p2.battles.every(b=>!b.replayAvailable&&!b.resultAvailable));await assert.rejects(read({section:'result',matchId:p2.battles[0].matchId}),e=>e.status===404);assert.equal((await read({playerId:id,section:'battles'},other.token)).pages,1);checks++;
+ assert.equal(snapshot(),original);assert.equal(db.prepare('SELECT total_changes() n').get().n,before);checks++;
+ await registry.handle('profile',{bio:'A careful commander.'},{token:owner.token});assert.equal((await read()).identity.bio,'A careful commander.');await assert.rejects(registry.handle('profile',{playerId:id,bio:'No'},{token:other.token}));checks++;
+ // An early-exit performance score remains part of lifetime/highest, but never average or Millennial count.
+ const last=db.prepare('SELECT match_id,score_components FROM stat_participants WHERE player_id=? LIMIT 1').get(id),old=JSON.parse(last.score_components);db.prepare('UPDATE stat_participants SET match_score=?,score_components=? WHERE player_id=? AND match_id=?').run(9999,JSON.stringify({...old,score:9999,exact:{n:'9999',d:'1'},completed:false}),id,last.match_id);
+ const changed=await read();assert.equal(changed.core.highestScore,9999);assert.ok(changed.core.averageScore<9999);assert.equal(changed.core.millennial,summary.thousandPlusCount-(old.completed&&Number(old.exact.n)/Number(old.exact.d)>=1000?1:0));checks++;
+ // Canonical tied awards include both recipients, even when one has no career award credit.
+ const duel=profile.recent[0].matchId;db.prepare("DELETE FROM stat_facts WHERE match_id=? AND kind='event'").run(duel);
+ for(let i=0;i<2;i++){const fact={index:i,chainId:'tie'+i,originActor:'p'+i,event:{kind:'impact',rootId:'tie'+i,workId:'w'+i,unitId:'u'+i,cells:[{x:0,y:0}],meta:{ownerId:'p'+i,source:'direct-human'},statistics:{rootActorId:'p'+i,unitType:'inf'}}};db.prepare('INSERT INTO stat_facts VALUES(?,?,?,?)').run(duel,'event',i,JSON.stringify(fact));}
+ db.prepare('UPDATE stat_matches SET event_cursor=2 WHERE id=?').run(duel);const tied=await read({section:'result',matchId:duel});assert.deepEqual(tied.awards.find(a=>a.name==='Lucky Shooter').winners,[0,1]);assert.equal((await read({},other.token)).rewards['Lucky Shooter'],1);checks++;
+ // Equal shared-battle counts resolve by stable account ID, never query order.
+ for(const r of db.prepare('SELECT id,descriptor FROM stat_matches').all()){const d=JSON.parse(r.descriptor);d.participants.push({actor:'fixture-peer',seat:9,kind:'account',playerId:users[2].account.playerId,displayName:'TestCruns'});db.prepare('UPDATE stat_matches SET descriptor=? WHERE id=?').run(JSON.stringify(d),r.id);}
+ assert.equal((await read()).friend.playerId,[other.account.playerId,users[2].account.playerId].sort((a,b)=>a.localeCompare(b))[0]);checks++;
+ // Incomplete retained facts never masquerade as a complete stored Result.
+ db.prepare('UPDATE stat_matches SET event_cursor=3 WHERE id=?').run(duel);assert.equal((await read()).recent[0].resultAvailable,false);await assert.rejects(read({section:'result',matchId:duel}),e=>e.status===404);checks++;
+ console.log(JSON.stringify({passed:true,checks,directory}));
+}finally{db.close();registry.close();}

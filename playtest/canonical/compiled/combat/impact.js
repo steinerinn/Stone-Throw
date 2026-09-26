@@ -4,7 +4,7 @@ import { dwarfRule, catapultBenefit, elfRule } from './units/benefits.js';
 import { clericRule, discoverResurrection } from './units/cleric.js';
 import { necromancerRule } from './units/necromancer.js';
 import { heroHit } from './units/hero.js';
-export function unitReaction(ctx, u, meta, cell) {
+export function unitReaction(ctx, u, meta, cell, freshHit = true) {
     const source = meta.source;
     if (source === 'plague' && !['demon', 'dragon', 'necro'].includes(u.type || ''))
         return null;
@@ -25,13 +25,13 @@ export function unitReaction(ctx, u, meta, cell) {
     else if (u.type === 'cleric')
         clericRule(ctx, meta);
     else if (u.type === 'necro')
-        necromancerRule(ctx, meta, cell);
+        necromancerRule(ctx, meta, cell, freshHit);
     return null;
 }
 /** Direct state transition only. Attack-layer/volley barriers choose when to call
  * unitReaction; interrupts and completion checks belong to the root scheduler. */
 export function resolveImpact(ctx, meta, cell, deferReactions = false) {
-    const p = seat(ctx.state, meta.targetPlayerId), k = cellKey(cell), u = unitAt(ctx.state, meta.targetBoardId, k), plague = meta.source === 'plague';
+    const p = seat(ctx.state, meta.targetPlayerId), k = cellKey(cell), u = unitAt(ctx.state, meta.targetBoardId, k), plague = meta.source === 'plague', freshHit = !p.shots.includes(k);
     if (p.shots.includes(k)) {
         if (p.resurrection.searchActive) {
             const suspect = p.resurrection.suspects.find(id => unit(ctx.state, id).cells.some(c => cellKey(c) === k));
@@ -48,11 +48,16 @@ export function resolveImpact(ctx, meta, cell, deferReactions = false) {
     }
     consumeCompatibilityEntropy(ctx);
     addUnique(p.shots, k);
-    emit(ctx, 'impact', meta, u?.id || null, [cell]);
+    const impact = emit(ctx, 'impact', meta, u?.id || null, [cell]);
+    if (impact.statistics?.doublePlague) {
+        for (const p of [...ctx.state.plagues, ...ctx.frames.flatMap(f => f.detachedPlague ? [f.detachedPlague] : [])])
+            if (p.doublePlague === impact.statistics.doublePlague)
+                delete p.doublePlague;
+    }
     if (!u)
         return { type: null, unitId: null, reaction: null, repeat: false, deferred: null };
     syncDamage(ctx.state, u);
-    if (u.type === 'assassin' && !plague)
+    if (u.type === 'assassin' && !plague && meta.source !== 'revolt')
         (ctx.assassinPending ??= []).push({ meta: { ...meta }, unitId: u.id, stage: 'activate' });
     if (u.type === 'hero')
         heroHit(ctx, u, meta);
@@ -83,5 +88,5 @@ export function resolveImpact(ctx, meta, cell, deferReactions = false) {
     }
     emit(ctx, u.lifecycle === 'destroyed' ? 'unit-destroyed' : 'unit-damaged', meta, u.id, [cell]);
     const deferred = deferReactions ? { unitId: u.id, cell: { ...cell }, meta: { ...meta } } : null;
-    return { type: u.type, unitId: u.id, reaction: deferred ? null : unitReaction(ctx, u, meta, cell), repeat: false, deferred };
+    return { type: u.type, unitId: u.id, reaction: deferred ? null : unitReaction(ctx, u, meta, cell, freshHit), repeat: false, deferred };
 }

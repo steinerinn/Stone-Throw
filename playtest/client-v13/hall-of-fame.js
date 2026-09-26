@@ -1,6 +1,6 @@
 const MODES=['Duel','3 Players','4 Players'];
 const node=(tag,text)=>{const n=document.createElement(tag);if(text!==undefined)n.textContent=text;return n;};
-function identity(row){const span=node('span'),valid=/^[A-Z]{2}$/.test(row.country||''),f=node(valid?'img':'span',valid?undefined:'—');f.className='cs-hof-flag';if(valid){f.src='/assets/ui/flags/'+row.country.toLowerCase()+'.svg';f.alt=new Intl.DisplayNames(['en'],{type:'region'}).of(row.country);}else f.setAttribute('aria-label','Nationality not set');span.append(f,document.createTextNode(' '+row.displayName));return span;}
+function identity(row){const span=node('span');if(row.playerId){span.dataset.profileId=row.playerId;span.tabIndex=0;span.setAttribute('role','button');span.setAttribute('aria-label','View '+row.displayName+' player card');}const valid=/^[A-Z]{2}$/.test(row.country||''),f=node(valid?'img':'span',valid?undefined:'—');f.className='cs-hof-flag';if(valid){f.src='/assets/ui/flags/'+row.country.toLowerCase()+'.svg';f.alt=new Intl.DisplayNames(['en'],{type:'region'}).of(row.country);}else f.setAttribute('aria-label','Nationality not set');span.append(f,document.createTextNode(' '+row.displayName));return span;}
 const value=(v,k)=>['winRatio','lossRatio','accuracy'].includes(k)?(100*v).toFixed(1)+'%':String(v);
 let launchHall=null;
 export function installHallOfFame(parent){

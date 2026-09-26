@@ -2,7 +2,7 @@ import type { Id, MatchState, PlayerId, BoardId, UnitId, Cell } from '../model.j
 export type ResolutionId = Id<'resolution'>;
 export type WorkId = Id<'rule-work'>;
 export type RuleDecisionId = Id<'rule-decision'>;
-export type RuleSource = 'direct-human' | 'direct-ai' | 'chain' | 'archer' | 'monk-deflect' | 'catapult-shot' | 'goblin' | 'dragon' | 'demon-blast' | 'wizard' | 'plague' | 'assassin';
+export type RuleSource = 'direct-human' | 'direct-ai' | 'chain' | 'archer' | 'monk-deflect' | 'catapult-shot' | 'goblin' | 'dragon' | 'demon-blast' | 'wizard' | 'plague' | 'assassin' | 'revolt';
 export type Timing = 'immediate-interrupt' | 'attack-remainder' | 'after-attack' | 'next-wave' | 'same-turn' | 'turn-boundary' | 'future-turn';
 export interface SourceMetadata {
     actorId: PlayerId;
@@ -62,6 +62,7 @@ export interface CombatSeat {
         suspects: UnitId[];
     };
     plagueExcluded: string[];
+    heldDoublePlague?: Cell[];
 }
 export interface HeroQueueEntry {
     unitId: UnitId;
@@ -75,6 +76,7 @@ export interface Outbreak {
     infected: string[];
 }
 export interface CompatPlague {
+    doublePlague?: string;
     triggerPlayerId: PlayerId;
     ownerId: PlayerId;
     targetPlayerId: PlayerId;
@@ -84,7 +86,24 @@ export interface CompatPlague {
     outbreaks: Outbreak[];
     announced: boolean;
 }
+export interface RevoltState {
+    qualifying: boolean;
+    rounds: number;
+    level: number;
+    waiting: PlayerId[];
+    started: PlayerId[];
+    pulse?: {
+        resumeStep: 'enter' | 'finish';
+        level: number;
+        players: PlayerId[];
+        scores: Record<string, {
+            n: string;
+            d: string;
+        }>;
+    };
+}
 export interface CombatState {
+    revolt?: RevoltState;
     ring?: {
         chaos?: {
             livingBeforeRoot: boolean;
@@ -114,6 +133,9 @@ export interface ReactionEntry {
     meta: SourceMetadata;
 }
 export type Operation = {
+    kind: 'revolt-pulse';
+    level: number;
+} | {
     kind: 'impact';
     meta: SourceMetadata;
     cell: Cell;
@@ -241,7 +263,7 @@ export interface PendingRuleDecision {
         unitId: UnitId | null;
     } | null;
 }
-export type EventKind = 'chaos-manifestation' | 'attack-started' | 'impact' | 'repeat-ignored' | 'unit-damaged' | 'unit-destroyed' | 'ability-spent' | 'reaction-generated' | 'benefit-scheduled' | 'plague-held' | 'plague-scheduled' | 'plague-contained' | 'hero-activated' | 'hero-moved' | 'hero-killed' | 'resurrection' | 'resurrection-discovered' | 'suspect-eliminated' | 'scouted' | 'monk-clue' | 'monk-duel' | 'decision-required' | 'decision-answered' | 'decision-cancelled' | 'work-started' | 'work-finished' | 'compatibility-truncation' | 'outcome' | 'resolution-completed';
+export type EventKind = 'peasant-revolt' | 'chaos-manifestation' | 'attack-started' | 'impact' | 'repeat-ignored' | 'unit-damaged' | 'unit-destroyed' | 'ability-spent' | 'reaction-generated' | 'benefit-scheduled' | 'plague-held' | 'plague-scheduled' | 'plague-contained' | 'hero-activated' | 'hero-moved' | 'hero-killed' | 'resurrection' | 'resurrection-discovered' | 'suspect-eliminated' | 'scouted' | 'monk-clue' | 'monk-duel' | 'decision-required' | 'decision-answered' | 'decision-cancelled' | 'work-started' | 'work-finished' | 'compatibility-truncation' | 'outcome' | 'resolution-completed';
 /** Internal/private facts only. Public projection is deliberately a later adapter. */
 export interface InternalRuleEvent {
     statistics?: Record<string, unknown>;
@@ -249,13 +271,20 @@ export interface InternalRuleEvent {
     rootId: ResolutionId;
     workId: WorkId | null;
     kind: EventKind;
-    meta: SourceMetadata | null;
+    meta: (Omit<SourceMetadata, 'actorId' | 'ownerId'> & {
+        actorId: PlayerId | null;
+        ownerId: PlayerId | null;
+    }) | null;
     unitId: UnitId | null;
     cells: Cell[];
     amount: number | null;
     reason: string | null;
 }
 export interface ResolutionContext {
+    environmental?: {
+        kind: 'peasant-revolt';
+        level: number;
+    };
     contract: 'stone-throw-resolution-v1';
     scope: 'accepted-action' | 'boundary-comparison';
     id: ResolutionId;

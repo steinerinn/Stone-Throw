@@ -1,5 +1,5 @@
 import {createChaosPresentation} from './chaos-presentation.js';
-import {mountGroupResult,scoreLines,participantScoreLines} from './result-screen.js';
+import {mountGroupResult,scoreLines,participantScoreLines,setResultArt} from './result-screen.js';
 import {mountOnlineOverview} from './online-overview.js';
 import {logEvent,observeLog,paintLog,dragLog,betaEnabled} from './game-log.js';
 import {mountPlacementFeedback} from './placement-feedback.js';
@@ -75,7 +75,7 @@ export async function mountClient(transport,callbacks={}){
  if(snapshot.phase!=='finished'){byId('resultOverlay').style.display='none';return;}
  byId('stLocalResultMenu').hidden=!!snapshot.groupRoom;const outcome=snapshot.outcome,draw=outcome==='draw',win=outcome==='win';
  byId('resultTitle').textContent=draw?'Draw.':win?'You won!':'You lose.';
- byId('resultArt').src='assets/results/'+(draw?'draw':win?'win':'lose')+'.svg';byId('resultArt').alt=draw?'Draw':win?'You win!':'You lose!';
+ setResultArt(byId('resultArt'),outcome);
  byId('resultSubtitle').textContent=snapshot.resultMessage||'';for(const text of [...scoreLines(snapshot.matchScore),...participantScoreLines(snapshot.participantScores)]){const line=document.createElement('div');line.textContent=text;byId('resultSubtitle').append(line);}byId('playAgainBtn').dataset.storyGiveUp='0';byId('playAgainBtn').textContent='PLAY AGAIN';byId('storyRetryBtn').hidden=true;byId('resultCloseBtn').style.display='block';byId('resultOverlay').style.display='flex';window.__stoneThrowSyncMultiplayerControls?.();byId('playAgainBtn').focus();
  }
  function renderInstruction(){const c=snapshot.choice,kind=!c?null:c.kind==='scout'?(c.area?'scout-area':'scout'):c.kind==='resurrection'?'resurrect':c.kind==='catapult-target'?'catapult':c.kind==='hero-relocation'?(snapshot.owned.find(u=>u.kind==='hero')?.hero?.hits<=1?'hero-any':'hero-adjacent'):null;const next=kind?c.handle+':'+kind:null;if(next===instructionKey)return;instructionKey=next;if(kind){actions.clear(true);actions.show(kind);}else actions.clear(false);}

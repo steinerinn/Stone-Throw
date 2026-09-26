@@ -33,7 +33,10 @@ export interface SeenCell {
     castleMask?: number;
 }
 export interface PublicEvent {
-    source?: 'direct' | 'archer' | 'catapult' | 'goblin' | 'wizard' | 'dragon' | 'demon' | 'plague' | 'monk' | 'assassin';
+    offscreen?: boolean;
+    environmental?: boolean;
+    revoltLevel?: number;
+    source?: 'revolt' | 'direct' | 'archer' | 'catapult' | 'goblin' | 'wizard' | 'dragon' | 'demon' | 'plague' | 'monk' | 'assassin';
     position: number;
     kind: 'impact' | 'miss' | 'unit-disclosed' | 'resurrection-announced' | 'hero-moved' | 'plague-observed' | 'resurrection-rejected' | 'resurrection-found';
     side: Side;

@@ -4,4 +4,4 @@ export declare function necromancers(ctx: ResolutionContext, ownerId: PlayerId):
 export declare function necroHits(ctx: ResolutionContext, ownerId: PlayerId): number;
 export declare function schedulePlague(ctx: ResolutionContext, ownerId: PlayerId, origin: Cell | null): void;
 export declare function releaseHeldPlague(ctx: ResolutionContext, clericOwnerId: PlayerId): void;
-export declare function necromancerRule(ctx: ResolutionContext, meta: SourceMetadata, origin: Cell): void;
+export declare function necromancerRule(ctx: ResolutionContext, meta: SourceMetadata, origin: Cell, freshHit?: boolean): void;

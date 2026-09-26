@@ -78,3 +78,5 @@ body .st-actions #stGear{width:44px;min-width:44px;padding:10px}
 .st-afk-own-warning .st-mp-dialog h2{font-size:clamp(26px,3.2vw,44px);line-height:1.15;color:#ffe19b;text-shadow:0 2px 3px #000;margin-bottom:18px}
 .st-afk-own-warning [role=timer]{font-size:clamp(20px,2vw,28px);font-weight:bold;color:#fff0cf;margin:0}
 .st-afk-own-warning .st-mp-actions:empty,.st-afk-own-warning [role=alert]:empty{display:none}
+
+.st-mp-newsflash.st-rematch-notice{position:fixed;top:32%;padding:24px 30px;background:linear-gradient(145deg,#18242b,#090f13);border:2px solid #b68b38;box-shadow:inset 0 0 0 3px #080d10,inset 0 0 0 4px #65512c,0 12px 45px #000;max-width:calc(100vw - 32px)}

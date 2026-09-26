@@ -11,7 +11,7 @@ export interface ImpactResult {
         meta: SourceMetadata;
     } | null;
 }
-export declare function unitReaction(ctx: ResolutionContext, u: Unit, meta: SourceMetadata, cell: Cell): ReactionEntry | null;
+export declare function unitReaction(ctx: ResolutionContext, u: Unit, meta: SourceMetadata, cell: Cell, freshHit?: boolean): ReactionEntry | null;
 /** Direct state transition only. Attack-layer/volley barriers choose when to call
  * unitReaction; interrupts and completion checks belong to the root scheduler. */
 export declare function resolveImpact(ctx: ResolutionContext, meta: SourceMetadata, cell: Cell, deferReactions?: boolean): ImpactResult;

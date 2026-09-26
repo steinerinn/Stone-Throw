@@ -16,7 +16,7 @@ export function normalPolicy(h:HostState,memory:NormalMemory){
  const heroSpacingExemptCells=new Set(hero?.cells.map(cellKey)||[]);
  if(hero)for(const {event:e} of h.events)if(e.unitId===hero.id)for(const c of e.cells)heroSpacingExemptCells.add(cellKey(c));
  if(hero?.hero?.currentCell)heroSpacingExemptCells.add(cellKey(hero.hero.currentCell));
- const env={heroSpacingExemptCells,groupPlagueFinalCoreCell,SIZE:h.config.size,PLAGUE_ROUNDS:5,INF_COUNT:cfg.inf||0,ARCHER_COUNT:cfg.archer||0,CAV_COUNT:cfg.cav||0,CASTLE_COUNT:cfg.castle||0,key:(x:number,y:number)=>x+','+y,parseKey,
+ const env={heroOnlyCore:survivingCore.length===0,heroSpacingExemptCells,groupPlagueFinalCoreCell,SIZE:h.config.size,PLAGUE_ROUNDS:5,INF_COUNT:cfg.inf||0,ARCHER_COUNT:cfg.archer||0,CAV_COUNT:cfg.cav||0,CASTLE_COUNT:cfg.castle||0,key:(x:number,y:number)=>x+','+y,parseKey,
  neighbors4:(x:number,y:number)=>neighbors4({size:h.config.size},x,y),neighbors8:(x:number,y:number)=>neighbors8({size:h.config.size},x,y),cavCellsAt:(x:number,y:number,orient:'H'|'V')=>cavCellsAt(x,y,orient),cavMap:cavs,cellToCav,
  enemyKnownHits:new Set(memory.knownHits),enemyCastleKnownHits:new Set(memory.castleHits),enemyScoutKnowledge:scout,enemyScoutedPlayerCells:new Set(enemy.scouted),enemyHeroHuntCandidates:new Set(memory.heroHunt),enemyMonkSearchCandidates:new Set(enemy.monkCandidates),enemyShots:shots,
  heroActivated:!!hero?.hero?.activated,heroKey:hero?.hero?.currentCell?cellKey(hero.hero.currentCell):null,playerHeroHitsTaken:hero?.hero?.hitsTaken||0,monkKey:monk?.cells[0]?cellKey(monk.cells[0]):null,

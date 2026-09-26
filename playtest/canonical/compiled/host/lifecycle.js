@@ -1,3 +1,4 @@
+import { observeRevolt, startRevoltTurn, finishRevoltRound, settleRevolt } from './revolt.js';
 import { beginChaosBoundary, observeChaosBoundary, settleChaos } from './chaos.js';
 import { processedChainCells } from '../combat/chain-statistics.js';
 import { cloneHost } from '../archives.js';
@@ -19,7 +20,7 @@ function collect(h) {
     observeChaosBoundary(h);
     for (let i = 0; i < r.frames.length; i++) {
         const f = r.frames[i];
-        if ((f.kind !== 'wave' && f.kind !== 'interrupt') || h.statisticsFrames.some(s => s.frameId === f.id))
+        if (r.environmental || (f.kind !== 'wave' && f.kind !== 'interrupt') || h.statisticsFrames.some(s => s.frameId === f.id))
             continue;
         const parent = r.frames[i - 1];
         h.statisticsFrames.push({ frameId: f.id, actorId: f.compatibilityTurnId, count: 0, startCells: h.counters.reduce((n, c) => n + c.cellsAffected, 0), biggest: f.kind === 'wave' && h.rootPurpose === 'shot' && parent?.kind === 'root' });
@@ -29,7 +30,7 @@ function collect(h) {
     h.statisticsFrames = h.statisticsFrames.filter(f => r.frames.some(frame => frame.id === f.frameId));
     // One settled causal root includes all nested waves/interrupts, regardless of
     // reaction owner. Count processed cells once, never attack announcements.
-    if (r.status === 'complete') {
+    if (r.status === 'complete' && !r.environmental) {
         const cells = r.events.reduce((n, e) => n + processedChainCells(e), 0), actor = r.events.find(e => e.statistics?.rootActorId)?.statistics?.rootActorId ?? r.activePlayerId, counter = h.counters.find(c => c.playerId === actor);
         if (counter) {
             counter.biggestAttack = Math.max(counter.biggestAttack, cells);
@@ -51,6 +52,7 @@ export function pumpHost(h, maxSteps = 100000, execution) {
             execution?.reserveNormalDemonRunes?.(r);
             stepResolution(r, { deferLocalHeroPolicy: true, deferTerminal: !!execution?.settleRootBeforeTerminal });
             collect(h);
+            observeRevolt(h);
             execution?.observePresentationStep?.(h);
             if (r.status === 'awaiting-decision') {
                 h.status = 'awaiting-decision';
@@ -58,16 +60,20 @@ export function pumpHost(h, maxSteps = 100000, execution) {
                 return;
             }
             if (r.status === 'complete') {
-                const purpose = h.rootPurpose;
+                const purpose = h.rootPurpose, resumeStep = h.state.revolt?.pulse?.resumeStep || 'finish';
                 h.pendingRoot = null;
                 h.rootPurpose = null;
-                const displaced = commitEliminations(h);
+                const displaced = purpose === 'revolt' ? settleRevolt(h) : commitEliminations(h);
                 settleChaos(h);
                 if (h.state.match.outcome.kind !== 'ongoing') {
                     terminal(h, execution);
                     return;
                 }
                 if (displaced) {
+                    if (purpose !== 'revolt' && h.state.revolt?.qualifying && !h.state.revolt.waiting.length && finishRevoltRound(h, 'enter')) {
+                        root(h, [{ kind: 'revolt-pulse', level: h.state.revolt.level }], 'revolt');
+                        continue;
+                    }
                     refreshHost(h);
                     return;
                 }
@@ -81,11 +87,14 @@ export function pumpHost(h, maxSteps = 100000, execution) {
                 }
                 else if (purpose === 'exit')
                     h.turnStep = 'finish';
+                else if (purpose === 'revolt')
+                    h.turnStep = resumeStep;
             }
             continue;
         }
         const p = seat(h.state, h.activePlayerId), primary = p.playerId === h.config.players[0].id;
         if (h.turnStep === 'enter') {
+            startRevoltTurn(h);
             h.plagueAwareAtTurnStart = h.state.plagues.some(q => q.targetPlayerId === p.reactionTarget.playerId);
             if (primary) {
                 budget(h);
@@ -142,8 +151,12 @@ export function pumpHost(h, maxSteps = 100000, execution) {
             }
             root(h, [...(h.state.ring ? h.state.plagues.filter(q => q.moveOnPlayerId === p.playerId).map(q => ({ kind: 'plague-step', targetBoardId: q.targetBoardId, ...(q.outbreaks[0]?.statisticsId ? { plagueId: q.outbreaks[0].statisticsId } : {}) })) : [{ kind: 'plague-step', targetBoardId: p.reactionTarget.boardId }]), { kind: 'terminal-check', reason: 'direct-end' }], 'exit');
         }
-        else if (h.turnStep === 'finish')
-            nextTurn(h);
+        else if (h.turnStep === 'finish') {
+            if (finishRevoltRound(h))
+                root(h, [{ kind: 'revolt-pulse', level: h.state.revolt.level }], 'revolt');
+            else
+                nextTurn(h);
+        }
         else
             throw Error('Unsupported host continuation ' + h.turnStep);
     }

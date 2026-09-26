@@ -4,8 +4,8 @@ export function createReplayCursor(replay){
  function apply(s,e){s.highlight=[];s.notice=e.kind.toUpperCase();
   if(e.kind==='checkpoint'){s.round=e.round;s.turn=e.turn;s.active=e.active;for(const b of e.boards)for(const c of b.cells){const cells=s.boards.find(x=>x.seat===b.seat).cells,k=c.x+','+c.y;cells[k]={...cells[k],...c};}}
   if(e.kind==='turn')s.turn=e.turn;
-  if(['shot','contact','plague','catapult'].includes(e.kind)){const b=s.boards.find(b=>b.seat===e.board);for(const c of e.cells){const k=c.x+','+c.y,old=b.cells[k]||{};b.cells[k]={...old,...c,observation:e.observation==='repeat'?old.observation||'hit':e.observation,plague:e.kind==='plague'||old.plague};s.highlight.push({board:e.board,...c});}}
-  if(e.kind==='special'||e.kind==='announcement')s.notice=e.name.replaceAll('-',' ').toUpperCase();
+  if(['shot','contact','plague','catapult','revolt'].includes(e.kind)){const b=s.boards.find(b=>b.seat===e.board);for(const c of e.cells){const k=c.x+','+c.y,old=b.cells[k]||{};b.cells[k]={...old,...c,observation:e.observation==='repeat'?old.observation||'hit':e.observation,plague:e.kind==='plague'||old.plague};s.highlight.push({board:e.board,...c});}}
+  if(e.kind==='special'||e.kind==='announcement')s.notice=e.name.replaceAll('-',' ').toUpperCase()+(e.name==='peasant-revolt'?' '+e.level:'');
   if(e.kind==='elimination')for(const seat of e.seats)s.boards.find(b=>b.seat===seat).eliminated=true;
   return s;
  }

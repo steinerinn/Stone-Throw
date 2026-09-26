@@ -14,9 +14,11 @@ export function shot(state, ownerId, k) { return seat(state, ownerId).shots.incl
 export function addUnique(list, v) { if (!list.includes(v))
     list.push(v); }
 export function emit(ctx, kind, meta = null, unitId = null, cells = [], amount = null, reason = null) {
-    const event = { sequence: ctx.events.length + 1, rootId: ctx.id, workId: ctx.frames.at(-1)?.id || null, kind, meta, unitId, cells: cells.map(c => ({ ...c })), amount, reason };
+    const event = { sequence: ctx.events.length + 1, rootId: ctx.id, workId: ctx.frames.at(-1)?.id || null, kind, meta: meta && ctx.environmental ? { ...meta, actorId: null, ownerId: null } : meta, unitId, cells: cells.map(c => ({ ...c })), amount, reason };
     if (['impact', 'suspect-eliminated', 'repeat-ignored', 'unit-destroyed', 'unit-damaged', 'hero-killed', 'resurrection', 'scouted', 'attack-started', 'plague-scheduled', 'work-started'].includes(kind))
         event.statistics = statisticalFacts(ctx, event);
+    if (ctx.environmental)
+        event.statistics = { ...event.statistics, environmental: 'peasant-revolt', revoltLevel: ctx.environmental.level, rootActorId: null };
     ctx.events.push(event);
     return event;
 }

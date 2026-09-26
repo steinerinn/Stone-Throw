@@ -39,7 +39,7 @@ export function observeRuleEvent(host, event) {
     (host.events = mutableRows(host.events)).push({ turnIndex: host.turnIndex, event: structuredClone(event) });
     const m = host.state.match, meta = event.meta;
     // Public deflection/absence evidence; never copy private compatibility candidates.
-    if (event.kind === 'monk-clue' && meta?.origin) {
+    if (event.kind === 'monk-clue' && meta?.origin && meta.ownerId) {
         const board = m.knowledge[meta.ownerId]?.boards[meta.targetPlayerId];
         if (board) {
             const prior = board.clues.find(c => c.kind === 'monk-candidates')?.cells ?? [];
@@ -55,7 +55,7 @@ export function observeRuleEvent(host, event) {
         if (f)
             f.count++;
     }
-    if ((event.kind === 'impact' || event.kind === 'suspect-eliminated') && meta && !meta.source.startsWith('direct-') && meta.source !== 'plague') {
+    if ((event.kind === 'impact' || event.kind === 'suspect-eliminated') && meta && !event.statistics?.environmental && !meta.source.startsWith('direct-') && meta.source !== 'plague') {
         let actor = meta.actorId;
         if (meta.source === 'monk-deflect') {
             actor = null;
@@ -86,7 +86,7 @@ export function observeRuleEvent(host, event) {
             const k = cellKey(c);
             if (meta.actorId !== meta.targetPlayerId && event.unitId && brain && !brain.knownHits.includes(k))
                 brain.knownHits.push(k);
-            (m.history = mutableRows(m.history)).push({ id: id('event-' + (m.history.length + 1)), kind: 'impact', actorId: meta.actorId, targetId: meta.targetPlayerId, boardId: meta.targetBoardId, unitId: event.unitId, cell: { ...c }, turnIndex: host.turnIndex });
+            (m.history = mutableRows(m.history)).push({ id: id('event-' + (m.history.length + 1)), kind: 'impact', actorId: event.statistics?.environmental ? null : meta.actorId, targetId: meta.targetPlayerId, boardId: meta.targetBoardId, unitId: event.unitId, cell: { ...c }, turnIndex: host.turnIndex });
             for (const observer of m.players) {
                 const known = m.knowledge[observer.id], board = known.boards[meta.targetPlayerId];
                 if (board) {

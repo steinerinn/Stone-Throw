@@ -12,7 +12,8 @@ export function createGroupNarrative(){
    if(!c.roots.has(root)&&ids.has(e.statistics?.rootActorId))c.roots.set(root,e.statistics.rootActorId);
    if(e.kind==='decision-answered'&&e.reason==='catapult-target')c.launches.set(root,e.sequence);
    const add=(key,row)=>{if(c.seen.has(key))return;c.seen.add(key);c.rows.push({id:++c.serial,...row});if(c.rows.length>120)c.rows.shift();};
-   if(e.kind==='attack-started'&&specials.has(e.reason)&&ids.has(meta?.ownerId)&&ids.has(meta?.targetPlayerId))add('attack:'+root+':'+e.sequence,{kind:'special',special:e.reason==='monk-deflect'?'monk':e.reason,actor:meta.ownerId,target:meta.targetPlayerId});
+   if(e.kind==='peasant-revolt')add('revolt:'+root,{kind:'revolt',level:e.amount});
+   if(!e.statistics?.environmental&&e.kind==='attack-started'&&specials.has(e.reason)&&ids.has(meta?.ownerId)&&ids.has(meta?.targetPlayerId))add('attack:'+root+':'+e.sequence,{kind:'special',special:e.reason==='monk-deflect'?'monk':e.reason,actor:meta.ownerId,target:meta.targetPlayerId});
    if(e.kind==='impact'&&meta?.source==='catapult-shot'&&ids.has(meta.ownerId)&&ids.has(meta.targetPlayerId))add('catapult:'+root+':'+(c.launches.get(root)??e.workId),{kind:'special',special:'catapult',actor:meta.ownerId,target:meta.targetPlayerId});
    if(['unit-destroyed','unit-damaged'].includes(e.kind)&&meta?.source==='plague'&&ids.has(meta.targetPlayerId)&&e.cells?.length)add('plague:'+root+':'+e.sequence,{kind:'plague',target:meta.targetPlayerId,destroyed:e.kind==='unit-destroyed',cell:e.cells[0]});
    for(const dead of e.statistics?.eliminationBoundary?.dead||[])if(ids.has(dead))add('elimination:'+dead,{kind:'elimination',target:dead,actor:c.roots.get(root)||null});
