@@ -67,7 +67,7 @@ export function openRegistry(directory,{now=Date.now}={}){
    if(action==='dev-review-decide'&&Object.keys(b).sort().join(',')==='action,playerId'&&typeof b.playerId==='string')return tx(()=>review.decide(b.playerId,a.id,b.action));
    fail('Invalid review request.');
   }
-  if(action==='profile-view')return profileReadModel(db,statistics,session(token)?.id,b);
+  if(action==='profile-view'){statistics.ensureAggregates();return profileReadModel(db,statistics,session(token)?.id,b);}
   if(action==='story-restart'){if(Object.keys(b).length)fail('Invalid Story restart request.');const a=session(token);if(!a)fail('Log in to restart account Story.',401);return tx(()=>{const state={...storyState(a.id),runId:randomUUID(),progress:null};saveRun(a.id,state);return {playerId:a.id,...state};});}
   if(action==='story-progress'){if(Object.keys(b).length)fail('Invalid Story progress request.');const a=session(token);return {playerId:a?.id||null,...(a?storyState(a.id):{progress:null,lifetime:null,runId:null})};}
   if(action==='me'){const a=session(token);return a?streak(a.id):{account:null};}

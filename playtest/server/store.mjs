@@ -13,7 +13,7 @@ export function openStore(directory,build,mode,{journalEnabled=true}={}){
  const lockFd=fs.openSync(lock,'wx',0o600);fs.writeFileSync(lockFd,JSON.stringify({pid:process.pid}));fs.closeSync(lockFd);
  let journalFd=null,journalRequired=false;const release=()=>{if(journalFd!==null){fs.closeSync(journalFd);journalFd=null;}if(fs.existsSync(lock))fs.unlinkSync(lock);};
  try{
-  let value=null,sequence=0,previous='',lastValue=null,reset=true,failed=false;const encode=archiveEncoder();let decode=archiveDecoder();
+  let value=null,sequence=0,previous='',lastValue=null,reset=true,failed=false;const encode=archiveEncoder({prune:true});let decode=archiveDecoder();
   if(fs.existsSync(file)){let saved;try{saved=JSON.parse(measured('checkpoint-disk-read',()=>fs.readFileSync(file,'utf8')));if(typeof saved.payload!=='string'||digest(saved.payload)!==saved.sha256)throw Error();}catch{throw Error('checkpoint-unavailable');}
    journalRequired=saved.journal===true;if(journalRequired&&!journalEnabled)throw Error('incompatible-checkpoint');if(journalRequired&&!fs.existsSync(journal))throw Error('checkpoint-unavailable');
    if(saved.format!==checkpointId||saved.build!==build||saved.mode!==mode)throw Error('incompatible-checkpoint');

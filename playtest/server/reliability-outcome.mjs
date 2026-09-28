@@ -3,8 +3,8 @@ import {reliabilityAccounting} from './statistics-metrics.mjs';
 export function finalReliability({incidents=0,disconnects=0,departure=false}={}){
  return incidents>=2?'AFK':departure||disconnects>=2?'DISCONNECTED':'FINISHED';
 }
-export function reliabilityHistory(rows){
- let accounting=null,historicalUnknown=0;
+export function reliabilityHistory(rows,initial=null){
+ let accounting=initial?{Full:initial.Full,Quit:0,Kick:0,Disconnect:initial.Disconnect,AFK:initial.AFK,forgiven:initial.forgivenAFK,cleanStreak:initial.cleanStreak,forgiveness:initial.forgiveness}:null,historicalUnknown=initial?.historicalUnknown||0;
  const seen=new Set();
  for(const row of rows){
   if(seen.has(row.match_id))continue;
