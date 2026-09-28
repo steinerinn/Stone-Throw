@@ -1,3 +1,4 @@
+import { recordEliminationScores } from './elimination-score.js';
 import { mutableRows } from '../archives.js';
 import { seat, destroyed } from '../combat/access.js';
 export function normalTarget(s, owner) {
@@ -35,6 +36,7 @@ export function commitEliminations(h) {
         h.events = mutableRows(h.events);
         h.events[h.events.length - 1] = { ...last, event: { ...last.event, statistics: { ...last.event.statistics, eliminationBoundary: { dead: [...dead], survivors: before.length - dead.length } } } };
     }
+    recordEliminationScores(h, dead);
     ring.eliminated.push(...dead);
     ring.order = before.filter(id => !dead.includes(id));
     for (const id of dead) {

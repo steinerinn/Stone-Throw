@@ -38,7 +38,7 @@ export interface PublicEvent {
     revoltLevel?: number;
     source?: 'revolt' | 'direct' | 'archer' | 'catapult' | 'goblin' | 'wizard' | 'dragon' | 'demon' | 'plague' | 'monk' | 'assassin';
     position: number;
-    kind: 'impact' | 'miss' | 'unit-disclosed' | 'resurrection-announced' | 'hero-moved' | 'plague-observed' | 'resurrection-rejected' | 'resurrection-found';
+    kind: 'impact' | 'miss' | 'unit-disclosed' | 'archer-no-shot' | 'resurrection-announced' | 'hero-moved' | 'plague-observed' | 'resurrection-rejected' | 'resurrection-found';
     side: Side;
     cell: Cell | null;
     unitKind: UnitKind | null;

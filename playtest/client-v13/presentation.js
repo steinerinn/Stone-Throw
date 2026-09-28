@@ -1,5 +1,5 @@
 import {createChaosPresentation} from './chaos-presentation.js';
-import {mountGroupResult,scoreLines,participantScoreLines,setResultArt} from './result-screen.js';
+import {mountGroupResult,scoreLines,participantScoreLines,setResultArt,clearResultArt} from './result-screen.js';
 import {mountOnlineOverview} from './online-overview.js';
 import {logEvent,observeLog,paintLog,dragLog,betaEnabled} from './game-log.js';
 import {mountPlacementFeedback} from './placement-feedback.js';
@@ -72,7 +72,7 @@ export async function mountClient(transport,callbacks={}){
  function paint(){if(!snapshot)return;for(const [id,g]of gestures)if(!gridInputAllowed(id==='playerGrid'?'self':'opponent'))g.valid=false;document.documentElement.style.setProperty('--board-track-count',snapshot.size);for(const [id,row]of [['pHdrRow',true],['eHdrRow',true],['pHdrCol',false],['eHdrCol',false]])header(id,row);grid('playerGrid','self');grid('enemyGrid','opponent');strip('playerUnitStrip','self');strip('enemyUnitStrip','opponent');byId('startBtn').disabled=!(snapshot.phase==='placement'&&ready());byId('shotsLeft').textContent=snapshot.phase==='placement'?'—':String(snapshot.shotsLeft);byId('status').textContent='';byId('heroCursorGhost').style.display=snapshot.choice?.kind==='hero-relocation'&&!heroCandidate?'block':'none';document.body.classList.toggle('player-shooting',phase()==='play'&&gridInputAllowed('opponent'));document.body.classList.toggle('resurrection-cursor',snapshot.choice?.kind==='resurrection');byId('enemyGrid').classList.toggle('spy-mode',snapshot.choice?.kind==='scout');const aiming=snapshot.choice?.kind==='catapult-target';document.body.classList.toggle('catapult-aiming',aiming);byId('enemyGrid').classList.toggle('catapult-aim-mode',aiming);preview();}
  function renderResult(){
  if(groupResult.render(snapshot,animating))return;
- if(snapshot.phase!=='finished'){byId('resultOverlay').style.display='none';return;}
+ if(snapshot.phase!=='finished'||!['win','loss','draw'].includes(snapshot.outcome)){byId('resultOverlay').style.display='none';clearResultArt(byId('resultArt'));return;}
  byId('stLocalResultMenu').hidden=!!snapshot.groupRoom;const outcome=snapshot.outcome,draw=outcome==='draw',win=outcome==='win';
  byId('resultTitle').textContent=draw?'Draw.':win?'You won!':'You lose.';
  setResultArt(byId('resultArt'),outcome);

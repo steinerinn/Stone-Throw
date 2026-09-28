@@ -1,0 +1,87 @@
+/* Main Menu only: retain every existing destination and control. */
+#stMainMenu{padding:18px 12px;align-items:center;background:radial-gradient(ellipse at 50% 18%,#26303555,transparent 65%)}
+#stMainMenu .st-menu-frame{width:min(740px,100%);padding:24px 38px 20px;background:linear-gradient(145deg,#1d252a,#0c1216 65%);border-color:#94743b;box-shadow:0 14px 65px #0009,inset 0 0 0 4px #ffffff03;box-sizing:border-box}
+#stMainMenu .st-menu-brand{margin-bottom:17px}
+#stMainMenu .st-menu-kicker{font-size:10px;letter-spacing:4px;color:#b3a488;margin-bottom:8px}
+#stMainMenu .st-menu-logo-host{min-height:0}
+#stMainMenu .st-menu-logo-host img{width:100%!important;max-width:610px!important;max-height:140px!important;object-fit:contain}
+#stMainMenu .st-menu-subtitle{font-size:12px;margin-top:9px;color:#b8bdc1}
+#stMainMenu .st-menu-actions{width:100%;gap:8px}
+#stMainMenu .st-menu-button{box-sizing:border-box;border:1px solid #796138;background:linear-gradient(110deg,#212b30,#141c20);padding:10px 16px;min-height:58px;transition:background .15s,border-color .15s;box-shadow:inset 3px 0 #a4803b33}
+#stMainMenu .st-menu-button.primary{background:linear-gradient(110deg,#302918,#1a1b16);border-color:#b18b40}
+#stMainMenu .st-menu-button:hover{border-color:#e2bd6e;background:#293239}
+#stMainMenu button:focus-visible{outline:2px solid #ffe1a0;outline-offset:3px}
+#stMainMenu .st-menu-icon{width:38px;height:38px;object-fit:contain}
+#stMainMenu .st-menu-button-title{font-size:17px;letter-spacing:1px}
+#stMainMenu .st-menu-button-copy{font-size:12px;line-height:1.35;color:#aebbc2}
+#stMainMenu .st-menu-button.exit{background:linear-gradient(110deg,#291e1c,#191619)}
+#stMainMenu .st-story-library-row .st-menu-button,#stMainMenu .st-menu-utility-row .st-menu-button{min-height:52px;padding:8px 12px}
+#stMainMenu .st-story-library-row .st-menu-button-title,#stMainMenu .st-menu-utility-row .st-menu-button-title{font-size:14px}
+#stMainMenu .st-story-library-row .st-menu-icon,#stMainMenu .st-menu-utility-row .st-menu-icon{width:29px;height:29px}
+#stMainMenu .st-story-resume-actions{grid-template-columns:1fr 1fr;gap:8px}
+#stMainMenu .st-story-resume-actions button{padding:6px;min-height:28px;border-color:#796138}
+#stMainMenu .st-menu-version{display:none}
+#stMainMenu .cs-world{margin-top:17px;border-top:1px solid #9d7b393d;padding-top:10px}
+#stMainMenu .cs-world-title{font:10px Georgia,serif;letter-spacing:3px;color:#c3ab7a;text-align:center}
+#stMainMenu .cs-world-stats{display:grid;grid-template-columns:repeat(3,1fr);margin:9px 0 11px;text-align:center}
+#stMainMenu .cs-world-stats>div+div{border-left:1px solid #9d7b393d}
+#stMainMenu .cs-world-stats strong{display:block;font:21px Georgia,serif;color:#f2d695;font-variant-numeric:tabular-nums}
+#stMainMenu .cs-world-stats span{display:block;font:9px Arial,sans-serif;letter-spacing:1px;margin-top:4px;color:#aab3b7}
+#stMainMenu .cs-rivalry-labels{display:flex;justify-content:space-between;font:bold 11px Georgia,serif;letter-spacing:1px;color:#e3cc91}
+#stMainMenu .cs-rivalry-caption{font:9px Arial,sans-serif;color:#8f9fa7;letter-spacing:2px}
+#stMainMenu .cs-rivalry-meter{height:8px;margin-top:6px;border:1px solid #a68849;background:#914b42;box-shadow:inset 0 1px 3px #0008}
+#stMainMenu .cs-rivalry-meter>div{height:100%;background:linear-gradient(90deg,#325f78,#72a0b4);width:0}
+#stMainMenu .cs-rivalry-meter.empty{background:#273139}
+#stMainMenu .cs-world-status{text-align:center;color:#9facb2;font:10px Arial,sans-serif;margin-top:5px;min-height:12px}
+#stMainMenu #csAccountBar{display:flex;justify-content:center;align-items:center;gap:8px;flex-wrap:wrap;margin:14px 0 0;padding-top:12px;border-top:1px solid #9d7b393d;font-size:13px}
+#stMainMenu #csAccountBar>span:first-child{color:#f0d396;margin-right:auto;max-width:180px;overflow-wrap:anywhere}
+#stMainMenu #csAccountBar button{font:11px Georgia,serif;letter-spacing:.4px;padding:9px 12px;border:1px solid #806739;background:linear-gradient(#252d31,#151c20);color:#eacf93;border-radius:2px}
+#stMainMenu #csAccountBar #csLogout{border-color:transparent;background:transparent;color:#abb4ba}
+@media(max-height:850px) and (min-width:621px){#stMainMenu{padding:10px}#stMainMenu .st-menu-frame{padding-top:18px;padding-bottom:16px}#stMainMenu .st-menu-logo-host img{max-height:110px!important}#stMainMenu .st-menu-brand{margin-bottom:12px}#stMainMenu .cs-world{margin-top:12px}}
+@media(max-width:620px){#stMainMenu{padding:8px}#stMainMenu .st-menu-frame{padding:20px 14px 16px}#stMainMenu .st-menu-logo-host img{max-height:90px!important}#stMainMenu .st-menu-kicker{font-size:8px;letter-spacing:2.5px}#stMainMenu .st-menu-brand{margin-bottom:14px}#stMainMenu .st-menu-subtitle{font-size:11px}#stMainMenu .st-menu-button{padding:9px 11px}#stMainMenu .st-menu-button-title{font-size:15px}#stMainMenu .st-menu-button-copy{font-size:11px}#stMainMenu .st-menu-button-layout{gap:9px}#stMainMenu .st-story-library-row,#stMainMenu .st-menu-utility-row{grid-template-columns:1fr 1fr}#stMainMenu .st-story-library-row .st-menu-button-title,#stMainMenu .st-menu-utility-row .st-menu-button-title{font-size:11px;letter-spacing:.3px}#stMainMenu .st-story-library-row .st-menu-icon,#stMainMenu .st-menu-utility-row .st-menu-icon{width:24px;height:24px}#stMainMenu .st-story-library-row .st-menu-button-copy,#stMainMenu .st-menu-utility-row .st-menu-button-copy{font-size:10px}#stMainMenu .cs-world-stats strong{font-size:19px}#stMainMenu .cs-world-stats span{font-size:8px;letter-spacing:.4px}#stMainMenu #csAccountBar>span:first-child{flex-basis:100%;max-width:none;margin:0;text-align:center}#stMainMenu #csAccountBar{gap:6px}#stMainMenu #csAccountBar button{padding:9px 10px}}
+/* Focused desktop composition and integrated account actions. */
+#stMainMenu .st-menu-frame{width:min(620px,100%);padding:20px 30px 15px}
+#stMainMenu .st-menu-brand{margin-bottom:12px}
+#stMainMenu .st-menu-logo-host img{max-width:470px!important;max-height:110px!important}
+#stMainMenu .st-menu-actions{gap:7px}
+#stMainMenu .st-menu-button{min-height:54px;padding:8px 12px}
+#stMainMenu #csAccountBar{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin:0;padding:0;border:0;width:100%}
+#stMainMenu #csAccountBar button{min-height:48px;text-align:left;border-radius:0;padding:8px 12px;border:1px solid #796138;background:linear-gradient(110deg,#212b30,#141c20)}
+#stMainMenu #csAccountBar .st-menu-button-title{font-size:14px}
+#stMainMenu #csAccountBar .st-menu-button-copy{font-size:11px}
+#stMainMenu #csAccountBar button:hover{border-color:#e2bd6e;background:#293239}
+#stMainMenu .cs-menu-identity{display:flex;align-items:center;justify-content:center;gap:12px;margin-top:10px;min-height:23px;font:12px Arial,sans-serif}
+#stMainMenu .cs-menu-player{color:#f0d396}
+#stMainMenu .cs-menu-streak{font-size:9px;letter-spacing:1px;color:#b5bdba}
+#stMainMenu #csLogout{padding:3px 6px;background:transparent;border:0;color:#9faeb6;font-size:10px;cursor:pointer}
+#stMainMenu .cs-menu-exit{display:block;margin:10px auto 0;min-height:26px;padding:4px 16px;width:auto;border-color:#795448;background:transparent;box-shadow:none}
+#stMainMenu .cs-menu-exit .st-menu-icon,#stMainMenu .cs-menu-exit .st-menu-button-copy{display:none}
+#stMainMenu .cs-menu-exit .st-menu-button-title{font-size:11px}
+#stMainMenu .cs-world{margin-top:12px;padding-top:8px}
+#stMainMenu .cs-world-stats{margin:7px 0 9px}
+.cs-about{box-sizing:border-box;width:min(580px,calc(100vw - 24px));max-height:calc(100dvh - 24px);overflow:auto;padding:26px;color:#eee0bd;border:1px solid #a78644;background:linear-gradient(145deg,#20282d,#0c1216);box-shadow:0 20px 80px #000b}
+.cs-about::backdrop{background:#000b}
+.cs-about>small{display:block;text-align:center;letter-spacing:4px;color:#ac9463;font:10px Georgia,serif}
+.cs-about h2{text-align:center;font:24px Georgia,serif;color:#e6c278;margin:12px 0 22px}
+.cs-about section{border-top:1px solid #77613c70;min-height:80px;padding-top:10px}
+.cs-about h3{font:13px Georgia,serif;letter-spacing:1px;color:#ddbf80;margin:0}
+.cs-about>button{display:block;width:100%;margin-top:12px;padding:12px;border:1px solid #a78644;background:linear-gradient(#28343a,#151e23);color:#e8cc90;font:bold 12px Georgia,serif;cursor:pointer}
+@media(max-height:850px) and (min-width:621px){#stMainMenu .st-menu-frame{padding-top:16px;padding-bottom:12px}#stMainMenu .st-menu-logo-host img{max-height:85px!important}#stMainMenu .st-menu-brand{margin-bottom:9px}#stMainMenu .cs-menu-identity{margin-top:6px}}
+@media(max-width:620px){#stMainMenu #csAccountBar{align-items:stretch}#stMainMenu .st-menu-frame{padding:16px 14px 12px}#stMainMenu .st-menu-logo-host img{max-height:80px!important}#stMainMenu #csAccountBar button{min-height:52px;padding:8px 12px}#stMainMenu #csAccountBar .st-menu-button-title{font-size:11px;letter-spacing:.3px}#stMainMenu #csAccountBar .st-menu-button-copy{font-size:10px}#stMainMenu .cs-menu-identity{gap:10px;margin-top:7px}#stMainMenu .st-menu-brand{margin-bottom:10px}#stMainMenu .st-menu-button{min-height:52px}#stMainMenu .cs-menu-exit{min-height:26px}}
+#stMainMenu .cs-menu-exit .st-menu-button-layout{display:block}
+#stMainMenu .cs-menu-exit .st-menu-button-title{white-space:nowrap}
+#stMainMenu .st-menu-frame::after{bottom:6px}
+#stMainMenu .cs-menu-identity{flex-wrap:wrap}
+
+#stMainMenu button.cs-menu-player{padding:0;border:0;background:none;font:inherit;color:#f0d396;cursor:pointer;text-underline-offset:3px}
+#stMainMenu button.cs-menu-player:hover{color:#ffe9b5;text-decoration:underline}
+#stMainMenu button.cs-menu-player:active{color:#c6a365}
+#stMainMenu #csAccountBar .st-menu-icon{width:29px;height:29px;object-fit:contain}
+#stMainMenu .cs-menu-award{display:block;background:url('/assets/result-screen/fantasy_medal_icon_collection.png') 100% 0/300% 200% no-repeat}
+@media(max-width:620px){#stMainMenu #csAccountBar .st-menu-icon{width:24px;height:24px}}
+#stMainMenu #csAccountBar .st-menu-button-layout{grid-template-columns:30px minmax(0,1fr);gap:10px;align-items:center}
+@media(max-width:620px){#stMainMenu #csAccountBar .st-menu-button-layout{grid-template-columns:30px minmax(0,1fr);gap:9px}}
+
+#stMainMenu .cs-menu-info{display:flex;align-items:center;justify-content:center;width:28px;height:28px;flex:0 0 28px;border:1px solid #b9944d;border-radius:50%;box-sizing:border-box;background:linear-gradient(135deg,#40351e,#111b20);color:#ebc975;font:bold 24px Georgia,serif;text-shadow:0 1px 2px #000}
+
+.cs-about[open]{display:flex;flex-direction:column;overflow:hidden}.cs-about-content{min-height:0;overflow:auto;overscroll-behavior:contain;padding-right:10px;line-height:1.6;font:14px/1.6 Arial,sans-serif}.cs-about-content section{min-height:0;padding:16px 0 8px}.cs-about-content h3{margin-bottom:12px}.cs-about-content p{margin:0 0 13px}.cs-about-content h4{font:14px Georgia,serif;color:#ddbf80;margin:0 0 6px}.cs-credit-group{margin:0 0 20px}.cs-credit-group p{margin:0 0 4px}.cs-about>small,.cs-about>h2,.cs-about>button{flex-shrink:0}.cs-about-content figure{margin:16px 0}.cs-about-content figure img{display:block;max-width:100%;height:auto}@media(max-width:500px){.cs-about{padding:18px}.cs-about h2{font-size:21px;margin:10px 0 14px}}

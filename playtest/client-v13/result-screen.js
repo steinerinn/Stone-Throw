@@ -1,22 +1,24 @@
 // Hide the previous decoded banner until the current outcome artwork is ready.
 const resultArtRequests=new WeakMap();
+export function clearResultArt(img){if(!img)return;resultArtRequests.delete(img);img.style.visibility='hidden';img.removeAttribute('src');img.alt='';}
 export function setResultArt(img,outcome){
+ if(!['win','loss','draw'].includes(outcome)){clearResultArt(img);return;}
  const art=outcome==='win'?'win':outcome==='draw'?'draw':'lose';
  const src='assets/results/'+art+'.svg';
  img.alt=art==='win'?'You win!':art==='draw'?'Draw':'You lose!';
- if(resultArtRequests.get(img)?.src===src)return;
+ if(resultArtRequests.get(img)?.src===src&&img.getAttribute('src')===src)return;
  const request={src};resultArtRequests.set(img,request);
  img.style.visibility='hidden';img.src=src;
  img.decode().then(()=>{if(resultArtRequests.get(img)===request)img.style.visibility='visible';},()=>{});
 }
 export function scoreLines(score){
  if(!score||!Number.isFinite(score.score))return [];
- const number=n=>new Intl.NumberFormat('en-US',{maximumFractionDigits:2}).format(n);
+ const number=n=>new Intl.NumberFormat('en-US',{maximumFractionDigits:0}).format(n);
  const lines=['MATCH SCORE: '+number(score.score)],c=score.comparison;
  if(c&&c.samples>=5)lines.push(number(Math.abs(c.percent))+'% '+(c.percent<0?'below':'above')+' average for '+c.label);
  return lines;
 }
-export function participantScoreLines(players=[]){return players.map(p=>p.name+(p.ai?' (AI)':'')+': '+(Number.isFinite(p.matchScore?.score)?new Intl.NumberFormat('en-US',{maximumFractionDigits:2}).format(p.matchScore.score):'Unavailable'));}
+export function participantScoreLines(players=[]){return players.map(p=>p.name+(p.ai?' (AI)':'')+': '+(Number.isFinite(p.matchScore?.score)?new Intl.NumberFormat('en-US',{maximumFractionDigits:0}).format(p.matchScore.score):'Unavailable'));}
 const el=(tag,cls,text)=>{const n=document.createElement(tag);if(cls)n.className=cls;if(text!==undefined)n.textContent=text;return n;};
 const labels=['','1ST','2ND','3RD','4TH'];
 const artFile=name=>'assets/result-screen/'+name+'.png';
@@ -45,9 +47,9 @@ export function mountGroupResult(){
  let room=null,early=false,final=false,disposed=false,panel=null,timer=null,fade=null,finalData=null;
  const overlay=()=>document.getElementById('resultOverlay');
  function hide(){panel?.remove();panel=null;if(document.body.classList.contains('st-group-results-open'))document.body.classList.remove('st-group-results-open');}
- function reset(){clearTimeout(timer);clearTimeout(fade);hide();room=null;early=false;final=false;finalData=null;overlay()?.classList.remove('cs-result-outro');for(const id of ['playAgainBtn','stLocalResultMenu'])document.getElementById(id).hidden=false;}
+ function reset(){clearTimeout(timer);clearTimeout(fade);hide();room=null;early=false;final=false;finalData=null;if(overlay())overlay().style.display='none';clearResultArt(document.getElementById('resultArt'));overlay()?.classList.remove('cs-result-outro');for(const id of ['playAgainBtn','stLocalResultMenu'])document.getElementById(id).hidden=false;}
  const menuObserver=new MutationObserver(()=>{if(document.body.classList.contains('st-main-menu-mode')){clearTimeout(timer);clearTimeout(fade);hide();overlay()?.classList.remove('cs-result-outro');}});menuObserver.observe(document.body,{attributes:true,attributeFilter:['class']});
- function open(data){if(disposed||document.body.classList.contains('st-main-menu-mode'))return;overlay().style.display='none';overlay().classList.remove('cs-result-outro');hide();panel=buildResultScreen(data,{view:hide,rematch:()=>{document.getElementById('stGroupRematch')?.click();},menu:()=>{hide();window.__stoneThrowLeaveMatch?.({fromResult:true});}});document.body.append(panel);document.body.classList.add('st-group-results-open');panel.querySelector('button')?.focus();}
+ function open(data){if(disposed||document.body.classList.contains('st-main-menu-mode'))return;overlay().style.display='none';overlay().classList.remove('cs-result-outro');const previous=panel,scroll=panel?.scrollTop||0;panel=buildResultScreen(data,{view:hide,rematch:()=>{document.getElementById('stGroupRematch')?.click();},menu:()=>{hide();window.__stoneThrowLeaveMatch?.({fromResult:true});}});if(previous){panel.style.animation='none';previous.replaceWith(panel);panel.scrollTop=scroll;}else document.body.append(panel);document.body.classList.add('st-group-results-open');if(!previous)panel.querySelector('button')?.focus();}
  const reopen=()=>{if(finalData){clearTimeout(timer);clearTimeout(fade);open(finalData);}};window.addEventListener('cs-open-group-results',reopen);
  const keyboard=e=>{if(!panel)return;if(e.key==='Escape'){e.preventDefault();hide();document.getElementById('stCenterStart')?.focus();}else if(e.key==='Tab'){const buttons=[...panel.querySelectorAll('button')],index=buttons.indexOf(document.activeElement);if(e.shiftKey&&index<=0){e.preventDefault();buttons.at(-1).focus();}else if(!e.shiftKey&&index===buttons.length-1){e.preventDefault();buttons[0].focus();}}};document.addEventListener('keydown',keyboard);
  return {render(s,animating){
@@ -55,8 +57,9 @@ export function mountGroupResult(){
   if(s.online.room!==room){reset();room=s.online.room;}
   if(s.phase!=='finished')return false;
   if(animating)return true;
+  if(!['win','loss','draw'].includes(s.outcome)){overlay().style.display='none';return true;}
   if(!s.online.complete){if(early)return true;early=true;return false;}
-  if(final){if(s.groupResult||s.matchScore){finalData=s.groupResult||{...finalData,matchScore:s.matchScore};if(panel)open(finalData);document.getElementById('resultSubtitle').replaceChildren(...scoreLines(s.matchScore).map(text=>el('div','cs-match-score',text)));}return true;}final=true;
+  if(final){if(s.groupResult||s.matchScore){const next=s.groupResult||{...finalData,matchScore:s.matchScore};const changed=JSON.stringify(next)!==JSON.stringify(finalData);finalData=next;if(panel&&changed)open(finalData);document.getElementById('resultSubtitle').replaceChildren(...scoreLines(s.matchScore).map(text=>el('div','cs-match-score',text)));}return true;}final=true;
   if(!s.groupResult)return true;finalData=s.groupResult;
   if(early){open(finalData);return true;}
   const outcome=s.outcome;

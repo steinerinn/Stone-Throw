@@ -1,5 +1,5 @@
 import {buildReplay,publicCheckpoint} from './replay.mjs';
-export function migrateReplays(db){db.exec('CREATE TABLE IF NOT EXISTS stat_replays(match_id TEXT PRIMARY KEY REFERENCES stat_matches(id),payload TEXT NOT NULL)');}
+export function migrateReplays(db){db.exec('CREATE TABLE IF NOT EXISTS profile_saved_battles(player_id TEXT NOT NULL REFERENCES accounts(id) ON DELETE CASCADE,match_id TEXT NOT NULL,saved_at INTEGER NOT NULL,summary TEXT NOT NULL,result TEXT NOT NULL,replay TEXT NOT NULL,PRIMARY KEY(player_id,match_id))');db.exec('CREATE TABLE IF NOT EXISTS stat_replays(match_id TEXT PRIMARY KEY REFERENCES stat_matches(id),payload TEXT NOT NULL)');}
 export function captureReplayCheckpoint(db,d,h){
  const cursor=h.events.length,value=publicCheckpoint(h);
  if(!db.prepare("SELECT 1 FROM stat_facts WHERE match_id=? AND kind='public-replay' LIMIT 1").get(d.id))db.prepare("INSERT INTO stat_facts VALUES(?,'public-replay',0,?)").run(d.id,JSON.stringify({round:0,turn:0,active:-1,boards:d.participants.map(p=>({seat:p.seat,cells:[]}))}));
@@ -24,7 +24,7 @@ export function finalizeReplay(db,d,facts){
  const checkpoints=db.prepare("SELECT sequence,payload FROM stat_facts WHERE match_id=? AND kind='public-replay' ORDER BY sequence").all(d.id).map(r=>({cursor:r.sequence,value:JSON.parse(r.payload)}));
  const replay=buildReplay(d,facts,checkpoints);db.prepare('INSERT INTO stat_replays VALUES(?,?) ON CONFLICT(match_id) DO NOTHING').run(d.id,JSON.stringify(replay));pruneReplays(db);return replay;
 }
-export function replayForProfile(db,playerId,matchId){if(!recentMatches(db,playerId).some(r=>r.matchId===matchId))return null;const r=db.prepare('SELECT payload FROM stat_replays WHERE match_id=?').get(matchId);return r?JSON.parse(r.payload):null;}
+export function replayForProfile(db,playerId,matchId){if(!recentMatches(db,playerId).some(r=>r.matchId===matchId))return null;const r=db.prepare('SELECT payload FROM stat_replays WHERE match_id=?').get(matchId);return r?repairReplayPresentation(db,JSON.parse(r.payload)):null;}
 export function backfillReplays(db,{apply=false}={}){
  const report={full:0,partial:0,none:0};if(apply)db.exec('BEGIN IMMEDIATE');try{
   for(const r of db.prepare("SELECT descriptor,event_cursor FROM stat_matches WHERE finalized=1 AND mode<>'Story' ORDER BY ended_at,id").all()){
@@ -36,4 +36,14 @@ export function backfillReplays(db,{apply=false}={}){
   }
   if(apply){pruneReplays(db);db.exec('COMMIT');}return report;
  }catch(e){if(apply)db.exec('ROLLBACK');throw e;}
+}
+
+// Upgrade presentation on read from retained event-time facts, without rewriting
+// saved battles or borrowing identities from future checkpoints.
+export function repairReplayPresentation(db,replay){
+ const row=db.prepare('SELECT descriptor,event_cursor FROM stat_matches WHERE id=?').get(replay.matchId);if(!row)return replay;
+ const facts=db.prepare("SELECT payload FROM stat_facts WHERE match_id=? AND kind='event' ORDER BY sequence").all(replay.matchId).map(r=>JSON.parse(r.payload));if(!facts.length||facts.length!==row.event_cursor)return replay;
+ const kinds=new Set(['shot','contact','plague','catapult','revolt']),fresh=buildReplay(JSON.parse(row.descriptor),facts).timeline.filter(e=>kinds.has(e.kind)),old=replay.timeline.filter(e=>kinds.has(e.kind));
+ if(old.length!==fresh.length||old.some((e,i)=>e.kind!==fresh[i].kind||e.board!==fresh[i].board||JSON.stringify(e.cells.map(c=>[c.x,c.y]))!==JSON.stringify(fresh[i].cells.map(c=>[c.x,c.y]))))return replay;
+ const result=structuredClone(replay);let i=0;for(const e of result.timeline)if(kinds.has(e.kind)){const source=fresh[i++];e.cells=e.cells.map((c,j)=>source.cells[j].kind?{...c,...source.cells[j]}:c);}return result;
 }

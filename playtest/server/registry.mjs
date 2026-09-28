@@ -1,3 +1,5 @@
+import {migrateFeedback,feedbackStore} from './feedback.mjs';
+import {migrateReview,reviewStore} from './anomaly-review.mjs';
 import {profileReadModel} from './profile-read-model.mjs';
 import {migrateReplays} from './replay-store.mjs';
 import {storyUnlocks,mergeStoryUnlocks} from './story-progress.mjs';
@@ -28,7 +30,7 @@ export function openRegistry(directory,{now=Date.now}={}){
  CREATE TABLE IF NOT EXISTS challenges(id TEXT PRIMARY KEY,browser_hash TEXT NOT NULL,answer_hash TEXT NOT NULL,expires INTEGER NOT NULL);
  CREATE TABLE IF NOT EXISTS limits(key TEXT PRIMARY KEY,count INTEGER NOT NULL,reset INTEGER NOT NULL);
 `);
- let migrationBackup;try{migrationBackup=migrateStatistics(db,directory);if(!db.prepare('PRAGMA table_info(stat_participants)').all().some(c=>c.name==='score_components')){const backups=path.join(directory,'backups');fs.mkdirSync(backups,{recursive:true,mode:0o700});db.prepare('VACUUM INTO ?').run(path.join(backups,'registry-before-match-score-'+randomUUID()+'.sqlite'));}db.exec('BEGIN IMMEDIATE');try{migrateScores(db);migrateReplays(db);db.exec('COMMIT');}catch(e){db.exec('ROLLBACK');throw e;}}catch(error){db.close();throw error;}const statistics=statisticsStore(db,{onFinalized:ids=>{for(const id of ids)refreshAvatar(id);}});
+ let migrationBackup;try{migrationBackup=migrateStatistics(db,directory);if(!db.prepare('PRAGMA table_info(stat_participants)').all().some(c=>c.name==='score_components')){const backups=path.join(directory,'backups');fs.mkdirSync(backups,{recursive:true,mode:0o700});db.prepare('VACUUM INTO ?').run(path.join(backups,'registry-before-match-score-'+randomUUID()+'.sqlite'));}db.exec('BEGIN IMMEDIATE');try{migrateScores(db);migrateReplays(db);migrateReview(db);migrateFeedback(db);db.exec('COMMIT');}catch(e){db.exec('ROLLBACK');throw e;}}catch(error){db.close();throw error;}const feedback=feedbackStore(db,{now});const review=reviewStore(db,{now});db.exec('BEGIN IMMEDIATE');try{review.backfill();db.exec('COMMIT');}catch(e){db.exec('ROLLBACK');db.close();throw e;}const statistics=statisticsStore(db,{review,onFinalized:ids=>{for(const id of ids)refreshAvatar(id);}});
  const q=(sql,...args)=>db.prepare(sql).get(...args),run=(sql,...args)=>db.prepare(sql).run(...args);
  const tx=fn=>{db.exec('BEGIN IMMEDIATE');try{const result=fn();db.exec('COMMIT');return result;}catch(e){db.exec('ROLLBACK');throw e;}};
  // Existing reserved columns suffice; only unset legacy defaults receive the stable Peasant fallback.
@@ -37,7 +39,7 @@ export function openRegistry(directory,{now=Date.now}={}){
   if(!a.avatar_unlocked){const wins=db.prepare("SELECT value FROM stat_career WHERE player_id=? AND mode IN ('Single Player','Duel','3 Players','4 Players')").all(id).reduce((n,r)=>n+(JSON.parse(r.value).wins||0),0),progress=q('SELECT progress_json FROM story_progress WHERE player_id=?',id);if(wins>=5||progress&&JSON.parse(progress.progress_json).finished===true){run('UPDATE accounts SET avatar_unlocked=1 WHERE id=?',id);a.avatar_unlocked=1;}}
   return a;
  }
- function ownAccount(a){return accountView(refreshAvatar(a.id));}
+ function ownAccount(a){return {...accountView(refreshAvatar(a.id)),reviewNotice:review.notice(a.id)};}
  function validateAvatar(id,unlocked=false){const a=avatarById(id);if(!a||!(a.access==='peasant'||a.access==='hero'&&unlocked))fail('Avatar is not available for this account.');return a.id;}
  function rate(key,max,period){const t=now();run('DELETE FROM limits WHERE reset <= ?',t);const old=q('SELECT * FROM limits WHERE key=?',key);if(old?.count>=max)fail('Too many attempts. Please try again later.',429);run('INSERT INTO limits VALUES(?,?,?) ON CONFLICT(key) DO UPDATE SET count=count+1',key,1,t+period);}
  function streak(id){const a=q('SELECT * FROM accounts WHERE id=?',id),day=new Date(now()).toISOString().slice(0,10);let changed=false;if(!a.last_day||day>a.last_day){const yesterday=new Date(now()-86400000).toISOString().slice(0,10),count=a.last_day===yesterday?a.streak+1:1;run('UPDATE accounts SET streak=?,longest_streak=?,last_day=?,last_login=? WHERE id=?',count,Math.max(count,a.longest_streak),day,now(),id);changed=true;}return {account:ownAccount(q('SELECT * FROM accounts WHERE id=?',id)),newDay:changed};}
@@ -48,8 +50,23 @@ export function openRegistry(directory,{now=Date.now}={}){
  const storyProgress=id=>{const row=q('SELECT progress_json FROM story_progress WHERE player_id=?',id);return row?JSON.parse(row.progress_json):null;};
  const storyState=id=>{const row=q('SELECT * FROM story_runs WHERE player_id=?',id),old=storyProgress(id);return row?{runId:row.run_id,progress:JSON.parse(row.progress_json),lifetime:mergeStoryUnlocks(JSON.parse(row.lifetime_json),storyUnlocks(old))}:{runId:'legacy',progress:old,lifetime:storyUnlocks(old)};};
  const saveRun=(id,state)=>run('INSERT INTO story_runs VALUES(?,?,?,?) ON CONFLICT(player_id) DO UPDATE SET run_id=excluded.run_id,progress_json=excluded.progress_json,lifetime_json=excluded.lifetime_json',id,state.runId,JSON.stringify(state.progress),JSON.stringify(state.lifetime));
- return {file,statistics,migrationBackup,storyProgress,storyState,completeStory:(id,progress,runId='legacy')=>tx(()=>{if(!q('SELECT id FROM accounts WHERE id=? AND status=?',id,'active'))return;const current=storyState(id);if(current.runId!==runId)return;saveRun(id,{...current,progress:!current.progress||progress.battle>=current.progress.battle?progress:current.progress,lifetime:mergeStoryUnlocks(current.lifetime,storyUnlocks(progress))});run('INSERT INTO story_progress VALUES(?,?,?,?) ON CONFLICT(player_id) DO UPDATE SET battle=excluded.battle,progress_json=excluded.progress_json,updated_at=excluded.updated_at WHERE excluded.battle>=story_progress.battle',id,progress.battle,JSON.stringify(progress),now());refreshAvatar(id);}),close:()=>db.close(),publicAccount,identity:token=>multiplayerIdentity(session(token)),identityById:id=>multiplayerIdentity(q('SELECT * FROM accounts WHERE id=? AND status=?',id,'active')),
- async handle(action,b,{token,browser,ip}){
+ return {file,statistics,recordRejectedReview:review.rejected,migrationBackup,storyProgress,storyState,completeStory:(id,progress,runId='legacy')=>tx(()=>{if(!q('SELECT id FROM accounts WHERE id=? AND status=?',id,'active'))return;const current=storyState(id);if(current.runId!==runId)return;saveRun(id,{...current,progress:!current.progress||progress.battle>=current.progress.battle?progress:current.progress,lifetime:mergeStoryUnlocks(current.lifetime,storyUnlocks(progress))});run('INSERT INTO story_progress VALUES(?,?,?,?) ON CONFLICT(player_id) DO UPDATE SET battle=excluded.battle,progress_json=excluded.progress_json,updated_at=excluded.updated_at WHERE excluded.battle>=story_progress.battle',id,progress.battle,JSON.stringify(progress),now());refreshAvatar(id);}),close:()=>db.close(),publicAccount,identity:token=>multiplayerIdentity(session(token)),identityById:id=>multiplayerIdentity(q('SELECT * FROM accounts WHERE id=? AND status=?',id,'active')),
+ async handle(action,b,{token,browser,ip,feedbackContext={}}){
+  if(action==='feedback-submit'){const a=session(token);rate('feedback:'+(a?.id||hash(browser||'anonymous')),10,3600000);return tx(()=>feedback.submit(b,{...feedbackContext,playerId:a?.id||null}));}
+  if(action.startsWith('dev-feedback-')){const a=session(token);if(!a||!['developer','admin'].includes(a.moderation_role))fail('Developer access required.',403);
+   if(action==='dev-feedback-list'&&Object.keys(b).every(k=>['type','status','offset'].includes(k)))return {items:feedback.list(b)};
+   if(action==='dev-feedback-get'&&Object.keys(b).join(',')==='id')return feedback.get(b.id);
+   if(action==='dev-feedback-status'&&Object.keys(b).sort().join(',')==='id,status')return tx(()=>feedback.mark(b.id,b.status,a.id));
+   fail('Invalid feedback request.');
+  }
+  if(action==='review-notice'){if(Object.keys(b).length)fail('Invalid request.');const a=session(token);return {notice:a?review.notice(a.id):null,playerId:a?.id||null};}
+  if(action.startsWith('dev-review-')){const a=session(token);if(!a||!['developer','admin'].includes(a.moderation_role))fail('Developer access required.',403);
+   if(action==='dev-review-search'&&Object.keys(b).every(k=>['metric','limit'].includes(k)))return review.search(b);
+   if(action==='dev-review-account'&&Object.keys(b).join(',')==='playerId'&&typeof b.playerId==='string')return review.account(b.playerId);
+   if(action==='dev-review-match'&&Object.keys(b).join(',')==='matchId'&&typeof b.matchId==='string')return review.detail(b.matchId);
+   if(action==='dev-review-decide'&&Object.keys(b).sort().join(',')==='action,playerId'&&typeof b.playerId==='string')return tx(()=>review.decide(b.playerId,a.id,b.action));
+   fail('Invalid review request.');
+  }
   if(action==='profile-view')return profileReadModel(db,statistics,session(token)?.id,b);
   if(action==='story-restart'){if(Object.keys(b).length)fail('Invalid Story restart request.');const a=session(token);if(!a)fail('Log in to restart account Story.',401);return tx(()=>{const state={...storyState(a.id),runId:randomUUID(),progress:null};saveRun(a.id,state);return {playerId:a.id,...state};});}
   if(action==='story-progress'){if(Object.keys(b).length)fail('Invalid Story progress request.');const a=session(token);return {playerId:a?.id||null,...(a?storyState(a.id):{progress:null,lifetime:null,runId:null})};}
@@ -65,6 +82,17 @@ export function openRegistry(directory,{now=Date.now}={}){
    rate('login-ip:'+ip,80,900000);let k;try{k=nameKey(b.username)[1];}catch{fail('Incorrect username or password.',401);}rate('login-name:'+k,20,900000);if(typeof b.password!=='string'||b.password.length>256)fail('Incorrect username or password.',401);const a=q('SELECT * FROM accounts WHERE username_key=?',k),derived=await key(b.password,a?.salt||'00000000000000000000000000000000');if(!a||!timingSafeEqual(derived,Buffer.from(a.password_hash,'hex'))||a.status!=='active')fail('Incorrect username or password.',401);return tx(()=>loginSession(a.id,token));
   }
   const a=session(token);if(!a)fail('Please log in again.',401);
+  if(action==='save-battle')return tx(()=>{
+   if(Object.keys(b).some(k=>!['matchId','replaceOldest'].includes(k))||typeof b.matchId!=='string'||b.matchId.length>200||b.replaceOldest!==undefined&&typeof b.replaceOldest!=='boolean')fail('Invalid saved battle request.');
+   if(q('SELECT 1 FROM profile_saved_battles WHERE player_id=? AND match_id=?',a.id,b.matchId))return {saved:true};
+   const count=q('SELECT count(*) n FROM profile_saved_battles WHERE player_id=?',a.id).n;
+   if(count>=10&&!b.replaceOldest)return {full:true};
+   const result=profileReadModel(db,statistics,a.id,{section:'result',matchId:b.matchId}),replay=profileReadModel(db,statistics,a.id,{section:'replay',matchId:b.matchId});
+   const recent=statistics.recentBattles(a.id).find(r=>r.matchId===b.matchId);if(!recent)fail('This battle is no longer available to save.');
+   const summary={matchId:b.matchId,date:recent.endedAt,mode:recent.mode,format:recent.format,outcome:recent.outcome,placement:recent.placement,score:recent.matchScore,participants:recent.participants,resultAvailable:true,replayAvailable:true,saved:true};
+   if(count>=10)run('DELETE FROM profile_saved_battles WHERE player_id=? AND match_id=(SELECT match_id FROM profile_saved_battles WHERE player_id=? ORDER BY saved_at,match_id LIMIT 1)',a.id,a.id);
+   run('INSERT INTO profile_saved_battles VALUES(?,?,?,?,?,?)',a.id,b.matchId,now(),JSON.stringify(summary),JSON.stringify(result),JSON.stringify(replay));return {saved:true};
+  });
   if(action==='avatar')return tx(()=>{if(Object.keys(b).length!==1||!Object.hasOwn(b,'avatarId'))fail('Invalid avatar request.');const current=refreshAvatar(a.id),id=validateAvatar(b.avatarId,!!current.avatar_unlocked);run('UPDATE accounts SET avatar_id=? WHERE id=?',id,a.id);return {account:ownAccount(q('SELECT * FROM accounts WHERE id=?',a.id))};});
   if(action==='profile')return tx(()=>{const current=q('SELECT * FROM accounts WHERE id=?',a.id);if(Object.keys(b).some(k=>!['displayName','country','confirmCountryChange','bio','email'].includes(k)))fail('Unsupported profile field.');
    if(b.displayName!==undefined&&b.displayName!==current.display_name){const [n,k]=nameKey(b.displayName);if(current.name_changes>0&&current.qualifying_games<current.next_name_at)fail(`You need to fully play ${current.next_name_at-current.qualifying_games} more games to change your name.`);if(q('SELECT id FROM accounts WHERE display_key=? AND id<>?',k,a.id))fail('Display name is already taken.');run('UPDATE accounts SET display_name=?,display_key=?,name_changes=name_changes+1,next_name_at=qualifying_games+100 WHERE id=?',n,k,a.id);}

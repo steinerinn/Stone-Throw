@@ -45,7 +45,7 @@ export interface KnownContact {id:ContactId;unitType:UnitType|null;cells:Cell[];
 export interface Clue {kind:'monk-candidates'|'resurrection-search'|'hero-search'|'elf-scout';cells:Cell[]}
 export interface BoardKnowledge {boardId:BoardId;cells:KnownCell[];contacts:KnownContact[];clues:Clue[]}
 /** Public event payloads contain no raw text, server event ID, or private unit reference. */
-export interface VisibleEvent {sequence:number;kind:'impact'|'miss'|'unit-disclosed'|'resurrection-announced'|'hero-moved'|'plague-observed'|'resurrection-rejected'|'resurrection-found';boardId:BoardId;cell:Cell|null;unitType:UnitType|null;contactId:ContactId|null}
+export interface VisibleEvent {sequence:number;kind:'impact'|'miss'|'unit-disclosed'|'archer-no-shot'|'resurrection-announced'|'hero-moved'|'plague-observed'|'resurrection-rejected'|'resurrection-found';boardId:BoardId;cell:Cell|null;unitType:UnitType|null;contactId:ContactId|null}
 export interface VisibleStat {kind:'shots'|'observed-hits';playerId:PlayerId;value:number}
 export interface VisibleDecision {sequence:number;kind:DecisionKind;boardId:BoardId;candidates:Cell[];remaining:number|null}
 export interface ObserverKnowledge {boards:Record<string,BoardKnowledge>;events:VisibleEvent[];stats:VisibleStat[];decisions:VisibleDecision[];turn:{phase:Phase;activePlayerId:PlayerId|null;round:number}|null;outcome:Outcome|null}

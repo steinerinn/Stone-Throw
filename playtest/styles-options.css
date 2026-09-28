@@ -1,0 +1,27 @@
+#stSettings.st-settings{width:min(500px,calc(100vw - 24px));box-sizing:border-box;max-height:calc(100dvh - 24px);overflow:auto;padding:22px;background:linear-gradient(145deg,#1d272d,#0c1418);border:1px solid #a58a4c;border-radius:0;box-shadow:0 18px 70px #0009;color:#eee1c0}
+#stSettings.st-menu-settings{left:50%;top:50%;right:auto;transform:translate(-50%,-50%)}
+#stSettings .st-settings-title{font:24px Georgia,serif;letter-spacing:2px;text-align:center;margin:0 0 15px;color:#e8c983}
+#stSettings section{border-top:1px solid #89723f66;padding:12px 0;margin:0}
+#stSettings h3{font:12px Georgia,serif;letter-spacing:1.5px;color:#cbb477;margin:0 0 9px;display:flex;align-items:center;justify-content:space-between}
+#stSettings .st-setting-row{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:7px 0;font:14px Arial,sans-serif}
+#stSettings .st-setting-row>span:last-child{display:flex;align-items:center;gap:8px}
+#stSettings button,#stSettings a.st-settings-menu-btn{box-sizing:border-box;border:1px solid #887344;border-radius:0;background:linear-gradient(#273138,#172126);color:#e8d29b;font:12px Georgia,serif;padding:8px 10px;cursor:pointer;text-decoration:none;box-shadow:none}
+#stSettings button:hover,#stSettings a:hover{border-color:#e0bf74;background:#303b40}
+#stSettings button:focus-visible,#stSettings a:focus-visible,#stSettings input:focus-visible{outline:2px solid #f0cd79;outline-offset:2px}
+#stSettings .st-toggle{min-width:48px;padding:7px 9px}#stSettings .st-toggle[aria-pressed=true]{color:#bdddaf;border-color:#6e9362;background:#1c3226}
+#stSettings .st-mini-reset{font-size:10px;padding:7px}
+#stSettings .cs-options-general>.st-setting-row:first-of-type{flex-wrap:wrap}
+#stSettings .cs-options-general>.st-setting-row:first-of-type>span{flex:1}
+#stSettings .cs-options-general .st-btn{flex-basis:100%;text-align:center}
+#stSettings #csAudioOptions{margin:0}
+#stSettings #csAudioExpand{font:10px Arial,sans-serif;padding:5px 8px}
+#stSettings .cs-audio-row{display:grid;grid-template-columns:76px 48px minmax(60px,1fr) 30px;align-items:center;gap:10px;margin:9px 0;font:12px Arial,sans-serif}
+#stSettings .cs-audio-row label{font:11px Arial,sans-serif;color:#d8d4c3}
+#stSettings .cs-audio-row input{width:100%;min-width:0;margin:0;accent-color:#c2a052;height:24px}
+#stSettings .cs-audio-row output{text-align:right;font-variant-numeric:tabular-nums;color:#e8cc91}
+#stSettings #csAudioChannels[hidden]{display:none}
+#stSettings .cs-options-support .st-setting-row,#stSettings .st-settings-menu-btn{width:100%}
+#stSettings #stMainMenuFromSettings{margin-top:4px;padding:11px;background:#302a1b;border-color:#b6964e}
+@media(max-width:600px){#stSettings.st-settings{padding:18px 14px}#stSettings .cs-audio-row{grid-template-columns:65px 44px minmax(50px,1fr) 27px;gap:7px}#stSettings .st-settings-title{font-size:22px}}
+#stSettings.st-settings.st-menu-settings{width:min(500px,calc(100vw - 24px))!important}
+#stSettings.st-settings.st-menu-settings::before{display:none}

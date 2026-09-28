@@ -9,7 +9,12 @@ export function coverRematch(){
  if(!source||document.getElementById('stRematchTransition'))return async()=>{};
  const cover=document.createElement('div');cover.id='stRematchTransition';
  Object.assign(cover.style,{position:'fixed',inset:'0',zIndex:'100010',background:'#090e11',overflow:'hidden'});
- const copy=source.cloneNode(true);copy.removeAttribute('id');copy.querySelectorAll('[id]').forEach(n=>n.removeAttribute('id'));copy.setAttribute('inert','');copy.setAttribute('aria-hidden','true');cover.append(copy);document.body.append(cover);copy.scrollTop=source.scrollTop;
+ const copy=source.cloneNode(true);
+ // The old client removes its stylesheet during remount. Freeze the rendered
+ // styles so portraits, flags and podiums cannot revert to intrinsic sizes.
+ const originals=[source,...source.querySelectorAll('*')],copies=[copy,...copy.querySelectorAll('*')];
+ for(let i=0;i<originals.length;i++){const computed=getComputedStyle(originals[i]);for(const property of computed)copies[i].style.setProperty(property,computed.getPropertyValue(property));copies[i].style.animation='none';copies[i].style.transition='none';}
+ copy.style.animation='none';copy.style.transition='none';copy.style.opacity='1';copy.style.transform='none';copy.classList.remove('cs-result-outro');copy.removeAttribute('id');copy.querySelectorAll('[id]').forEach(n=>n.removeAttribute('id'));copy.setAttribute('inert','');copy.setAttribute('aria-hidden','true');cover.append(copy);document.body.append(cover);copy.scrollTop=source.scrollTop;
  return async()=>{await new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r)));cover.remove();};
 }
 function popup(id){styles();const box=document.createElement('div');box.id=id;box.className='st-mp-overlay';box.innerHTML='<section class="st-mp-dialog st-frame" role="dialog" aria-modal="true"><h2></h2><p class="st-mp-clock" role="timer"></p><div class="st-mp-actions"></div><p class="st-mp-error" role="alert"></p></section>';document.body.append(box);return box;}

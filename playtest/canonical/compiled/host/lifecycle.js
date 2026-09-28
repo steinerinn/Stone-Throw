@@ -1,3 +1,5 @@
+import { shotAudit } from './shot-audit.js';
+import { recordEliminationScores } from './elimination-score.js';
 import { observeRevolt, startRevoltTurn, finishRevoltRound, settleRevolt } from './revolt.js';
 import { beginChaosBoundary, observeChaosBoundary, settleChaos } from './chaos.js';
 import { processedChainCells } from '../combat/chain-statistics.js';
@@ -38,7 +40,8 @@ function collect(h) {
         }
     }
 }
-function terminal(h, execution) { h.status = 'complete'; h.turnStep = 'finish'; h.pendingPolicyCells = []; execution?.normalTerminalMessage?.(h); refreshHost(h); }
+function terminal(h, execution) { if (!h.state.ring && h.state.match.outcome.kind !== 'ongoing')
+    recordEliminationScores(h, h.state.match.outcome.kind === 'win' ? h.state.match.outcome.eliminatedIds : h.config.players.map(p => p.id)); h.status = 'complete'; h.turnStep = 'finish'; h.pendingPolicyCells = []; execution?.normalTerminalMessage?.(h); refreshHost(h); }
 function nextTurn(h) { const order = h.state.ring?.order || h.config.players.map(p => p.id), next = order[(order.indexOf(h.activePlayerId) + 1) % order.length]; if (next === h.starterId)
     h.round++; h.activePlayerId = next; h.turnIndex++; h.turnStep = 'enter'; h.guards.turnActions = 0; h.status = 'awaiting-turn'; h.lastProbeSkippedPlague = false; }
 function budget(h) { const p = seat(h.state, h.activePlayerId), hero = h.state.match.units.find(u => u.ownerId === p.playerId && u.type === 'hero'); p.ordinaryShots = p.nextShots + (hero?.hero?.activated && hero.hero.currentCell ? 1 : 0); p.nextShots = 2; }
@@ -171,7 +174,7 @@ export function acceptCommand(host, command, execution) {
         throw Error('Duplicate command');
     if (!/^[A-Za-z0-9_-]{1,96}$/.test(command.id))
         throw Error('Invalid command ID');
-    const h = cloneHost(host), rngBefore = h.rng.cursor, eventStart = h.events.length;
+    const h = cloneHost(host), rngBefore = h.rng.cursor, eventStart = h.events.length, audit = command.kind === 'shoot' ? shotAudit(h, command) : undefined;
     if (command.kind === 'place')
         place(h, command.placement);
     else if (command.kind === 'start') {
@@ -245,7 +248,7 @@ export function acceptCommand(host, command, execution) {
             pumpHost(h, 100000, execution);
         }
     }
-    h.history.push({ sequence: h.history.length + 1, command: structuredClone(command), rngBefore, rngAfter: h.rng.cursor, eventStart, eventEnd: h.events.length });
+    h.history.push({ ...(audit ? { shotAudit: audit } : {}), sequence: h.history.length + 1, command: structuredClone(command), rngBefore, rngAfter: h.rng.cursor, eventStart, eventEnd: h.events.length });
     refreshHost(h);
     return h;
 }

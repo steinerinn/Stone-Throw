@@ -6,3 +6,62 @@
 .cs-profile .cs-replay-board{height:auto;width:min(100%,370px);max-width:100%;aspect-ratio:auto}.cs-profile .cs-replay-grid{height:auto;width:100%;aspect-ratio:1}.cs-profile .cs-replay-boards{align-items:flex-start}
 .cs-profile .cp-historical{animation:none}.cs-profile .cp-historical:before{display:none}.cs-profile .cp-historical .cs-podium{width:100%;margin:10px auto;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;align-items:center;justify-items:center}.cs-profile .cp-historical .cs-place{grid-area:auto;width:100%;height:auto;min-height:0;margin:0;display:flex;flex-direction:column;align-items:center}.cs-profile .cp-historical .cs-podium-people{padding:0;transform:none;gap:6px;width:100%}.cs-profile .cp-historical .cs-podium-person{width:100px}.cs-profile .cp-historical .cs-portrait{height:60px;width:60px;margin:auto}.cs-profile .cp-historical .cs-platform{position:relative;width:100%;max-width:260px;padding:0 0 35px;margin:0}.cs-profile .cp-historical .cs-platform-art{height:100px;max-height:100px;width:100%;object-fit:contain}.cs-profile .cp-historical .cs-platform strong{top:40%;font-size:25px}.cs-profile .cp-historical .cs-place-scores{position:absolute;bottom:0;left:0;right:0;font-size:12px}.cs-profile .cp-historical .cs-awards{display:grid;grid-template-columns:1fr 1fr}.cs-profile .cp-historical[data-page="0"] .cs-awards,.cs-profile .cp-historical[data-page="1"] .cs-podium{display:none!important}.cs-profile .cp-historical .cs-result-actions{flex-shrink:0}.cs-profile .cp-historical .cs-result-button{min-height:36px;padding:10px}.cs-profile .cp-historical .cs-match-score{font-size:14px}@media(max-width:699px){.cs-profile .cp-historical .cs-platform-art{height:65px}.cs-profile .cp-historical .cs-portrait{height:45px;width:45px}.cs-profile .cp-historical .cs-podium-person{width:75px}.cs-profile .cp-historical .cs-place-scores{font-size:11px}.cs-profile .cp-historical .cs-podium{gap:5px}}
 .cs-profile.cp-card{height:fit-content;grid-template-rows:auto auto}.cs-profile .cp-historical .cs-platform{aspect-ratio:auto;inset:auto;padding:0}.cs-profile .cp-historical .cs-place-scores{position:static;inset:auto;line-height:1.3}.cs-profile .cp-historical .cs-podium{align-items:start;row-gap:16px;max-height:none}.cs-profile .cp-historical .cs-platform strong{top:50px}.cs-profile .cp-historical .cs-participant-score{margin:3px 0}@media(max-width:699px){.cs-profile .cp-historical .cs-platform strong{top:33px}}
+.cs-profile .cp-tabs{grid-template-columns:1fr 1fr}
+.cs-profile .cp-body{overflow:auto}
+.cs-profile .cp-connections{display:block}
+.cs-profile .cp-friend{display:flex;align-items:center;gap:8px;margin:7px 0;font-size:12px}
+.cs-profile .cp-friend img{width:21px;height:15px;object-fit:contain}
+.cs-profile .cp-friend-link{border:0;background:none;padding:0;color:#e5c67e;text-decoration:underline;text-underline-offset:3px}
+.cp-streak{margin-top:18px;border:1px solid #796138;padding:12px;background:#10191e}
+.cp-save-confirm{max-width:min(520px,90vw);padding:24px;background:#142027;color:#ead19b;border:1px solid #b6964e}.cp-save-confirm::backdrop{background:#000b}.cp-save-confirm h2{font:20px Georgia,serif}.cp-save-confirm button{margin:8px;padding:10px;border:1px solid #a88b4c;background:#263239;color:#ead19b}
+.cs-profile .cp-historical{position:relative;inset:auto;height:auto;min-height:0;overflow:visible;display:block;padding:12px;background:#0b1419}
+.cs-profile .cp-historical .cs-result-heading{margin:0;padding:0}.cs-profile .cp-historical .cs-result-heading h1{font-size:28px}
+.cs-profile .cp-historical .cs-podium{display:flex!important;align-items:flex-end;justify-content:center;gap:14px;width:100%;height:auto;min-height:0;margin:14px 0}
+.cs-profile .cp-historical .cs-place{position:relative!important;inset:auto!important;transform:none!important;flex:1;max-width:230px;display:flex;flex-direction:column;align-items:center;gap:3px}
+.cs-profile .cp-historical .cs-podium-people{position:static!important;inset:auto!important;transform:none!important;display:flex;justify-content:center;margin:0;padding:0}
+.cs-profile .cp-historical .cs-platform{position:relative!important;inset:auto!important;width:100%;height:95px;max-width:200px;margin:0;padding:0}
+.cs-profile .cp-historical .cs-platform-art{position:static!important;width:100%;height:95px;max-height:95px;object-fit:contain}
+.cs-profile .cp-historical .cs-platform strong{position:absolute;top:45%;left:0;right:0;font-size:23px}
+.cs-profile .cp-historical .cs-place-scores{position:static!important;inset:auto!important;margin:3px 0;font-size:11px}
+.cs-profile .cp-historical .cs-awards{display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:10px 0}
+.cs-profile .cp-historical .cs-award{padding:10px 8px 10px 62px;min-height:76px;width:auto}
+.cs-profile .cp-historical .cs-award-seal{display:block!important;left:7px;top:10px;width:45px;height:52px}
+.cs-profile .cp-historical .cs-award h3{font-size:12px}.cs-profile .cp-historical .cs-result-actions{position:static;display:flex;justify-content:center;margin-top:12px}
+@media(max-width:699px){.cs-profile .cp-historical .cs-podium{display:grid!important;grid-template-columns:1fr 1fr!important}.cs-profile .cp-historical .cs-awards{grid-template-columns:1fr 1fr}.cs-profile .cp-historical .cs-award{padding:8px 8px 8px 44px}.cs-profile .cp-historical .cs-award-seal{width:28px;height:33px}.cs-profile .cp-historical .cs-result-actions{flex-wrap:wrap}}
+.cs-profile .cp-historical.cs-results{height:auto!important;overflow:visible!important;display:block!important}
+.cs-profile .cp-historical .cs-podium{flex:none;max-height:none}
+.cs-profile .cp-row-actions{flex-wrap:wrap}
+
+.cs-profile .cp-connections{columns:auto}
+.cs-profile .cp-historical .cs-place{height:auto!important;min-height:0!important;margin:0!important}
+.cs-profile .cp-historical .cs-podium-people{padding:0!important;gap:6px!important}
+.cs-profile .cp-historical .cs-podium-person{width:100px!important}
+.cs-profile .cp-historical .cs-portrait{height:60px!important;width:60px!important}
+
+.cp-saved-section{margin-top:18px}
+
+.cs-profile .cp-friend-rank{min-width:22px;color:#dbb76d;font-weight:bold}
+
+.cp-profile-intro{display:flex;align-items:center;gap:12px;margin-bottom:14px}.cp-profile-intro .cp-identity{flex:1;min-width:0;margin-bottom:0}.cp-profile-intro .cp-streak{flex:0 0 210px;margin-top:0;padding:10px;font-size:12px}.cp-profile-intro .cp-streak h2{font-size:14px}.cp-profile-intro .cp-streak p{line-height:1.35;margin-bottom:6px}.cp-profile-intro .cp-streak p:last-child{margin-bottom:0}.cp-profile-intro .cp-identity{gap:10px}.cp-profile-intro .cp-avatar-wrap{width:88px}
+
+.cs-profile .cp-connections{display:grid;grid-template-columns:1fr 1fr;gap:14px;align-items:start}.cp-award-grid{display:grid;gap:5px}.cp-award-count{display:grid;grid-template-columns:28px minmax(0,1fr) auto;gap:7px;align-items:center;font:12px Arial,sans-serif;min-height:29px}.cp-award-count .cs-medal{display:block;width:27px;height:29px}.cp-award-count strong{color:#f0d28d;font:15px Georgia,serif}.cp-award-note{font:11px Arial,sans-serif;color:#b7b9b5;margin-top:8px!important}.cp-award-counts h2{font-size:14px}@media(max-width:699px){.cp-award-counts{margin-top:16px}}
+
+.cs-profile .cp-connections{margin-top:8px}.cs-profile .cp-connections .cp-tiles{grid-template-columns:1fr;margin:0 0 12px}.cs-profile .cp-connections .cp-award-grid{gap:3px}.cs-profile .cp-connections .cp-award-count{min-height:27px}
+
+@media(min-width:700px) and (max-height:850px){.cs-profile .cp-tiles>div{padding:7px 9px}.cs-profile .cp-tiles dd{font-size:17px;margin-top:3px}.cs-profile .cp-connections{gap:10px}.cs-profile .cp-friend{margin:5px 0}.cs-profile .cp-award-count{min-height:24px}.cs-profile .cp-award-count .cs-medal{width:24px;height:25px}}
+
+.cs-profile .cp-connections .cp-award-grid{grid-template-columns:1fr 1fr;gap:7px 10px}.cs-profile .cp-connections .cp-award-count{grid-template-columns:25px 1fr;gap:3px 5px;font-size:11px}.cs-profile .cp-connections .cp-award-count strong{grid-column:2;font-size:12px}.cs-profile .cp-award-note{margin:0 0 7px!important}.cs-profile .cp-badges .cp-earned-badge{height:15px;border:0;border-radius:0;opacity:1}
+
+.cs-profile .cp-connections .cp-award-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:10px 6px}.cs-profile .cp-connections .cp-award-count{grid-template-columns:25px minmax(0,1fr)}.cs-profile .cp-connections .cp-award-count>span:not(.cs-medal){position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%)}.cs-profile .cp-connections .cp-award-count strong{grid-column:auto;white-space:nowrap}
+
+.cs-profile .cp-awards-total{font:12px Arial,sans-serif;color:#c7c4b7;margin:10px 0}.cs-profile .cp-profile-intro .cp-streak{background:linear-gradient(125deg,#30291b,#111c21 65%);border:1px solid #99763b;box-shadow:inset 0 0 0 3px #131a1c;padding:10px 12px}.cp-streak h2{letter-spacing:1.5px;font-size:12px!important;margin-bottom:4px!important}.cp-streak-current{display:flex;align-items:center;gap:10px;color:#f4d38b}.cp-streak-current>strong{font:36px Georgia,serif;line-height:1.1}.cp-streak-current>span{font:10px Arial,sans-serif;letter-spacing:1px}.cp-streak-records{display:flex;gap:14px;border-top:1px solid #756039;margin-top:6px;padding-top:6px}.cp-streak-records>div{display:grid;gap:3px}.cp-streak-records span{font:8px Arial,sans-serif;letter-spacing:.5px;color:#b8aa8d}.cp-streak-records strong{font:12px Georgia,serif;color:#e6cc92}.cp-award-count:focus-visible,.cp-badges>span:focus-visible{outline:1px solid #e8c477;outline-offset:3px}
+
+/* Metal finishes preserve the existing six award silhouettes and sprite artwork. */
+.cs-profile .cs-medal[data-tier=locked]{filter:grayscale(1);opacity:.45}
+.cs-profile .cs-medal[data-tier=bronze]{filter:grayscale(1) sepia(1) saturate(2.4) hue-rotate(345deg) brightness(.8)}
+.cs-profile .cs-medal[data-tier=silver]{filter:grayscale(1) brightness(1.35) contrast(1.1)}
+.cs-profile .cs-medal[data-tier=gold]{filter:grayscale(1) sepia(1) saturate(3.5) brightness(1.12)}
+.cs-profile .cs-medal[data-tier=platinum]{filter:grayscale(1) sepia(.45) saturate(2.5) hue-rotate(145deg) brightness(1.65) contrast(1.15)}
+
+/* Stored replay: two battlefields per page, using canonical cell artwork. */
+.cs-profile .cs-replay-boards{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));align-content:start;gap:14px;overflow:auto}.cs-profile .cs-replay-board{height:auto;min-width:0;aspect-ratio:auto}.cs-profile .cs-replay-grid{width:100%;height:auto;max-width:370px;aspect-ratio:1}.cs-profile .cs-replay-board h3{height:36px;display:flex;align-items:center;justify-content:center;font-size:14px}.cs-profile .cs-replay-grid .cell{min-width:0;min-height:0}.cs-profile .cs-replay-slot{height:calc(100% - 95px)}

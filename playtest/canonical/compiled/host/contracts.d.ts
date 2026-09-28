@@ -59,7 +59,17 @@ export type HostCommand = {
     kind: 'answer';
     answer: DecisionCommand;
 };
+export interface ShotAudit {
+    version: 1;
+    unitId: UnitId | null;
+    unitType: UnitType | null;
+    core: boolean;
+    hit: boolean;
+    previouslyKnown: boolean;
+    unitPreviouslyKnown: boolean;
+}
 export interface HostRecord {
+    shotAudit?: ShotAudit;
     sequence: number;
     command: HostCommand;
     rngBefore: number;

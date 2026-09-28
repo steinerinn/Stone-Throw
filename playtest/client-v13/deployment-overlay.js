@@ -1,3 +1,6 @@
+import {renderReliability} from './reliability-bar.js';
+const reliabilityCache=new Map();
+function seatReliability(id,host){let entry=reliabilityCache.get(id);if(!entry||Date.now()-entry.time>60000){entry={time:Date.now(),promise:fetch('/api/registry/profile-view',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({playerId:id,section:'reliability'})}).then(r=>{if(!r.ok)throw Error();return r.json();}).then(r=>r.reliability)};reliabilityCache.set(id,entry);}entry.promise.then(r=>{if(host.isConnected)renderReliability(host,r,{vertical:true});}).catch(()=>{host.remove();reliabilityCache.delete(id);});}
 // Observer-safe identity/readiness only; never placement contents or credentials.
 let overlay,remaining=0,synced=0;
 function positionPanel(){
@@ -32,7 +35,7 @@ export function paintDeployment(meta,snapshot){
   const identity=document.createElement('div');identity.className='cs-deployment-name';if(p?.playerId&&!ai){identity.dataset.profileId=p.playerId;identity.tabIndex=0;identity.setAttribute('role','button');identity.setAttribute('aria-label','View '+meta.names[i]+' player card');const portrait=row.querySelector('img');if(portrait){portrait.dataset.profileId=p.playerId;portrait.tabIndex=0;portrait.setAttribute('role','button');portrait.setAttribute('aria-label','View '+meta.names[i]+' player card');}}
   if(!ai&&!waiting&&/^[A-Z]{2}$/.test(p?.country||'')){const flag=document.createElement('img');flag.className='cs-deployment-flag';flag.src='/assets/ui/flags/'+p.country.toLowerCase()+'.svg';flag.alt=p.country;identity.append(flag);}
   const name=document.createElement('span');name.textContent=waiting?'Waiting for PLAYER':(meta.names[i]||'PLAYER')+(ai?' (AI)':'');identity.append(name);row.append(identity);
-  const ready=document.createElement('strong');ready.className='cs-deployment-ready';ready.textContent=meta.ready[i]?'READY':'NOT READY';row.append(ready);rows.append(row);
+  const ready=document.createElement('strong');ready.className='cs-deployment-ready';ready.textContent=meta.ready[i]?'READY':'NOT READY';row.append(ready);rows.append(row);if(p?.playerId&&!ai&&!waiting&&!String(meta.code||'').startsWith('local-')){row.classList.add('cs-has-reliability');const meter=document.createElement('aside');meter.className='cs-seat-reliability';meter.setAttribute('aria-label','Online player reliability');row.append(meter);seatReliability(p.playerId,meter);}
  }
  positionPanel();
 }

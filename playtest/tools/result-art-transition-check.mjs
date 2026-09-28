@@ -8,6 +8,7 @@ try{
  await p.route('**/result-fixture',r=>r.fulfill({contentType:'text/html',body:`<img id="art"><script type="module">import {setResultArt} from '/client-v13/result-screen.js';window.show=o=>setResultArt(document.getElementById('art'),o);window.ready=true;</script>`}));
  await p.goto(app.origin+'/result-fixture');await p.waitForFunction(()=>window.ready);
  await p.evaluate(()=>show('loss'));await p.waitForFunction(()=>document.getElementById('art').style.visibility==='visible');checks++;
+ await p.evaluate(()=>show('ongoing'));assert.equal(await p.locator('#art').getAttribute('src'),null);assert.equal(await p.locator('#art').evaluate(e=>e.style.visibility),'hidden');checks+=2;
  for(const outcome of ['win','loss','draw']){
   const filename=outcome==='loss'?'lose':outcome;let release;const gate=new Promise(r=>release=r);
   await p.route('**/assets/results/'+filename+'.svg',async r=>{await gate;await r.continue();});

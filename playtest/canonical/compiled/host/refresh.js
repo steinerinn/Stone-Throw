@@ -38,6 +38,13 @@ export function observeResurrectionFeedback(host, boardId, cell, found) { for (c
 export function observeRuleEvent(host, event) {
     (host.events = mutableRows(host.events)).push({ turnIndex: host.turnIndex, event: structuredClone(event) });
     const m = host.state.match, meta = event.meta;
+    if (event.kind === 'ability-spent' && event.reason === 'archer-no-shot' && event.unitId) {
+        const u = m.units.find(u => u.id === event.unitId);
+        for (const observer of m.players) {
+            const k = m.knowledge[observer.id];
+            (k.events = mutableRows(k.events)).push({ sequence: k.events.length + 1, kind: 'archer-no-shot', boardId: u.boardId, cell: null, unitType: null, contactId: null });
+        }
+    }
     // Public deflection/absence evidence; never copy private compatibility candidates.
     if (event.kind === 'monk-clue' && meta?.origin && meta.ownerId) {
         const board = m.knowledge[meta.ownerId]?.boards[meta.targetPlayerId];

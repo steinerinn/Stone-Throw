@@ -31,11 +31,11 @@ export function backfillScores(db,{apply=false}={}){
 // Read persisted values only. The result's cohort is bounded by its finalization time.
 export function matchResultScore(db,matchId,actor){
  const row=db.prepare(`SELECT p.match_score,p.score_formula_version,p.score_components,m.descriptor,m.ended_at FROM stat_participants p JOIN stat_matches m ON m.id=p.match_id WHERE m.id=? AND p.actor=? AND m.finalized=1`).get(matchId,actor);
- if(!row||row.match_score===null||row.score_formula_version!=='MATCH_SCORE_V1')return null;
+ if(!row||row.match_score===null||!['MATCH_SCORE_V1','MATCH_SCORE_V2_ELIMINATION'].includes(row.score_formula_version))return null;
  const stored=JSON.parse(row.score_components||'null');if(!stored)return null;
  const c=JSON.parse(row.descriptor).classification;let comparison=null;
  if(c&&stored.completed){
-  const samples=db.prepare(`SELECT p.match_score,p.score_components,m.descriptor FROM stat_participants p JOIN stat_matches m ON m.id=p.match_id WHERE m.finalized=1 AND m.ended_at<=? AND p.kind!='ai' AND p.reliability='Full' AND p.match_score IS NOT NULL AND p.score_formula_version='MATCH_SCORE_V1'`).all(row.ended_at).filter(r=>{const k=JSON.parse(r.descriptor).classification;return k&&k.mode===c.mode&&k.startingHumans===c.startingHumans&&k.startingAI===c.startingAI&&JSON.parse(r.score_components||'null')?.completed;});
+  const samples=db.prepare(`SELECT p.match_score,p.score_components,m.descriptor FROM stat_participants p JOIN stat_matches m ON m.id=p.match_id WHERE m.finalized=1 AND m.ended_at<=? AND p.kind!='ai' AND p.reliability='Full' AND p.match_score IS NOT NULL AND p.score_formula_version=?`).all(row.ended_at,row.score_formula_version).filter(r=>{const k=JSON.parse(r.descriptor).classification;return k&&k.mode===c.mode&&k.startingHumans===c.startingHumans&&k.startingAI===c.startingAI&&JSON.parse(r.score_components||'null')?.completed;});
   if(samples.length>=5){const average=samples.reduce((a,r)=>a+r.match_score,0)/samples.length;if(average>0)comparison={samples:samples.length,average,percent:100*(row.match_score-average)/average,label:c.startingHumans+' PLAYER'+(c.startingHumans===1?'':'S')+' + '+c.startingAI+' AI'};}
  }
  return {matchId,formulaVersion:row.score_formula_version,score:row.match_score,exact:stored.exact,comparison};

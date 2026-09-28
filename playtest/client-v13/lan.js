@@ -38,9 +38,10 @@ export function installLan(session,browserClient,opened){
  syncControls();renderBar();}
  if(meta)observe(opened.update);if(opened.multiplayerMenu){document.body.classList.add('st-main-menu-mode');void showSetup();}
  // Explicit room transitions preserve the document; server cookies remain authoritative.
- async function navigateSeat(deployment=false){generation++;meta=null;group.clear();observeAfk(session,null);disconnect.observe(null,last);bar.hidden=true;consent.hidden=true;panel.hidden=true;browserClient.unmount();document.body.classList.remove('st-multiplayer-mode');document.body.classList.add('st-main-menu-mode');by('resultOverlay').style.display='none';by('stLanResultMenu')?.remove();
+ async function navigateSeat(deployment=false){generation++;meta=null;group.clear();observeAfk(session,null);disconnect.observe(null,last);bar.hidden=true;consent.hidden=true;if(!deployment)panel.hidden=true;browserClient.unmount();document.body.classList.remove('st-multiplayer-mode');document.body.classList.add('st-main-menu-mode');by('resultOverlay').style.display='none';by('stLanResultMenu')?.remove();
   let out;try{out=await resolveReturn(session,await session.open());await browserClient.enterOpened(out);observe(out.update);}catch(error){location.reload();throw error;} // Exceptional failed remount reboots through the cold entry gate.
   if(out.update?.lan&&(deployment||out.reconnected&&!out.mainMenu&&!out.multiplayerMenu))document.body.classList.remove('st-main-menu-mode');
+  if(deployment)panel.hidden=true;
  }
  function detachView(){if(detached)return;detached=true;generation++;meta=null;observeAfk(session,null);disconnect.observe(null,last);bar.hidden=true;consent.hidden=true;browserClient.unmount();clearInterval(timer);clearInterval(listTimer);clearInterval(heartbeat);document.body.classList.add('st-main-menu-mode');location.reload();}
  const heartbeat=setInterval(async()=>{if(!meta||meta.ring||detached)return;const version=generation;try{const out=await session.request('pvp/heartbeat');if(detached||version!==generation||!meta)return;meta=out.lan;observeAfk(session,meta);shownAt=Date.now();disconnect.observe(meta,last);renderBar();}catch(e){if(detached||version!==generation)return;if(['rejoin-required','seat-handed-to-ai'].includes(e.code))location.reload();}},2000);

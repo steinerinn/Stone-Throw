@@ -12,4 +12,5 @@ for(const n of [2,3,4]){
  const d={id:'public-replay',configuration:h.config,build:'test',mode:'Duel',startedAt:1,endedAt:2,participants:h.config.players.map((p,seat)=>({actor:p.id,seat,kind:'account',displayName:'Player '+seat,reliability:'Full'}))},facts=h.events.map((f,index)=>({...f,index})),replay=buildReplay(d,facts,checkpoints),cursor=createReplayCursor(replay);
  assert.equal(JSON.stringify(replay).includes('castle-secret'),false);assert.equal(JSON.stringify(replay).includes('rng'),false);assert.deepEqual(cursor.seek(0).boards[1].cells,{});assert.equal(cursor.seek(cursor.length).boards[1].cells['6,2'].kind,'castle');checks++;
 }
+const scoutReplay=buildReplay({id:'scout',configuration:{size:15},participants:[],startedAt:1},[{index:0,event:{kind:'scouted',cells:[{x:12,y:13}]}}]);assert.deepEqual(scoutReplay.timeline,[{kind:'announcement',name:'scouting'}]);checks++;
 console.log(JSON.stringify({passed:true,checks,privateScoutExcluded:true,canonicalCastleGeometry:true,noFutureDisclosure:true,authorityUnchanged:true}));

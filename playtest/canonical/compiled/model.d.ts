@@ -177,7 +177,7 @@ export interface BoardKnowledge {
 /** Public event payloads contain no raw text, server event ID, or private unit reference. */
 export interface VisibleEvent {
     sequence: number;
-    kind: 'impact' | 'miss' | 'unit-disclosed' | 'resurrection-announced' | 'hero-moved' | 'plague-observed' | 'resurrection-rejected' | 'resurrection-found';
+    kind: 'impact' | 'miss' | 'unit-disclosed' | 'archer-no-shot' | 'resurrection-announced' | 'hero-moved' | 'plague-observed' | 'resurrection-rejected' | 'resurrection-found';
     boardId: BoardId;
     cell: Cell | null;
     unitType: UnitType | null;

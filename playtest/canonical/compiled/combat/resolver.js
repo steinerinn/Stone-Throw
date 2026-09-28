@@ -45,8 +45,8 @@ function attack(ctx, entry) {
             else
                 u.abilities.push({ kind: 'archer', spent: true });
         }
-        emit(ctx, 'ability-spent', meta, u?.id || null);
         const count = archerShotCount(ctx.rng);
+        emit(ctx, 'ability-spent', meta, u?.id || null, [], null, count === 0 ? 'archer-no-shot' : undefined);
         layers = [archerTargets(size, meta.origin, attackBlockedCells(ctx.state, meta.targetPlayerId), count, ctx.rng)];
         defer = true;
     }
