@@ -7,7 +7,7 @@ import {avatarControl} from './avatar-picker.js';
 import {installHallOfFame} from './hall-of-fame.js';
 import {setStoryAccount} from './story-account.js';
 // Registry is an optional account layer. It never supplies match commands or seat credentials.
-const SKIP='chainSiege.registry.guestSkip.v1';let statisticsEnabled=false;let account=null,pending=null,ready=false,bypass=false,streakMessage='';
+const SKIP='chainSiege.registry.guestSkip.v1';let account=null,pending=null,ready=false,bypass=false,streakMessage='';
 const css=document.createElement('link');css.rel='stylesheet';css.href='/styles-registry.css';document.head.append(css);
 const bar=document.createElement('div');bar.id='csAccountBar';bar.className='cs-account-bar';document.querySelector('#stMainMenu .st-menu-frame').append(bar);
 installMainMenu(bar);
@@ -61,16 +61,11 @@ function show(mode,message){dialog.dataset.mode=mode;dialog.replaceChildren();co
  }
  if(!dialog.open)dialog.showModal();}
 function skipped(){try{return localStorage.getItem(SKIP)==='1';}catch{return false;}}
-const loaded=api('me').then(r=>{statisticsEnabled=!!r.statisticsInspector;account=r.account;if(r.newDay&&account)streakMessage=`You have a ${account.currentStreak}-day streak! Your record is ${account.longestStreak} days.`;}).catch(()=>{account=null;}).finally(()=>{ready=true;paint();});paint();
+const loaded=api('me').then(r=>{account=r.account;if(r.newDay&&account)streakMessage=`You have a ${account.currentStreak}-day streak! Your record is ${account.longestStreak} days.`;}).catch(()=>{account=null;}).finally(()=>{ready=true;paint();});paint();
 // Read-only presentation view of the existing authoritative /me response.
 export const startupAccount=loaded.then(()=>account?{displayName:account.displayName}:null);
 window.addEventListener('click',e=>{const target=e.target.closest?.('#stMenuFull,#stMenuOnline');if(!target||bypass)return;if(ready&&(account||skipped()))return;e.preventDefault();e.stopImmediatePropagation();pending=target;loaded.then(()=>{if(account||skipped())resume();else show('guest');});},true);
 dialog.addEventListener('cancel',()=>{pending=null;});
-
-async function showStatistics(){
- dialog.dataset.mode='statistics';dialog.replaceChildren(el('h2','Playtest statistics â€” read only'));const body=el('div');dialog.append(body,button('REFRESH',refresh),button('CLOSE',close));if(!dialog.open)dialog.showModal();await refresh();
- async function refresh(){body.replaceChildren(el('p','Loadingâ€¦'));try{const data=await api('statistics');body.replaceChildren(el('p','Finalized matches only. AI has no career or global Human credit. Scores are not calculated.'),el('h3','Global counters'),el('pre',JSON.stringify(Object.fromEntries([['PLAYER SHOTS','playerShots'],['CELLS HIT','cellsHit'],['UNIT CELLS HIT','unitCellsHit'],['PLAGUE CELLS','plagueCells'],['SCOUTED CELLS','scoutedCells']].map(([label,key])=>[label,data.global[key]??0])),null,2)));if(!data.modes.length)body.append(el('p','No finalized registered matches yet. Guests contribute global counters only.'));for(const mode of data.modes){const details=el('details'),title=el('summary',mode.mode);details.append(title,el('pre',JSON.stringify(mode,null,2)));body.append(details);}}catch(e){body.replaceChildren(el('p',e.message));}}
-}
 
 dialog.addEventListener('close',()=>{if(dialog.dataset.mode==='profile')void profileUI.open();});
 const profileUI=installProfile({api,editAccount:()=>show('profile'),onAccount:value=>{account=value;paint();}});

@@ -123,8 +123,8 @@
       "file": "styles-13.css",
       "type": "stylesheet",
       "mime": "text/css",
-      "sha256": "02764469cc6076974fc893bd62cf80fa1885e5f89d28062edfbdbac40a07ec1f",
-      "bytes": 2162,
+      "sha256": "fad99075d30a38213a0b5ec80d964a2489acbf9342ed200f642563953bade82b",
+      "bytes": 1208,
       "originalAttributes": "",
       "index": 13
     },
@@ -132,8 +132,8 @@
       "file": "styles-14.css",
       "type": "stylesheet",
       "mime": "text/css",
-      "sha256": "03484eda1fc5eaae3faa7aa64c5c91d73b151f78fd7a91cd6dd9f60b03e215f4",
-      "bytes": 5813,
+      "sha256": "04a1cdecf1be6f849bf8b8610b04b119f3d8c5ac3daf842391d1c18e989f4c32",
+      "bytes": 1403,
       "originalAttributes": "",
       "index": 14
     },
@@ -141,8 +141,8 @@
       "file": "styles-15.css",
       "type": "stylesheet",
       "mime": "text/css",
-      "sha256": "2aa3594176dbc57d699c833ff33f012c5907bc4f64ff035fc96da9e1b24fa499",
-      "bytes": 5284,
+      "sha256": "b5fca010c929641464de1a75ab3d8c7976286b9447d8227dee4b0cda1ff23699",
+      "bytes": 5094,
       "originalAttributes": "",
       "index": 15
     },
@@ -150,8 +150,8 @@
       "file": "styles-16.css",
       "type": "stylesheet",
       "mime": "text/css",
-      "sha256": "f11475a37791cff824e8f74bf4966e987b0c79152a7841c446b4ebe6fffdaf49",
-      "bytes": 4297,
+      "sha256": "9551a88dac40778e99a028a0a360224906054de0439cb53c497d319e6d46bc19",
+      "bytes": 4189,
       "originalAttributes": "",
       "index": 16
     },
@@ -168,8 +168,8 @@
       "file": "styles-18.css",
       "type": "stylesheet",
       "mime": "text/css",
-      "sha256": "910d02218a11f76d00592c055418ccb4ecfa275ff43ccee088160372d1e62e46",
-      "bytes": 3909,
+      "sha256": "a1a99b1c7ab582bd97b852aa7f35b6b1ba0ceb8101a62ec281d7359953941e16",
+      "bytes": 3779,
       "originalAttributes": "",
       "index": 18
     },
@@ -208,15 +208,6 @@
       "bytes": 3783,
       "originalAttributes": " id=\"stActionInstructionStyle\"",
       "index": 22
-    },
-    {
-      "file": "client/shell.js",
-      "type": "script",
-      "role": "client-shell",
-      "mime": "application/javascript",
-      "bytes": 35916,
-      "sha256": "d4ff9670755f178e51239f2825044ae427c9f4473b146307c555a13473938c29",
-      "originalScriptIndex": 1
     },
     {
       "file": "client/loading-screen.js",
