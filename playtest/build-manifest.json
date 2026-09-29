@@ -6,6 +6,9 @@
   "parentManifestSha256": "ed4b76d4f2548759ee793c49b172ed0631b2de130a51dc0c97ba2a348dbe3146",
   "status": "UNACCEPTED / UNPROMOTED - no commit, push, merge or deployment",
   "files": {
+    "TRUSTED-PROXY-IP.md": "b449563588e1bed2cc462a8026c6b9b2b17923ff71d04adde935fe1d70028491",
+    "tools/client-ip-check.mjs": "216946e4af85d93d577955a4d22bcb75c970f7548c889d84fb5eabbe2b5c1320",
+    "server/client-ip.mjs": "6f097695cb3aecdcc2c469aac5b59d1e11b8f2cb5f029a6d02c97bf04ae32da8",
     ".gitignore": "04a2de27100950b276f4cea46140065913fd765b247538bfc4c244a56cd4a809",
     "ACCEPTANCE.md": "867da2e0d5f2bade2119836d35f2509e489a850e1436c6bb64b38a4b31dc4f57",
     "AFK-DISCONNECT-RELIABILITY-PHASE1.md": "45b2d82b345a73d69119e1a468ae47bcbfe76b8d84dbddc3902f46abba57702b",
@@ -876,7 +879,7 @@
     "server/hall-of-fame.mjs": "ccbbdb915d2655e8b3327e3655cb2844e19974799427b4cce65705fbfbfaeadf",
     "server/hof-eligibility.mjs": "8726f38fed004c371eceb18d4ba378c6cadf8a47d8b202b753c876eccc6818f3",
     "server/liveness-store.mjs": "ccfa61f1f0eafec70a8a38ddc724c736531766e90125da69aed8c629a63c6b42",
-    "server/main.mjs": "e035202fcc32421196a72539b223e4c1667e1410163a373f86f75ba83114d806",
+    "server/main.mjs": "a9bfce1c76b3064f1341829237fac0e8e00a73e1e5e0e0737da04297c84c6d5e",
     "server/match-classification.mjs": "9a435d348d9dcd0c34448468624061691d6899e482e7bc879b9dee4dd88e158a",
     "server/match-score.mjs": "2e9bf7edfdc00ebac809145e719c019eed6ca41e40b142a1f2e6de957532c3f3",
     "server/multiplayer.mjs": "30864b5362d77227d12cdab21eabd78f62f481aaf3a55b686c396f8a180f7607",
