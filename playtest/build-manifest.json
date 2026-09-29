@@ -827,7 +827,7 @@
     "client-v13/placement-feedback.js": "c6e9df4ed1ec7da16420642c5aa4267018da1a3a835abb0a6c0f5ccc32ce6441",
     "client-v13/presentation.js": "48770d78175eed7af272a239a6883f2aac7e76ba734125103b164c81471c84ae",
     "client-v13/profile.js": "c6a338f0ba817434836670b63a8217ffd9a5c2923d73c1d25356323fca019e6e",
-    "client-v13/registry.js": "23c0453613cd475a7bd7e39e0c24cc710c48de7cebba3aa33e3e4bb0e4be74fc",
+    "client-v13/registry.js": "dd83feadf8bb39f3157935b4c9f2d15dc23839716fc17dcc3e2df13b1aa7bb24",
     "client-v13/rejoin.js": "42d7c5472efa58081c734af6b4225284e9949a85523ab06ae567a32132d07315",
     "client-v13/reliability-bar.js": "270296158f57c033115c88d4f87dcc58bfe6db55b9c44731d8c75fcf24e20440",
     "client-v13/replay-state.js": "add49a66fdcedcca379cf17e96ba8275b3a1893d713a635af0e886721e413bae",
