@@ -45,3 +45,22 @@
 .cs-result-heading .cs-match-score{margin:3px 0;font-size:14px;line-height:1.25;letter-spacing:.02em;color:#f0e3c8;text-shadow:0 2px 3px #000}
 
 .cs-place{margin-bottom:48px}.cs-place-scores{position:absolute;top:100%;left:0;right:0;z-index:4;text-align:center;color:#f4d68c;font-size:14px;text-shadow:0 2px 3px #000}.cs-participant-score{margin:4px 0;overflow-wrap:anywhere}.cs-crowded-place{margin-bottom:90px}
+
+/* Six earned award badges, anchored at 60-degree intervals around portraits. */
+.cs-badged-avatar{position:relative;isolation:isolate;overflow:visible!important}
+.cs-badged-avatar>img{display:block;width:100%;height:100%;object-fit:contain}
+.cs-badged-avatar .cs-avatar-badge{position:absolute;transform:translate(-50%,-50%);width:24%;height:27%;z-index:2;filter:drop-shadow(0 1px 2px #000);border:0;outline-offset:2px}
+.cs-avatar-badge[data-tier=bronze]{filter:grayscale(1) sepia(1) saturate(2.4) hue-rotate(345deg) brightness(.8)}
+.cs-avatar-badge[data-tier=silver]{filter:grayscale(1) brightness(1.35) contrast(1.1)}
+.cs-avatar-badge[data-tier=gold]{filter:grayscale(1) sepia(1) saturate(3.5) brightness(1.12)}
+.cs-avatar-badge[data-tier=platinum]{filter:grayscale(1) sepia(.45) saturate(2.5) hue-rotate(145deg) brightness(1.65) contrast(1.15)}
+.cs-profile .cp-avatar-wrap.cs-badged-avatar{aspect-ratio:1;height:auto;flex-shrink:0;margin:6px}
+.cs-profile .cp-avatar-wrap.cs-badged-avatar>img{width:100%;height:auto}
+.cs-deployment-avatar.cs-badged-avatar{margin:8px;flex-shrink:0}
+
+.cs-badge-detail{position:fixed;inset:auto;margin:0;box-sizing:border-box;width:max-content;max-width:min(280px,calc(100vw - 16px));padding:10px 12px;border:1px solid #987c42;background:#10191e;color:#edd6a2;font:13px/1.5 Arial,sans-serif;white-space:pre-line;text-align:left;box-shadow:0 5px 20px #0009;z-index:100001}
+.cs-avatar-badge{cursor:help}.cs-avatar-badge:focus-visible{outline:2px solid #edd6a2}
+
+.cs-medal.cs-simple-medal{background-image:url('assets/result-screen/badges-simple-v2.png');background-size:355.555556% 237.037037%;clip-path:circle(50%);aspect-ratio:1}
+.cs-badged-avatar .cs-avatar-badge{height:auto;aspect-ratio:1}
+.cs-award-seal .cs-simple-medal{height:auto;aspect-ratio:1}

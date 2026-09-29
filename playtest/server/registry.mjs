@@ -1,3 +1,4 @@
+import {profileAggregate} from './profile-aggregates.mjs';
 import {migrateFeedback,feedbackStore} from './feedback.mjs';
 import {migrateReview,reviewStore} from './anomaly-review.mjs';
 import {profileReadModel} from './profile-read-model.mjs';
@@ -46,7 +47,7 @@ export function openRegistry(directory,{now=Date.now}={}){
  function session(token){if(typeof token!=='string'||!/^[a-f0-9]{64}$/.test(token))return null;const a=q('SELECT a.* FROM sessions s JOIN accounts a ON a.id=s.player_id WHERE s.token_hash=? AND s.expires>? AND a.status=?',hash(token),now(),'active');return a||null;}
  function loginSession(id,previous){if(previous)run('DELETE FROM sessions WHERE token_hash=?',hash(previous));run('DELETE FROM sessions WHERE expires<=?',now());const token=randomBytes(32).toString('hex');run('INSERT INTO sessions VALUES(?,?,?)',hash(token),id,now()+30*86400000);run('UPDATE accounts SET last_login=? WHERE id=?',now(),id);return {token,...streak(id)};}
  let hashing=0;async function key(p,s){if(hashing>=2)fail('Please try again shortly.',429);hashing++;try{return await derive(p,s,64,{N:32768,r:8,p:3,maxmem:64*1024*1024});}finally{hashing--;}}
- const multiplayerIdentity=a=>a?{kind:'account',playerId:a.id,displayName:a.display_name,avatarId:a.avatar_id,country:a.country||null}:null;
+ const multiplayerIdentity=a=>a?{kind:'account',playerId:a.id,displayName:a.display_name,avatarId:a.avatar_id,country:a.country||null,rewards:profileAggregate(db,a.id).rewards}:null;
  const storyProgress=id=>{const row=q('SELECT progress_json FROM story_progress WHERE player_id=?',id);return row?JSON.parse(row.progress_json):null;};
  const storyState=id=>{const row=q('SELECT * FROM story_runs WHERE player_id=?',id),old=storyProgress(id);return row?{runId:row.run_id,progress:JSON.parse(row.progress_json),lifetime:mergeStoryUnlocks(JSON.parse(row.lifetime_json),storyUnlocks(old))}:{runId:'legacy',progress:old,lifetime:storyUnlocks(old)};};
  const saveRun=(id,state)=>run('INSERT INTO story_runs VALUES(?,?,?,?) ON CONFLICT(player_id) DO UPDATE SET run_id=excluded.run_id,progress_json=excluded.progress_json,lifetime_json=excluded.lifetime_json',id,state.runId,JSON.stringify(state.progress),JSON.stringify(state.lifetime));
@@ -82,6 +83,7 @@ export function openRegistry(directory,{now=Date.now}={}){
    rate('login-ip:'+ip,80,900000);let k;try{k=nameKey(b.username)[1];}catch{fail('Incorrect username or password.',401);}rate('login-name:'+k,20,900000);if(typeof b.password!=='string'||b.password.length>256)fail('Incorrect username or password.',401);const a=q('SELECT * FROM accounts WHERE username_key=?',k),derived=await key(b.password,a?.salt||'00000000000000000000000000000000');if(!a||!timingSafeEqual(derived,Buffer.from(a.password_hash,'hex'))||a.status!=='active')fail('Incorrect username or password.',401);return tx(()=>loginSession(a.id,token));
   }
   const a=session(token);if(!a)fail('Please log in again.',401);
+  if(action==='delete-saved-battle')return tx(()=>{if(Object.keys(b).length!==1||typeof b.matchId!=='string'||b.matchId.length>200)fail('Invalid saved battle request.');run('DELETE FROM profile_saved_battles WHERE player_id=? AND match_id=?',a.id,b.matchId);return {deleted:true};});
   if(action==='save-battle')return tx(()=>{
    if(Object.keys(b).some(k=>!['matchId','replaceOldest'].includes(k))||typeof b.matchId!=='string'||b.matchId.length>200||b.replaceOldest!==undefined&&typeof b.replaceOldest!=='boolean')fail('Invalid saved battle request.');
    if(q('SELECT 1 FROM profile_saved_battles WHERE player_id=? AND match_id=?',a.id,b.matchId))return {saved:true};

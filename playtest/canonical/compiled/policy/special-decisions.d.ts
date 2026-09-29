@@ -3,6 +3,7 @@ import type { PlayerId } from '../model.js';
 export declare function catapultOpenScore(h: HostState, target: PlayerId, start: string, protectedSet?: Set<string>, limit?: number): number;
 export declare function bestCatapult(h: HostState, actor: PlayerId, cells: readonly string[], protectedSet?: Set<string>): string | null;
 export declare function catapultOrigin(h: HostState, actor: PlayerId, avoidKnown?: readonly string[], avoidOrigins?: readonly string[]): string | null;
+export declare function heroUnscouted(h: HostState, owner: PlayerId, candidates: readonly string[]): string[];
 export declare function heroPlagueSafe(h: HostState, owner: PlayerId, candidates: readonly string[]): string[];
 export declare function heroRelocation(h: HostState, owner: PlayerId): string | null;
 /** Second-hit legacy policy: the second seat prefers unscouted cells, then

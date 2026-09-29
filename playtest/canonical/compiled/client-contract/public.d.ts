@@ -102,10 +102,21 @@ export interface PublicStatistics {
     strength: StrengthSample[];
 }
 export interface Snapshot {
+    publicSounds?: {
+        epoch: string;
+        cursor: number;
+        events: {
+            position: number;
+            kind: string;
+            count: number;
+        }[];
+    };
+    beingScouted?: string | null;
     monkDuelSequence?: number;
     scoutFootprints?: {
         side: Side;
         cell: Cell;
+        faded?: true;
     }[];
     plagueActive?: boolean;
     heroPresentation?: {

@@ -7,3 +7,14 @@
 /* Shared narration preference: compact control within existing Story cards. */
 #stMenuDialog .st-narration-toggle,#stStoryAftermathCard .st-narration-toggle{display:block;float:right;width:auto;margin:0 0 8px 12px;padding:4px 8px;font:700 11px Arial,sans-serif;letter-spacing:0}
 #stMenuDialog .st-narration-toggle[hidden],#stStoryAftermathCard .st-narration-toggle[hidden]{display:none}
+
+@media(max-width:760px){
+ #stMenuDialog:has([data-story-scene]){align-items:flex-start;padding-top:12px}
+ #stStoryPhaseOverlay{align-items:flex-start;padding:12px;box-sizing:border-box}
+ #stStoryPhaseOverlay .st-story-phase-stage{display:flex;flex-direction:column;gap:12px;min-height:0;max-height:calc(100dvh - 24px);width:100%}
+ #stStoryAftermathCard,#stStoryPhaseOverlay .revealed #stStoryAftermathCard{position:relative;left:auto;top:auto;transform:none!important;animation:none;order:2;width:100%;min-height:0;max-height:calc(100dvh - 24px);flex:1 1 auto;margin:0}
+ #stStoryUnitReveal{display:none;position:relative;right:auto;top:auto;bottom:auto;order:1;flex:0 0 auto;margin:30px auto 0;transform:none!important;max-width:100%}
+ #stStoryPhaseOverlay .revealed #stStoryUnitReveal:not(.dismissed){display:block;animation:stStoryPhoneReveal .4s ease-out forwards}
+ #stStoryPhaseOverlay .revealed #stStoryUnitReveal.dismissed{display:none}
+ @keyframes stStoryPhoneReveal{from{opacity:0;translate:0 -20px}to{opacity:1;translate:0 0}}
+}

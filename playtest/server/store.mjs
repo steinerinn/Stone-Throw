@@ -1,3 +1,4 @@
+import {durableReplace,retryFile} from './durable-file.mjs';
 import fs from 'node:fs';
 import path from 'node:path';
 import {createHash} from 'node:crypto';
@@ -24,7 +25,7 @@ export function openStore(directory,build,mode,{journalEnabled=true}={}){
   if(!journalEnabled)return {value,release,write(next){if(failed)throw Error('checkpoint-write-failed');try{
    const payload=measured('checkpoint-serialization',()=>JSON.stringify(next,(_,v)=>v instanceof Map?{$map:[...v]}:v));
    const sha256=digest(payload);if(sha256===lastValue)return;
-   measured('disk-write-fsync',()=>{const temp=file+'.tmp',fd=fs.openSync(temp,'w',0o600);try{fs.writeFileSync(fd,JSON.stringify({format:checkpointId,build,mode,sha256,payload}));fs.fsyncSync(fd);}finally{fs.closeSync(fd);}fs.renameSync(temp,file);});
+   measured('disk-write-fsync',()=>{durableReplace(file,JSON.stringify({format:checkpointId,build,mode,sha256,payload}));});
    lastValue=sha256;
   }catch(error){failed=true;throw error;}}};
   if(fs.existsSync(journal)){
@@ -40,10 +41,10 @@ export function openStore(directory,build,mode,{journalEnabled=true}={}){
    if(!reset&&valueText===lastValue&&!packet.updates.length)return;
    const payload=measured('checkpoint-serialization',()=>JSON.stringify({format:checkpointId,build,mode,reset,packet})),sha256=digest(payload),line=JSON.stringify({sequence:sequence+1,previous,sha256,payload})+'\n';
    measured('disk-write-fsync',()=>{
-    if(!fs.existsSync(file)){const temp=file+'.tmp',fd=fs.openSync(temp,'w',0o600);try{fs.writeFileSync(fd,JSON.stringify({format:checkpointId,build,mode,sha256:digest('null'),payload:'null'}));fs.fsyncSync(fd);}finally{fs.closeSync(fd);}fs.renameSync(temp,file);}
-    if(journalFd===null)journalFd=fs.openSync(journal,'a',0o600);
-    fs.writeFileSync(journalFd,line);fs.fsyncSync(journalFd);
-    if(!journalRequired){const saved=JSON.parse(fs.readFileSync(file,'utf8')),temp=file+'.tmp',fd=fs.openSync(temp,'w',0o600);try{fs.writeFileSync(fd,JSON.stringify({...saved,journal:true}));fs.fsyncSync(fd);}finally{fs.closeSync(fd);}fs.renameSync(temp,file);journalRequired=true;}
+    if(!fs.existsSync(file)){durableReplace(file,JSON.stringify({format:checkpointId,build,mode,sha256:digest('null'),payload:'null'}));}
+    if(journalFd===null)journalFd=retryFile('open-journal',journal,()=>fs.openSync(journal,'a',0o600));
+    fs.writeFileSync(journalFd,line);retryFile('fsync-journal',journal,()=>fs.fsyncSync(journalFd));
+    if(!journalRequired){const saved=JSON.parse(fs.readFileSync(file,'utf8'));durableReplace(file,JSON.stringify({...saved,journal:true}));journalRequired=true;}
    });
    sequence++;previous=sha256;lastValue=valueText;reset=false;
    }catch(error){failed=true;throw error;}

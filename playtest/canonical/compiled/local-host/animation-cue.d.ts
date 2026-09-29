@@ -6,7 +6,7 @@ export interface AnimationCue {
     level?: number;
     pulseId?: string;
     ownerPlayerId?: string;
-    kind: 'revolt' | 'double-plague' | 'enemy-shot' | 'catapult' | 'wizard' | 'archer' | 'goblin' | 'demon' | 'dragon' | 'assassin';
+    kind: 'plague' | 'revolt' | 'double-plague' | 'enemy-shot' | 'catapult' | 'wizard' | 'archer' | 'goblin' | 'demon' | 'dragon' | 'assassin';
     side: Side;
     ownerSide: Side;
     origin: Cell;

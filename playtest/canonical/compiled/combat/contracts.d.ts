@@ -281,6 +281,7 @@ export interface InternalRuleEvent {
     reason: string | null;
 }
 export interface ResolutionContext {
+    deferredScoutOwners?: PlayerId[];
     environmental?: {
         kind: 'peasant-revolt';
         level: number;

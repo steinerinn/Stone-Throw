@@ -11,7 +11,7 @@ export function assignNpc(seats,seat,choose=randomInt){
  seat.npc=available[choose(available.length)];seat.name=seat.npc;
 }
 export function assignNpcs(seats){for(const seat of seats)if(seat?.controller==='ai')assignNpc(seats,seat);}
-export function publicIdentity(seat){const a=avatarById(seat.npc?AI_AVATARS[seat.npc]:seat.identity?.avatarId)||avatarById(DEFAULT_AVATAR);return {playerId:seat.identity?.kind==='account'?seat.identity.playerId:null,name:seat.name,avatar:a.assetPath,ai:seat.controller==='ai',country:seat.npc?null:seat.identity?.country||null};}
+export function publicIdentity(seat){const a=avatarById(seat.npc?AI_AVATARS[seat.npc]:seat.identity?.avatarId)||avatarById(DEFAULT_AVATAR);return {playerId:seat.identity?.kind==='account'?seat.identity.playerId:null,name:seat.name,rewards:seat.npc?{}:seat.identity?.rewards||{},avatar:a.assetPath,ai:seat.controller==='ai',country:seat.npc?null:seat.identity?.country||null};}
 
 // Rank equal elimination boundaries together, then compress to dense places.
 // Surviving winner(s), including a final draw, occupy the shared top platform.

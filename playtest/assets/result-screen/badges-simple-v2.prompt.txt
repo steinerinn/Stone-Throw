@@ -1,0 +1,4 @@
+Tool: built-in image_gen. Reference: approved simplified avatar badge preview.
+Prompt: Create six simplified circular medieval silver badges in a 3 by 2 sheet: target with arrow, blindfolded face, eagle head; fierce helmeted warrior, chain links, skull. Thin clean rims, strong symbols, no ornate spikes, consistent neutral metal for tier tinting. No avatar or text.
+Follow-up prompt: Remove background outside the six circles, preserving the designs and grid.
+Integration: The generated background was not transparent; the UI uses circular CSS clipping and measured sprite regions to exclude it. Bronze, Silver, Gold and Platinum use the existing tier filters. Original artwork retained as a separate asset.

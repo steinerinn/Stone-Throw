@@ -85,3 +85,24 @@
 #stMainMenu .cs-menu-info{display:flex;align-items:center;justify-content:center;width:28px;height:28px;flex:0 0 28px;border:1px solid #b9944d;border-radius:50%;box-sizing:border-box;background:linear-gradient(135deg,#40351e,#111b20);color:#ebc975;font:bold 24px Georgia,serif;text-shadow:0 1px 2px #000}
 
 .cs-about[open]{display:flex;flex-direction:column;overflow:hidden}.cs-about-content{min-height:0;overflow:auto;overscroll-behavior:contain;padding-right:10px;line-height:1.6;font:14px/1.6 Arial,sans-serif}.cs-about-content section{min-height:0;padding:16px 0 8px}.cs-about-content h3{margin-bottom:12px}.cs-about-content p{margin:0 0 13px}.cs-about-content h4{font:14px Georgia,serif;color:#ddbf80;margin:0 0 6px}.cs-credit-group{margin:0 0 20px}.cs-credit-group p{margin:0 0 4px}.cs-about>small,.cs-about>h2,.cs-about>button{flex-shrink:0}.cs-about-content figure{margin:16px 0}.cs-about-content figure img{display:block;max-width:100%;height:auto}@media(max-width:500px){.cs-about{padding:18px}.cs-about h2{font-size:21px;margin:10px 0 14px}}
+
+#stMainMenu .cs-menu-auth{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:0 0 14px}
+#stMainMenu .cs-menu-auth[hidden]{display:none}
+#stMainMenu .cs-menu-auth .st-menu-button{border-color:#c19a4f;background:linear-gradient(120deg,#44361e,#202a2d);min-height:48px;padding:9px 13px}
+#stMainMenu .cs-menu-legal{font:10px/1.5 Arial,sans-serif;color:#9f9b8e;text-align:center;margin-top:10px}
+#stStartup .cs-startup-rally{font:bold 13px/1.5 Georgia,serif;color:#efc56d;text-align:center;width:100%;box-sizing:border-box;max-width:600px;margin:18px auto 26px;font-size:clamp(16px,2vw,20px);line-height:1.5;letter-spacing:.04em}
+.cs-startup-rally[hidden]{display:none}
+
+.cs-about-content .cs-history-photo{width:55%;margin:22px auto 26px}
+.cs-history-open{display:block;width:100%;padding:5px;border:1px solid #957641;background:#0a1115;cursor:zoom-in;box-shadow:0 6px 20px #0006}
+.cs-about-content .cs-history-photo img{display:block;width:100%;height:auto}
+.cs-history-photo figcaption{font:12px/1.55 Arial,sans-serif;color:#b9b3a3;margin-top:9px;text-align:center}
+.cs-photo-viewer[open]{display:flex;flex-direction:column;position:fixed;inset:0;width:100vw;height:100dvh;max-width:none;max-height:none;margin:0;padding:12px;box-sizing:border-box;border:0;background:rgba(3,6,8,.98);color:#edd397;overflow:hidden}
+.cs-photo-viewer::backdrop{background:#000e}
+.cs-photo-controls{display:flex;justify-content:center;gap:8px;flex-wrap:wrap;padding-bottom:12px;flex:0 0 auto}
+.cs-photo-controls button{min-height:44px;padding:8px 14px;border:1px solid #957641;color:#edd397;background:#182126;font:bold 12px Georgia,serif;cursor:pointer}
+.cs-photo-controls button:disabled{opacity:.45;cursor:default}
+.cs-photo-stage{position:relative;flex:1 1 auto;min-height:0;overflow:hidden;touch-action:none;overscroll-behavior:contain}
+.cs-photo-stage img{position:absolute;top:50%;left:50%;max-width:none;max-height:none;transform-origin:center;user-select:none;touch-action:none}
+.cs-photo-stage.zoomed{cursor:grab}.cs-photo-stage.zoomed:active{cursor:grabbing}
+@media(max-width:650px){.cs-about-content .cs-history-photo{width:100%;margin:18px auto}.cs-history-photo figcaption{font-size:12px}.cs-photo-viewer[open]{padding:8px}.cs-photo-controls{gap:5px}.cs-photo-controls button{padding:8px 10px}}

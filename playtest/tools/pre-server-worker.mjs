@@ -1,0 +1,4 @@
+import {startServer} from '../server/main.mjs';
+import {serializeHost} from '../canonical/compiled/host/serialization.js';
+let offset=Number(process.env.TEST_OFFSET||0);const app=await startServer({port:Number(process.env.PORT||0),lan:true,stateDir:process.env.ST_STATE_DIR,registryDir:process.env.ST_REGISTRY_DIR,seed:42,playtestSnapshotOnly:process.env.TEST_JOURNAL!=='1',betaGameLog:true,now:()=>Date.now()+offset,logger:()=>{}});
+process.send({ready:true,origin:app.origin});process.on('message',async m=>{try{let data;if(m.action==='inspect'){const r=app.pvp.getRoom(m.code);data={host:serializeHost(r.host),seats:r.seats,epoch:r.epoch,revision:r.revision,afk:r.afk,statistics:r.matchStatistics,heap:process.memoryUsage().heapUsed};}if(m.action==='offset'){offset+=m.ms;data=true;}if(m.action==='retire'){data=await app.pvp.retireClosed();}process.send({id:m.id,data});}catch(e){process.send({id:m.id,error:e.stack});}});

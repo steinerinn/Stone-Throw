@@ -51,6 +51,7 @@ export function catapultOrigin(h, actor, avoidKnown = [], avoidOrigins = []) { c
         if (!safe.has(k))
             outside.push(k);
     } return bestCatapult(h, actor, outside.length ? outside : all, safe); }
+export function heroUnscouted(h, owner, candidates) { const known = new Set(h.state.ring ? Object.entries(h.state.ring.knowledge).filter(([pair]) => pair.endsWith(':' + owner)).flatMap(([, k]) => k.scouted) : h.state.seats.filter(p => p.playerId !== owner).flatMap(p => p.scouted)); const safe = candidates.filter(k => !known.has(k)); return safe.length ? safe : [...candidates]; }
 export function heroPlagueSafe(h, owner, candidates) { const outbreaks = h.state.plagues.filter(p => p.targetPlayerId === owner).flatMap(p => p.outbreaks); if (!candidates.length || !outbreaks.length)
     return [...candidates]; const protectedSet = protectedCells(h, owner), safe = candidates.filter(k => !protectedSet.has(k)); if (safe.length)
     return safe; const distance = (k) => { const c = parseKey(k); let best = Infinity; for (const o of outbreaks) {
@@ -73,7 +74,7 @@ export function heroRelocation(h, owner) { const p = seat(h.state, owner), old =
         const k = x + ',' + y;
         if (!p.shots.includes(k) && !p.occupied.includes(k))
             all.push(k);
-    } if (owner === h.config.players[0].id)
+    } const preferred = heroUnscouted(h, owner, all); all.splice(0, all.length, ...preferred); if (owner === h.config.players[0].id)
     return pick(h, all.filter(k => k !== oldKey), 'hero-uniform'); if (!all.length)
     return null; const observer = seat(h.state, p.reactionTarget.playerId), unscouted = all.filter(k => !targetKnowledge(h.state, observer.playerId, owner).scouted.includes(k)), plagueSafe = heroPlagueSafe(h, owner, unscouted.length ? unscouted : all), ctx = { size: h.config.size }, near = (k) => { const q = parseKey(k); return neighbors8(ctx, q.x, q.y); }; const dangerous = (k) => near(k).some(n => { const u = unitAt(h.state, p.boardId, n); if (!u)
     return false; if (u.type === 'monk')
@@ -96,7 +97,7 @@ else {
     return pick(h, openSecondary, 'hero-open-secondary'); return pick(h, primary.length ? primary : secondary.length ? secondary : safe.length ? safe : all, 'hero-fallback'); }
 /** Second-hit legacy policy: the second seat prefers unscouted cells, then
  * applies Plague distance safety; the first seat keeps the raw neighbor order. */
-export function heroLocalEscape(h, owner, legal) { let pool = [...legal]; if (owner === h.config.players[1].id) {
+export function heroLocalEscape(h, owner, legal) { let pool = heroUnscouted(h, owner, legal); if (owner === h.config.players[1].id) {
     const observer = seat(h.state, seat(h.state, owner).reactionTarget.playerId), unscouted = pool.filter(k => !observer.scouted.includes(k));
     pool = heroPlagueSafe(h, owner, unscouted.length ? unscouted : pool);
 } return pick(h, pool, 'hero-local-escape'); }

@@ -60,6 +60,7 @@ export type EventKind='peasant-revolt'|'chaos-manifestation'|'attack-started'|'i
 /** Internal/private facts only. Public projection is deliberately a later adapter. */
 export interface InternalRuleEvent {statistics?:Record<string,unknown>;sequence:number;rootId:ResolutionId;workId:WorkId|null;kind:EventKind;meta:(Omit<SourceMetadata,'actorId'|'ownerId'>&{actorId:PlayerId|null;ownerId:PlayerId|null})|null;unitId:UnitId|null;cells:Cell[];amount:number|null;reason:string|null}
 export interface ResolutionContext {
+ deferredScoutOwners?:PlayerId[];
  environmental?:{kind:'peasant-revolt';level:number};
  contract:'stone-throw-resolution-v1';scope:'accepted-action'|'boundary-comparison';id:ResolutionId;acceptedActionId:string;activePlayerId:PlayerId;
  compatibility:'golden-v1.427';status:'running'|'awaiting-decision'|'complete';

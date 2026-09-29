@@ -1,3 +1,4 @@
+import {avatarBadges,medalArt} from './avatar-badges.js';
 // Hide the previous decoded banner until the current outcome artwork is ready.
 const resultArtRequests=new WeakMap();
 export function clearResultArt(img){if(!img)return;resultArtRequests.delete(img);img.style.visibility='hidden';img.removeAttribute('src');img.alt='';}
@@ -15,7 +16,7 @@ export function scoreLines(score){
  if(!score||!Number.isFinite(score.score))return [];
  const number=n=>new Intl.NumberFormat('en-US',{maximumFractionDigits:0}).format(n);
  const lines=['MATCH SCORE: '+number(score.score)],c=score.comparison;
- if(c&&c.samples>=5)lines.push(number(Math.abs(c.percent))+'% '+(c.percent<0?'below':'above')+' average for '+c.label);
+ if(c&&c.samples>=5)lines.push(Math.abs(c.percent).toFixed(1).replace(/\.0$/, '')+'% '+(c.percent<0?'below':'above')+' average for '+c.label);
  return lines;
 }
 export function participantScoreLines(players=[]){return players.map(p=>p.name+(p.ai?' (AI)':'')+': '+(Number.isFinite(p.matchScore?.score)?new Intl.NumberFormat('en-US',{maximumFractionDigits:0}).format(p.matchScore.score):'Unavailable'));}
@@ -23,7 +24,7 @@ const el=(tag,cls,text)=>{const n=document.createElement(tag);if(cls)n.className
 const labels=['','1ST','2ND','3RD','4TH'];
 const artFile=name=>'assets/result-screen/'+name+'.png';
 const medalNames=['Lucky Shooter','The Blind One','Eagle Eye','Most Fierce','Chain Master','Purple Death'];
-function emblem(name){const n=el('span','cs-medal');const i=medalNames.indexOf(name);n.style.backgroundPosition=`${(i%3)*50}% ${Math.floor(i/3)*100}%`;n.dataset.medal=name;return n;}
+function emblem(name){const n=el('span','cs-medal');const i=medalNames.indexOf(name);medalArt(n,i);n.dataset.tier="gold";n.dataset.medal=name;return n;}
 export function buildResultScreen(data,{view,rematch,menu,historical=false,back}){
  const panel=el('section','cs-results');panel.setAttribute('role','dialog');panel.setAttribute('aria-modal','true');panel.setAttribute('aria-label','Battle results');
  const header=el('header','cs-result-heading');header.append(el('p','cs-result-kicker','CHAIN SIEGE'),el('h1','','BATTLE RESULTS'),el('div','cs-result-rule'));for(const text of scoreLines(data.matchScore))header.append(el('p','cs-match-score',text));panel.append(header);
@@ -32,14 +33,14 @@ export function buildResultScreen(data,{view,rematch,menu,historical=false,back}
   const players=data.players.filter(p=>p.placement===place);if(!players.length&&place!==4)continue;
   const station=el('section','cs-place cs-place-'+place);station.dataset.place=place;station.dataset.occupants=players.length;if(players.length>2)station.classList.add('cs-crowded-place');station.style.setProperty('--occupants',Math.max(1,players.length));
   const people=el('div','cs-podium-people');
-  for(const p of players){const person=el('div','cs-podium-person');const portrait=el('div','cs-portrait');const image=el('img');image.src=p.avatar;image.alt=p.name;portrait.append(image);person.append(portrait,el('p','cs-podium-name',p.name));if(p.playerId&&!p.ai){person.dataset.profileId=p.playerId;person.tabIndex=0;person.setAttribute('role','button');person.setAttribute('aria-label','View '+p.name+' player card');}const flag=el('div','cs-podium-country');if(p.ai){flag.textContent='(AI)';flag.classList.add('cs-identity-ai');}else if(/^[A-Z]{2}$/.test(p.country||'')){const image=el('img');image.src='assets/ui/flags/'+p.country.toLowerCase()+'.svg';image.alt=p.country;flag.append(image);}person.append(flag);people.append(person);}
+  for(const p of players){const person=el('div','cs-podium-person');const portrait=el('div','cs-portrait');const image=el('img');image.src=p.avatar;image.alt=p.name;portrait.append(image);avatarBadges(portrait,p.rewards);person.append(portrait,el('p','cs-podium-name',p.name));if(p.playerId&&!p.ai){person.dataset.profileId=p.playerId;person.tabIndex=0;person.setAttribute('role','button');person.setAttribute('aria-label','View '+p.name+' player card');}const flag=el('div','cs-podium-country');if(p.ai){flag.textContent='(AI)';flag.classList.add('cs-identity-ai');}else if(/^[A-Z]{2}$/.test(p.country||'')){const image=el('img');image.src='assets/ui/flags/'+p.country.toLowerCase()+'.svg';image.alt=p.country;flag.append(image);}person.append(flag);people.append(person);}
   const platform=el('div','cs-platform');const file=place===1?(players.length===1?'1st place solo':'1st place duo'):place===4&&!players.length?'4th place no player':['','','2nd place','3rd place','4th place'][place];
   const art=el('img','cs-platform-art');art.src=artFile(file);art.alt='';art.setAttribute('aria-hidden','true');platform.append(art);station.dataset.platform=file;
   if(players.length)platform.append(el('strong','',labels[place]));else{station.classList.add('cs-empty-fourth');platform.setAttribute('aria-label','Unoccupied wooden platform with rat');}
   station.append(people,platform);if(players.length){const scores=el('div','cs-place-scores');for(const [i,text]of participantScoreLines(players).entries()){const line=el('p','cs-participant-score',text);line.dataset.seat=players[i].seat;scores.append(line);}platform.append(scores);}podium.append(station);
  }
  panel.append(podium);
- if(data.awards.length){const heading=el('h2','cs-award-title','MATCH AWARDS'),awards=el('div','cs-awards');const emblems=['✦','◈','⌖','⚔','⛓','✧'];for(const a of data.awards){const card=el('article','cs-award'),symbol=el('span','cs-award-seal');symbol.append(emblem(a.name));card.dataset.award=a.name;symbol.setAttribute('aria-hidden','true');card.append(symbol,el('h3','',a.name),el('p','cs-award-winner',a.winners.map(i=>data.players.find(p=>p.seat===i)?.name).join(' · ')),el('p','cs-award-value',a.unit==='accuracy'?Math.round(a.value*100)+'% accuracy':a.value+' '+a.unit));awards.append(card);}panel.append(heading,awards);}
+ if(data.awards.length){const heading=el('h2','cs-award-title','MATCH AWARDS'),awards=el('div','cs-awards');const emblems=['✦','◈','⌖','⚔','⛓','✧'];for(const a of data.awards){const card=el('article','cs-award'),symbol=el('span','cs-award-seal');symbol.append(emblem(a.name));card.dataset.award=a.name;symbol.setAttribute('aria-hidden','true');card.append(symbol,el('h3','',a.name),el('p','cs-award-winner',a.winners.map(i=>data.players.find(p=>p.seat===i)?.name).join(' · ')),el('p','cs-award-value',a.unit==='accuracy'?(a.value*100).toFixed(1).replace(/\.0$/, '')+'% accuracy':a.value+' '+a.unit));awards.append(card);}panel.append(heading,awards);}
  const actions=el('footer','cs-result-actions');for(const [text,fn]of (historical?[['BACK TO PROFILE / BATTLES',back]]:[['VIEW BATTLEFIELD',view],['REMATCH',rematch],['LEAVE MATCH',menu]])){const b=el('button','cs-result-button',text);b.type='button';if(text==='LEAVE MATCH')b.dataset.leaveMatch='1';b.onclick=fn;actions.append(b);}panel.append(actions);return panel;
 }
 export function mountGroupResult(){

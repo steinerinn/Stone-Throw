@@ -20,7 +20,11 @@ export function accumulateProfile(db,d,facts,expected=facts.length){
  if(result){a.rewardMatches++;for(const award of result)if(award.winners.includes(row.seat))a.rewards[award.name]=(a.rewards[award.name]||0)+1;}
  if(row.match_score!==null&&score?.exact){a.score.exactTotal=add(a.score.exactTotal,score.exact);a.score.lifetimeTotalScore=numeric(a.score.exactTotal);a.score.scoredMatchCount++;const value=numeric(score.exact);a.score.highestMatchScore=a.score.highestMatchScore===null?value:Math.max(a.score.highestMatchScore,value);if(score.completed&&BigInt(score.exact.n)>=1000n*BigInt(score.exact.d))a.score.thousandPlusCount++;}
  if(completed){a.completedCount++;a.completedSum+=row.match_score;}
- if(['Duel','3 Players','4 Players'].includes(d.mode))a.reliability=reliabilityHistory([{...row,descriptor:d}],a.reliability);
+ if(['Duel','3 Players','4 Players'].includes(d.mode)){
+  // Administrative exemptions are separate from immutable match/review evidence.
+  const exemption=db.prepare('SELECT 1 FROM reliability_exemptions WHERE player_id=? AND match_id=?').get(id,d.id);
+  if(!exemption)a.reliability=reliabilityHistory([{...row,descriptor:d}],a.reliability);
+ }
  const keys=['Overall',d.classification?.mode==='single'||d.mode==='Single Player'?'Single Player':'Online',d.participants.length===2?'Duel':d.participants.length+'P'];if(d.classification)keys.push(d.classification.startingHumans+' PLAYER + '+d.classification.startingAI+' AI');for(const key of keys){const g=a.groups[key]||{title:key,games:0,wins:0,losses:0,draws:0,biggestChain:0,placements:{},scoreSum:0,scoreCount:0,highestScore:null};g.games++;if(row.outcome==='Win')g.wins++;if(row.outcome==='Loss')g.losses++;if(row.outcome==='Draw')g.draws++;for(const k of PROFILE_METRICS)g[k]=g[k]===null||!Number.isFinite(s[k])?null:(g[k]||0)+s[k];g.biggestChain=g.biggestChain===null||!Number.isFinite(s.biggestChain)?null:Math.max(g.biggestChain,s.biggestChain);if(row.placement)g.placements[row.placement]=(g.placements[row.placement]||0)+1;if(completed){g.scoreSum+=row.match_score;g.scoreCount++;g.highestScore=g.highestScore===null?row.match_score:Math.max(g.highestScore,row.match_score);}a.groups[key]=g;}
  for(const p of d.participants)if(p.kind==='account'&&p.playerId&&p.playerId!==id)db.prepare('INSERT INTO profile_friends VALUES(?,?,1) ON CONFLICT(player_id,friend_id) DO UPDATE SET battles=battles+1').run(id,p.playerId);
  db.prepare('INSERT INTO profile_totals VALUES(?,?) ON CONFLICT(player_id) DO UPDATE SET value=excluded.value').run(id,JSON.stringify(a));
@@ -38,7 +42,8 @@ export function ensureProfileAggregates(db){
  db.exec('SAVEPOINT profile_rebuild');try{rebuildProfileAggregates(db);db.exec('RELEASE profile_rebuild');}catch(e){db.exec('ROLLBACK TO profile_rebuild; RELEASE profile_rebuild');throw e;}
 }
 export function migrateProfileAggregates(db){
- db.exec(`CREATE TABLE IF NOT EXISTS profile_totals(player_id TEXT PRIMARY KEY,value TEXT NOT NULL);
+ db.exec(`CREATE TABLE IF NOT EXISTS reliability_exemptions(player_id TEXT NOT NULL,match_id TEXT NOT NULL,created_at INTEGER NOT NULL,reason TEXT NOT NULL,original_outcome TEXT NOT NULL,PRIMARY KEY(player_id,match_id));
+ CREATE TABLE IF NOT EXISTS profile_totals(player_id TEXT PRIMARY KEY,value TEXT NOT NULL);
  CREATE TABLE IF NOT EXISTS profile_recent(player_id TEXT NOT NULL,match_id TEXT NOT NULL,ended_at INTEGER NOT NULL,started_at INTEGER NOT NULL,PRIMARY KEY(player_id,match_id));
  CREATE TABLE IF NOT EXISTS profile_friends(player_id TEXT NOT NULL,friend_id TEXT NOT NULL,battles INTEGER NOT NULL,PRIMARY KEY(player_id,friend_id));
  CREATE INDEX IF NOT EXISTS profile_friend_rank ON profile_friends(player_id,battles DESC,friend_id);

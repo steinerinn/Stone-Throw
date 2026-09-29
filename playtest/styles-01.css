@@ -121,3 +121,10 @@ body:not(.story-mode-active) #stoneThrowShell{
 body.story-mode-active .st-stat-chain-values{column-gap:0}
 /* The narrowest Story ribbon also needs the number/owner gaps to yield. */
 body.story-mode-active .st-stat-chain-values>span:first-child,body.story-mode-active .st-stat-chain-values>span:last-child{column-gap:0}
+
+/* Narrow battlefield controls retain readable labels and touch targets. */
+@media(max-width:520px){.st-topbar .st-actions{display:flex;flex-wrap:wrap;gap:8px;width:100%;min-width:0}.st-topbar .st-actions .st-btn{box-sizing:border-box;flex:1 1 120px;min-width:0;min-height:44px;white-space:normal;overflow-wrap:break-word}.st-topbar .st-actions .st-icon-btn{flex:0 0 44px}.st-topbar .st-center-status .st-btn{min-height:44px}}
+
+#stFollowAction{display:none} @media(max-width:650px){body.st-shell-active #stFollowAction{display:inline-block;min-height:44px}#stFollowAction[aria-pressed=true]{background:#554522;border-color:#d8ba70}#stFollowAction[aria-pressed=false]{opacity:.7}}
+
+@media(max-width:650px){body.st-shell-active .st-topbar{grid-template-columns:minmax(0,1fr)!important;gap:8px!important;padding:8px!important}body.st-shell-active .st-topbar .st-actions{display:flex!important;flex-wrap:wrap!important;gap:8px!important;width:100%!important;min-width:0!important}body.st-shell-active .st-topbar .st-actions .st-btn{box-sizing:border-box;flex:1 1 110px!important;width:auto!important;min-width:0!important;max-width:100%!important;min-height:44px!important;height:auto!important;white-space:normal!important;padding:9px 10px!important}body.st-shell-active .st-topbar .st-actions .st-icon-btn{flex:0 0 44px!important}body.st-shell-active .st-center-status{min-width:0!important;width:100%!important}}

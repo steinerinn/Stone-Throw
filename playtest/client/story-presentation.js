@@ -141,8 +141,22 @@ const chapters={
     "sha256": "769490e61eee94cff5f965f16297198c14b7c74bf7c9e2feaf0de5b158f9ac0b",
     "bytes": 7624556
   },
-  "phase4_monk": {
+  "phase4_open": {
     "chapter": 11,
+    "title": "Prepare for Battle",
+    "paragraphs": [
+      "The threat of the Plague now hung over both kingdoms. Soldiers spoke of it in lowered voices, and the thought of an unseen corruption spreading through the ranks weighed heavily on every camp.",
+      "Fear travelled faster than any army. Men who had faced arrows, siege stones and monsters now found themselves watching the ground beneath their feet.",
+      "For the first time in some time, the armies returned to equal footing. Infantry, Cavalry, Archers, Castles and Catapults marched beside Dwarves, Elves, Goblins and Necromancers, each kingdom facing the other with the same weapons and the same grim confidence that the other side would break first.",
+      "For a brief moment, the war stood balanced on a knife's edge.",
+      "Beyond the torchlight, however, another order had been watching in silence."
+    ],
+    "wav": "assets/story/audio/00_The_Missing_Narration.wav",
+    "sha256": "2365ba8a0401d7c63a553786d92b50c42be787ce996c73ad3c1835574b44a3df",
+    "bytes": 2400300
+  },
+  "phase4_monk": {
+    "chapter": 12,
     "title": "THE SILENT ORDER",
     "paragraphs": [
       "The war had already attracted soldiers, engineers, priests and powers best discussed quietly, but the next visitor arrived alone. He wore little armour, brought no followers or supplies, and asked only to speak with the king.",
@@ -156,7 +170,7 @@ const chapters={
     "bytes": 4033484
   },
   "phase4_complete": {
-    "chapter": 12,
+    "chapter": 13,
     "title": "FORCES BEST LEFT UNDISTURBED",
     "paragraphs": [
       "For a while, the war settled into an uneasy balance, although very little about it was still ordinary. Mountain clans and Elven scouts marched beside human soldiers, the Necromancer guilds had brought the Plague into the conflict, Clerics of the East now opposed them wherever it spread, and even the secretive Monks had stepped onto the field.",
@@ -168,7 +182,7 @@ const chapters={
     "bytes": 3269772
   },
   "phase5_dragon": {
-    "chapter": 13,
+    "chapter": 14,
     "title": "FIRE IN THE MOUNTAINS",
     "paragraphs": [
       "After the battle, the defeated king decided that ordinary reinforcements were no longer enough. Among the oldest royal records was a warning about the Dragons that had lived in the northern mountains longer than either kingdom had existed. The warning was quite clear: do not travel there. The king read that part twice, then ordered horses. If he was going to ignore several centuries of good advice, he at least intended to do it in person.",
@@ -185,7 +199,7 @@ const chapters={
     "bytes": 9159372
   },
   "phase5_demon": {
-    "chapter": 14,
+    "chapter": 15,
     "title": "A DOOR BEST LEFT CLOSED",
     "paragraphs": [
       "The Dragon had seemed like the sort of advantage no enemy could answer. That illusion lasted until the rival kingdom acquired one of its own. After the next defeat, the king finally accepted that this war would answer almost anything with more of the same, so he turned toward a path his ancestors had not merely discouraged but forbidden.",
@@ -202,7 +216,7 @@ const chapters={
     "bytes": 8516300
   },
   "phase5_wizard": {
-    "chapter": 15,
+    "chapter": 16,
     "title": "THE SKY ANSWERS",
     "paragraphs": [
       "Word reached the court of a Wizard so old that he spoke of ancient kings as former acquaintances and occasionally corrected historians who had the details wrong. His long life, people said, came from a bargain made thousands of years earlier: blood, power and part of himself traded for a life that seemed unwilling to end.",
@@ -217,7 +231,7 @@ const chapters={
     "bytes": 4682604
   },
   "phase5_complete": {
-    "chapter": 16,
+    "chapter": 17,
     "title": "NO MORE RESTRAINT",
     "paragraphs": [
       "Years had passed since the first skirmish over a disputed border, long enough for the war to become part of the landscape. Roads had been widened for armies, villages near the fighting had grown used to columns of soldiers passing through, and fields that once measured seasons by planting and harvest now measured them by camps, fortifications and supply trains.",
@@ -231,7 +245,7 @@ const chapters={
     "bytes": 5540460
   },
   "hero_intro": {
-    "chapter": 17,
+    "chapter": 18,
     "title": "ONE LAST CONDITION",
     "paragraphs": [
       "After the battle, the defeated king sent for a man who had once been among his most trusted warriors. The Hero had served the crown for many years and fought in campaigns long before the present war began, but eventually he had laid down his weapons and withdrawn to his own lands. He had earned his peace, and until now the king had respected it.",
@@ -244,7 +258,7 @@ const chapters={
     "bytes": 3642572
   },
   "phase6_final": {
-    "chapter": 18,
+    "chapter": 19,
     "title": "THE FINAL BATTLE",
     "paragraphs": [
       "The Hero's refusal left both kingdoms with an awkward possibility rather than a new soldier. Across the border, the rival kingdom had a champion of its own who had made much the same choice: neither intended to take part in the war, but both lived close enough to the front that an attack on their lands or their people could draw them into it without warning.",
@@ -260,7 +274,7 @@ const chapters={
     "bytes": 6363500
   },
   "story_complete": {
-    "chapter": 19,
+    "chapter": 20,
     "title": "THE LAST STONE FALLS",
     "paragraphs": [
       "When the enemy army finally began to break, few people recognised the moment for what it was. One part of the line gave way, then another, and soon soldiers who had fought through years of war were retreating across ground covered in smoke, shattered weapons and the remains of everything both kingdoms had brought to the field.",
@@ -275,6 +289,20 @@ const chapters={
     "wav": "assets/story/audio/19_the_last_stone_falls.wav",
     "sha256": "7de325ab559ea263aa845102c69f232da8c0e241ab414ae39549a5e6c819d3fb",
     "bytes": 7697612
+  },
+  "assassin_reveal": {
+    "chapter": 21,
+    "title": "THE ASSASSIN",
+    "paragraphs": [
+      "Reports have begun to spread of a shadow moving between the camps.",
+      "No banner follows him, and no army claims him. Yet wherever he appears, hidden positions are uncovered and darker forces seem strangely willing to answer his call.",
+      "If the rumours are true, this Assassin may be one of the most dangerous men in either kingdom — not because he commands an army, but because he knows how to find what others have hidden.",
+      "There are other rumours. The Assassin has begun stirring the common folk against the war.",
+      "For now, few dare rise while armies still hold the field."
+    ],
+    "wav": "assets/story/audio/00_The_Assassin.wav",
+    "sha256": "5f505d0aac145866dde0f2f7755fa31d9e35c8ea3dc8f1a18c0981817c6fd6d4",
+    "bytes": 1033260
   }
 };
 const preferenceKey='stoneThrow.storyNarration.enabled.v1';
@@ -288,9 +316,17 @@ document.getElementById('stStoryAftermathCard')?.prepend(makeControl('stTransiti
 syncControls();
 window.chainSiegeAudio.subscribe(()=>{enabled=window.chainSiegeAudio.get().narrator.on;syncControls();});
 const html=scene=>chapters[scene].paragraphs.map(p=>'<p>'+p.replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;')+'</p>').join('');
-function stop(hide=true){document.documentElement.dataset.musicNarrating='false';if(hide)delete document.documentElement.dataset.musicStoryScene;if(hide)for(const button of storyControls)button.hidden=true;const previous=current;current=null;if(previous){window.chainSiegeAudio.releaseNarrator(previous);previous.onerror=null;previous.pause();previous.removeAttribute('src');previous.load();}}
-function play(scene){
- stop();const chapter=chapters[scene];if(!chapter)return;document.documentElement.dataset.musicStoryScene=scene;for(const button of storyControls)button.hidden=false;
+let narrationSerial=0,fade=null;
+function dispose(audio){window.chainSiegeAudio.releaseNarrator(audio);audio.onerror=null;audio.pause();audio.removeAttribute('src');audio.load();}
+function stop(hide=true,fadeMs=0){
+ narrationSerial++;if(fade){cancelAnimationFrame(fade.frame);dispose(fade.audio);fade.resolve();fade=null;}
+ document.documentElement.dataset.musicNarrating='false';if(hide)delete document.documentElement.dataset.musicStoryScene;if(hide)for(const button of storyControls)button.hidden=true;
+ const previous=current;current=null;if(!previous)return Promise.resolve();
+ if(!fadeMs||previous.paused){dispose(previous);return Promise.resolve();}
+ return new Promise(resolve=>{const start=performance.now(),volume=previous.volume,job={audio:previous,resolve,frame:null};fade=job;const step=now=>{if(fade!==job)return;const progress=Math.min(1,(now-start)/fadeMs);previous.volume=volume*(1-progress);if(progress<1)job.frame=requestAnimationFrame(step);else{dispose(previous);fade=null;resolve();}};job.frame=requestAnimationFrame(step);});
+}
+async function play(scene,{fadePrevious=false}={}){
+ const stopped=stop(true,fadePrevious?350:0),serial=narrationSerial;await stopped;if(serial!==narrationSerial)return;const chapter=chapters[scene];if(!chapter)return;document.documentElement.dataset.musicStoryScene=scene;for(const button of storyControls)button.hidden=false;
  try{
   const audio=new Audio();current=audio;audio.preload='none';
   for(const event of ['playing','pause','ended','error'])audio.addEventListener(event,()=>{if(current===audio)document.documentElement.dataset.musicNarrating=String(event==='playing');});

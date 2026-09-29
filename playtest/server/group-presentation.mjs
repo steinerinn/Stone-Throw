@@ -16,7 +16,7 @@ export function groupPresentation(project,target,onFrame){
  function capture(r,live){const state=states.get(r);if(!state)return;const delta=live.events.slice(state.cursor).map(r=>r.event);state.cursor=live.events.length;// No public event means the previous implementation emitted no frame. Avoid
  // rebuilding and validating both complete observer histories for that step.
  if(r.seats.every((seat,i)=>seat.controller!=='human'||live.state.match.knowledge[live.config.players[i].id].events.length<=state.positions[i]))return;
- const publicEvent={id:r.code+':'+r.epoch+':'+r.revision+':'+(++state.serial),at:Date.now()+180,...(delta.some(e=>e.kind==='hero-moved')?{minimumMs:1600}:{})};const commonImpact=delta.find(e=>(e.kind==='impact'||e.kind==='suspect-eliminated'&&e.meta?.source==='dragon')&&e.meta&&e.cells[0]),onlineAnimation=publicAnimation(r,live,commonImpact,state);const old=r.host,match=live.state.match;
+ const publicEvent={id:r.code+':'+r.epoch+':'+r.revision+':'+(++state.serial),at:Date.now()+180,...(delta.some(e=>e.kind==='hero-moved')?{minimumMs:1600}:delta.some(e=>e.kind==='impact'&&e.meta?.source==='direct-ai')?{minimumMs:300}:{})};const commonImpact=delta.find(e=>(e.kind==='impact'||e.kind==='suspect-eliminated'&&e.meta?.source==='dragon')&&e.meta&&e.cells[0]),onlineAnimation=publicAnimation(r,live,commonImpact,state);const old=r.host,match=live.state.match;
  // Refresh mutates current derived fields/board clues, never the append-only journals.
  // Clone the working board data once; retain read-only journal references for projection.
  const stateView=cloneCombat(live.state);

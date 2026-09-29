@@ -159,6 +159,19 @@ function effects(ctx, deferTerminal = false) {
             }
         }
     }
+    // Ring scouting waits for the complete chain and any Chaos reorder. Keep the benefit durable.
+    if (ctx.state.ring && (p.elfNow || p.areaScoutNow)) {
+        ctx.deferredScoutOwners ??= [];
+        if (!ctx.deferredScoutOwners.includes(p.playerId))
+            ctx.deferredScoutOwners.push(p.playerId);
+        if (p.elfNow) {
+            p.spyLater = Math.max(p.spyLater, 5);
+            p.elfNow = false;
+        }
+        p.areaScoutLater = (p.areaScoutLater || 0) + (p.areaScoutNow || 0);
+        p.areaScoutNow = 0;
+        return;
+    }
     if (p.areaScoutNow) {
         p.areaScoutLater = (p.areaScoutLater || 0) + p.areaScoutNow;
         const count = p.areaScoutNow;

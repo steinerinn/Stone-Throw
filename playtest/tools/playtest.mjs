@@ -1,4 +1,4 @@
-import {localRecovery} from './local-recovery.mjs';
+import {localRecovery,recordLocalCompatibility} from './local-recovery.mjs';
 import {registryDirectory} from '../server/registry.mjs';
 import fs from 'node:fs';
 import os from 'node:os';
@@ -22,6 +22,7 @@ export async function startPlaytest({lan=false,stateDir=playtestStateDirectory(l
  if(lan){process.env.ST_PLAGUE_CAPTURE_DIR=path.join(stateDir,'plague-diagnostics');console.log('Game Log private capture folder (Settings OFF by default): '+process.env.ST_PLAGUE_CAPTURE_DIR+' (bounded; checkpoint journal disabled)');}
  const options={hofPlaytest:true,statisticsInspector:true,recoverLocalSession:localRecovery(root,stateDir),playtestSnapshotOnly:true,betaGameLog:lan,development:false,lan,bind:lan?'0.0.0.0':'127.0.0.1',stateDir,publicOrigin:undefined,secureCookies:false};
  let app;try{app=await startServer({...options,port:3212});}catch(e){if(!['EADDRINUSE','EACCES'].includes(e.code))throw e;throw new Error('Port 3212 is unavailable ('+e.code+'). Close the previous playtest terminal with Ctrl+C, then run PLAYTEST-LAN.cmd again. The playtest will not switch to another port');}
+ recordLocalCompatibility(root,stateDir);
  console.log('Chain Siege private Registry: '+registryDirectory());
  console.log('Chain Siege playtest: '+app.origin+' — keep this window open. Press Ctrl+C to stop.');
  if(lan){const port=new URL(app.origin).port;for(const address of Object.values(os.networkInterfaces()).flat().filter(a=>a?.family==='IPv4'&&!a.internal))console.log('Phone / second device: http://'+address.address+':'+port);}

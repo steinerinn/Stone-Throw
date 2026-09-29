@@ -2,12 +2,12 @@ import type {HostState} from '../host/contracts.js';
 import type {PlayerId} from '../model.js';
 import {seat,cellKey,targetKnowledge} from '../combat/access.js';
 import {neighbors8} from '../rules/coordinates.js';
-import {heroPlagueSafe} from './special-decisions.js';
+import {heroPlagueSafe,heroUnscouted} from './special-decisions.js';
 import {pick,draw} from './auto-target.js';
 /** Approved first-hit AI policy only. The resolver supplies the legal set;
  * this policy cannot invent destinations or change subsequent relocations. */
 export function firstHeroRelocation(h:HostState,owner:PlayerId,legal:string[]):string|null {
- const p=seat(h.state,owner),pool=heroPlagueSafe(h,owner,legal.filter(k=>!p.shots.includes(k)&&!p.occupied.includes(k)));
+ const p=seat(h.state,owner),pool=heroPlagueSafe(h,owner,heroUnscouted(h,owner,legal.filter(k=>!p.shots.includes(k)&&!p.occupied.includes(k))));
  if(!pool.length)return null;
  const units=h.state.match.units.filter(u=>u.ownerId===owner);
  const revealed=new Set(targetKnowledge(h.state,p.reactionTarget.playerId,owner).scouted);

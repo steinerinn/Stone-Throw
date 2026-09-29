@@ -1,7 +1,7 @@
 const MODES=[['All','ALL'],['Duel','DUEL'],['3 Players','3 PLAYER'],['4 Players','4 PLAYER']];
 const node=(tag,text,cls)=>{const n=document.createElement(tag);if(text!==undefined)n.textContent=text;if(cls)n.className=cls;return n;};
 function identity(row){const span=node('span',undefined,'cs-hof-identity');if(row.playerId){span.dataset.profileId=row.playerId;span.tabIndex=0;span.setAttribute('role','button');span.setAttribute('aria-label','View '+row.displayName+' player card');}const valid=/^[A-Z]{2}$/.test(row.country||''),flag=node(valid?'img':'span',valid?undefined:'⚑','cs-hof-flag');if(valid){flag.src='/assets/ui/flags/'+row.country.toLowerCase()+'.svg';flag.alt=new Intl.DisplayNames(['en'],{type:'region'}).of(row.country);}else flag.setAttribute('aria-label','Nationality not set');span.append(flag,node('span',row.displayName));return span;}
-const value=(v,k)=>new Intl.NumberFormat('en-US',{maximumFractionDigits:0}).format(Math.round(['winRatio','lossRatio','accuracy'].includes(k)?100*v:v))+(['winRatio','lossRatio','accuracy'].includes(k)?'%':'');
+const value=(v,k)=>['winRatio','lossRatio','accuracy'].includes(k)?(100*v).toFixed(1).replace(/\.0$/, '')+'%':new Intl.NumberFormat('en-US',{maximumFractionDigits:0}).format(v);
 function rankRow(r,key,own){const row=node('div',undefined,'cs-hof-row'+(own?' cs-hof-own':''));row.append(node('span','#'+r.rank,'cs-hof-rank'),identity(r),node('span',value(r.value,key),'cs-hof-value'));if(own){row.setAttribute('aria-label','Your ranking');row.querySelector('.cs-hof-identity').append(node('small','YOU','cs-hof-you'));}return row;}
 let launchHall=null;
 export function installHallOfFame(parent){

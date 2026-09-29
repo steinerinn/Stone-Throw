@@ -30,7 +30,7 @@ export function assertResolution(value) {
     plain(value);
     ensure(value && typeof value === 'object', 'Expected resolution');
     const ctx = value;
-    exact(ctx, ['contract', 'scope', 'id', 'acceptedActionId', 'activePlayerId', 'compatibility', 'status', 'state', 'rng', 'frames', 'future', 'decisions', 'events', 'generated', 'nextWork', 'nextDecision', 'completedAtEvent', 'externalEntropy', ...(ctx.environmental ? ['environmental'] : []), ...(ctx.assassinPending !== undefined ? ['assassinPending'] : [])]);
+    exact(ctx, ['contract', 'scope', 'id', 'acceptedActionId', 'activePlayerId', 'compatibility', 'status', 'state', 'rng', 'frames', 'future', 'decisions', 'events', 'generated', 'nextWork', 'nextDecision', 'completedAtEvent', 'externalEntropy', ...(ctx.environmental ? ['environmental'] : []), ...(ctx.assassinPending !== undefined ? ['assassinPending'] : []), ...(ctx.deferredScoutOwners !== undefined ? ['deferredScoutOwners'] : [])]);
     ensure(['accepted-action', 'boundary-comparison'].includes(ctx.scope), 'Unknown resolution scope');
     ensure(ctx.contract === 'stone-throw-resolution-v1' && ctx.compatibility === 'golden-v1.427', 'Unknown rules contract');
     ensure(['running', 'awaiting-decision', 'complete'].includes(ctx.status), 'Invalid resolution status');
@@ -91,6 +91,8 @@ export function assertResolution(value) {
             }
         }
     }
+    if (ctx.deferredScoutOwners !== undefined)
+        ensure(Array.isArray(ctx.deferredScoutOwners) && new Set(ctx.deferredScoutOwners).size === ctx.deferredScoutOwners.length && ctx.deferredScoutOwners.every(id => players.has(id)), 'Invalid deferred Scout owners');
     if (ctx.environmental) {
         exact(ctx.environmental, ['kind', 'level']);
         ensure(ctx.environmental.kind === 'peasant-revolt' && integer(ctx.environmental.level) && ctx.environmental.level > 0, 'Invalid environmental root');

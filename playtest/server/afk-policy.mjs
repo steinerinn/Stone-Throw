@@ -13,7 +13,7 @@ export function requiredInput(r){
  const stamp=createHash('sha256').update(JSON.stringify([h.events.length,d?.id||'shot',r.afkGeneration||0])).digest('hex');
  return {seat:i,key:[r.epoch,r.revision,stamp].join(':')};
 }
-export function resetAfk(r){r.afk=null;r.afkGeneration=0;for(const s of r.seats||[])if(s){s.afkIncidents=0;s.afkHistory=[];s.disconnects=0;}}
+export function resetAfk(r){delete r.sharedIncidentPendingUntil;r.afk=null;r.afkGeneration=0;for(const s of r.seats||[])if(s){s.afkIncidents=0;s.afkHistory=[];s.disconnects=0;delete s.sharedIncident;delete s.reliabilityIncidents;}}
 export function cancelAfk(r){if(r.afk){r.afkGeneration=(r.afkGeneration||0)+1;r.afk=null;}}
 export function afkInfo(r,i,now){
  const input=requiredInput(r),a=r.afk;
@@ -44,7 +44,9 @@ export function reconcileAfk(r,now,takeover){
  const votes=a.voters.map(i=>a.votes[i]);a.threshold=r.seats[a.seat].afkIncidents>=2?1:Math.ceil(a.voters.length/2);
  const unanimous=a.voters.length+aiVoters.length>0&&votes.every(v=>v==='wait');
  a.deadline=a.warningAt+(unanimous?AFK_WAIT_MS:AFK_DEADLINE_MS);
- if(votes.filter(v=>v==='kick').length>=Math.max(1,a.threshold)||now>=a.deadline){takeover(r,a.seat,'afk');cancelAfk(r);}
+ // A silent socket cannot confirm a usable AFK deadline; let heartbeat recovery
+ // or disconnect/shared-incident classification settle it first.
+ if(votes.filter(v=>v==='kick').length>=Math.max(1,a.threshold)||now>=a.deadline&&now-r.seats[a.seat].seen<=1000){takeover(r,a.seat,'afk');cancelAfk(r);}
 }
 export function voteAfk(r,i,body,now,takeover){
  reconcileAfk(r,now,takeover);const a=r.afk;

@@ -65,3 +65,6 @@
 
 /* Stored replay: two battlefields per page, using canonical cell artwork. */
 .cs-profile .cs-replay-boards{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));align-content:start;gap:14px;overflow:auto}.cs-profile .cs-replay-board{height:auto;min-width:0;aspect-ratio:auto}.cs-profile .cs-replay-grid{width:100%;height:auto;max-width:370px;aspect-ratio:1}.cs-profile .cs-replay-board h3{height:36px;display:flex;align-items:center;justify-content:center;font-size:14px}.cs-profile .cs-replay-grid .cell{min-width:0;min-height:0}.cs-profile .cs-replay-slot{height:calc(100% - 95px)}
+
+.cs-profile .cp-avatar-wrap.cs-badged-avatar{width:112px;margin:10px}
+@media(max-width:699px){.cs-profile .cp-avatar-wrap.cs-badged-avatar{width:94px;margin:8px}}

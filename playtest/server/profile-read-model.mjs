@@ -17,7 +17,7 @@ export function profileReadModel(db,statistics,viewerId,request){
  if(['result','replay'].includes(section)&&(typeof matchId!=='string'||matchId.length>200))deny('Invalid battle reference.');
  if(['result','replay'].includes(section)&&!owner)deny('Only your own retained battle history is available.',403);
  const saved=owner?db.prepare('SELECT match_id,summary FROM profile_saved_battles WHERE player_id=? ORDER BY saved_at DESC,match_id DESC').all(playerId):[];
- if(owner&&['result','replay'].includes(section)){const stored=db.prepare('SELECT result,replay FROM profile_saved_battles WHERE player_id=? AND match_id=?').get(playerId,matchId);if(stored)return section==='replay'?repairReplayPresentation(db,parse(stored.replay)):parse(stored.result);}
+ if(owner&&['result','replay'].includes(section)){const stored=db.prepare('SELECT result,replay FROM profile_saved_battles WHERE player_id=? AND match_id=?').get(playerId,matchId);if(stored){if(section==='replay')return repairReplayPresentation(db,parse(stored.replay));const result=parse(stored.result);return {...result,players:result.players.map(p=>({...p,rewards:p.playerId?profileAggregate(db,p.playerId).rewards:{}}))};}}
  const rows=db.prepare("SELECT p.*,m.descriptor,m.ended_at,m.started_at,m.player_count,m.event_cursor,m.mode FROM stat_participants p JOIN stat_matches m ON m.id=p.match_id WHERE p.player_id=? AND p.kind='account' AND m.finalized=1 AND m.mode<>'Story'"+(section==='overview'?' AND p.match_id IN (SELECT match_id FROM profile_recent WHERE player_id=?)':'')+" ORDER BY m.ended_at DESC,m.started_at DESC,m.id DESC"+(section==='overview'?' LIMIT 5':'')).all(...(section==='overview'?[playerId,playerId]:[playerId]));
  const recent=statistics.recentBattles(playerId),latest=new Set(recent.map(r=>r.matchId));
  const identity={playerId,displayName:account.display_name,country:account.country,bio:account.bio,avatarId:account.avatar_id,avatar:avatarById(account.avatar_id)?.assetPath||avatarById(DEFAULT_AVATAR).assetPath};
@@ -27,7 +27,7 @@ export function profileReadModel(db,statistics,viewerId,request){
   const resultAwards=resultSummary(row);if(!resultAwards)return null;
   const players=d.participants.map(p=>{
    const a=p.playerId?db.prepare("SELECT id,display_name,country,avatar_id FROM accounts WHERE id=? AND status='active'").get(p.playerId):null;
-   return {seat:p.seat,placement:d.finalResult.placements[p.actor],name:p.displayName||a?.display_name||'PLAYER',playerId:a?.id||null,ai:p.kind==='ai',country:a?.country||null,avatar:(avatarById(a?.avatar_id||AI_AVATARS[p.displayName]||DEFAULT_AVATAR)||avatarById(DEFAULT_AVATAR)).assetPath,matchScore:statistics.matchResultScore(row.match_id,p.actor)};
+   return {seat:p.seat,placement:d.finalResult.placements[p.actor],name:p.displayName||a?.display_name||'PLAYER',playerId:a?.id||null,rewards:a?profileAggregate(db,a.id).rewards:{},ai:p.kind==='ai',country:a?.country||null,avatar:(avatarById(a?.avatar_id||AI_AVATARS[p.displayName]||DEFAULT_AVATAR)||avatarById(DEFAULT_AVATAR)).assetPath,matchScore:statistics.matchResultScore(row.match_id,p.actor)};
   });
   if(players.some(p=>!Number.isInteger(p.placement)))return null;
   return {count:players.length,players,awards:resultAwards,matchScore:statistics.matchResultScore(row.match_id,row.actor)};

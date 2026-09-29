@@ -92,6 +92,8 @@ export function pumpHost(h, maxSteps = 100000, execution) {
                     h.turnStep = 'finish';
                 else if (purpose === 'revolt')
                     h.turnStep = resumeStep;
+                if (r.deferredScoutOwners?.includes(p.playerId) && (p.spyLater || p.areaScoutLater))
+                    root(h, [...(p.spyLater ? [{ kind: 'turn-scout', ownerId: p.playerId, count: p.spyLater }] : []), ...Array.from({ length: p.areaScoutLater || 0 }, () => ({ kind: 'turn-scout', ownerId: p.playerId, count: 1, area: true }))], 'entry');
             }
             continue;
         }

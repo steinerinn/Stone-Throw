@@ -3,7 +3,7 @@
 export function animationCue(h, events, groups) {
     // A false resurrection candidate is still a visible Dragon path step; omitting its
     // cue splits the flight and makes the remaining diagonal replay from the origin.
-    const e = events.find(e => (e.kind === 'impact' || e.kind === 'suspect-eliminated' && e.meta?.source === 'dragon') && e.meta && (e.meta.source === 'revolt' || e.statistics?.doublePlague || ['direct-human', 'direct-ai', 'catapult-shot', 'wizard', 'archer', 'goblin', 'demon-blast', 'dragon', 'assassin'].includes(e.meta.source)));
+    const e = events.find(e => (e.kind === 'impact' || e.kind === 'suspect-eliminated' && e.meta?.source === 'dragon') && e.meta && (e.meta.source === 'revolt' || e.statistics?.doublePlague || ['direct-human', 'direct-ai', 'catapult-shot', 'wizard', 'archer', 'goblin', 'demon-blast', 'dragon', 'assassin', 'plague'].includes(e.meta.source)));
     if (!e?.meta || !e.cells[0])
         return;
     const m = e.meta, own = h.config.players.findIndex(p => p.id === m.ownerId), target = h.config.players.findIndex(p => p.id === m.targetPlayerId);

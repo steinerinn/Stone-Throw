@@ -31,3 +31,17 @@ export function createGroupNarrative(){
   return {global:!r.local,self:h.config.players[self].id,players:h.config.players.map((p,i)=>({id:p.id,name:r.seats[i]?.name||'Waiting for PLAYER'})),events:c.rows.flatMap(row=>{if(row.kind!=='plague')return [{...row}];if(!snapshot)return [];const seat=h.config.players.findIndex(p=>p.id===row.target),same=c=>c.x===row.cell.x&&c.y===row.cell.y;const observed=seat===self?snapshot.owned?.find(u=>u.cells.some(same)):(snapshot.online?.boards?.find(b=>b.seat===seat)?.cells||(h.config.players.length===2?snapshot.opponent:[])||[]).find(c=>same(c.cell));if(!observed)return [];const {cell,...safe}=row;return [{...safe,unit:observed.kind||null}];})};
  };
 }
+
+// Sound-only public cues: never expose cells, identities, or hidden unit geometry.
+export function createPublicSounds(){const cache=new WeakMap();return r=>{
+ const h=r.host;let c=cache.get(r);if(!c||c.epoch!==r.epoch||c.cursor>h.events.length){c={epoch:r.epoch,cursor:0,rows:[]};cache.set(r,c);}
+ for(let i=c.cursor;i<h.events.length;i++){const e=h.events[i].event;let kind=null,count=1;
+ if(e.kind==='scouted'){kind='scout';count=Math.max(1,e.cells.length);}
+ else if(e.kind==='resurrection')kind='resurrect';
+ else if(e.kind==='hero-moved')kind='hero-move';
+ else if(e.kind==='hero-killed')kind='hero-dead';
+ else if(e.kind==='impact'&&e.statistics?.unitType==='hero')kind='hero-hit';
+ else if(e.kind==='impact'&&e.meta?.source==='catapult-shot')kind='stone';
+ if(kind)c.rows.push({position:i+1,kind,count});
+ }c.cursor=h.events.length;if(c.rows.length>256)c.rows.splice(0,c.rows.length-256);return {epoch:String(r.epoch??0),cursor:c.cursor,events:c.rows.slice()};
+ };}

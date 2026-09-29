@@ -51,3 +51,32 @@ body.st-shell-active.resurrection-cursor #playerGrid .cell{cursor:url("assets/cu
 
 /* Measured map dimensions must not be clamped by the secondary card content box. */
 @media(min-width:651px){.st-secondary-card .st-grid-host{max-width:none;margin-inline:0;left:50%;translate:-50% 0}}
+
+/* Stacked phones read around the ring: A, B, C, D. */
+@media(max-width:650px){.st-secondary-card{order:var(--st-mobile-order,0)}}
+
+
+/* Phone maps use the viewport; decorative frame space goes to playable cells. */
+@media(max-width:650px){
+ body.st-shell-active.st-full-battlefield{--cs-phone-cell:calc((100vw - 16px)/var(--board-track-count,15))}
+ body.st-shell-active.st-full-battlefield #stoneThrowShell{width:calc(100vw - 8px)}
+ body.st-shell-active.st-full-battlefield .st-boards,body.st-shell-active.st-full-battlefield .st-secondary-boards{display:flex!important;flex-direction:column;width:100%;padding:0!important;align-items:center}
+ body.st-shell-active.st-full-battlefield .st-board-wrap,body.st-shell-active.st-full-battlefield .st-secondary-card{width:calc(100vw - 12px)!important;min-width:0;max-width:none!important;padding:0!important;box-sizing:border-box;--cell:var(--cs-phone-cell);border:0;box-shadow:none}
+ body.st-shell-active.st-full-battlefield .st-grid-host{--cell:var(--cs-phone-cell);width:calc(100vw - 12px)!important;min-width:0!important;max-width:none!important;min-height:0!important;height:auto!important;padding:0!important;margin:0!important;border:0!important;box-shadow:none!important;background:none!important;left:auto!important;translate:none!important;box-sizing:border-box}
+ body.st-shell-active.st-full-battlefield .st-grid-host::before,body.st-shell-active.st-full-battlefield .st-grid-host::after{display:none!important}
+ body.st-shell-active.st-full-battlefield .grid{--cell:var(--cs-phone-cell)!important;margin-inline:auto!important}
+ body.st-shell-active.st-full-battlefield .unit-strip{display:grid!important;grid-template-columns:repeat(16,minmax(0,1fr));gap:0!important;width:calc(100vw - 12px)!important;max-width:none!important;margin:8px 0 0!important;zoom:1!important;box-sizing:border-box;left:0!important;translate:none!important;transform:none!important}
+ body.st-shell-active.st-full-battlefield .unit-strip-item{width:auto!important;min-width:0!important;margin:0!important;padding-inline:0!important;box-sizing:border-box}
+ body.st-shell-active.st-full-battlefield .unit-strip .unit-strip-icon{width:100%!important;max-width:100%;height:calc((100vw - 16px)/16)!important;min-width:0!important;min-height:0!important;background-size:contain!important}
+ body.st-shell-active.st-full-battlefield .unit-strip [data-unit="assassin"]{position:relative;left:auto;top:auto}
+ body.st-shell-active.st-full-battlefield .unit-strip-pips{max-width:100%}
+}
+
+@media(max-width:650px){body.st-shell-active.st-full-battlefield .st-left-stack{min-width:0;width:100%}body.st-shell-active.st-full-battlefield .st-battle{width:100%;min-width:0;box-sizing:border-box;padding-inline:0!important;border:0;box-shadow:none}body.st-shell-active.st-full-battlefield #stOnlineOverview{width:100%}}
+
+/* Phone boards keep player names; banners must not cover the first grid row. */
+@media(max-width:650px){body.st-shell-active.st-full-battlefield .st-board-head{display:none!important}}
+
+@media(max-width:650px){body.st-shell-active.st-full-battlefield .st-board-wrap::before,body.st-shell-active.st-full-battlefield .st-board-wrap::after{content:none!important;display:none!important}}
+
+@media(max-width:650px){body.st-shell-active.st-full-battlefield:not(.st-multiplayer-mode) .st-board-head{display:block!important;position:static!important;transform:none!important;width:100%!important;margin:8px 0!important}body.st-shell-active.st-full-battlefield:not(.st-multiplayer-mode) .st-board-banner-img{display:none!important}body.st-shell-active.st-full-battlefield:not(.st-multiplayer-mode) .st-board-title{position:static!important;width:auto!important;height:auto!important;margin:0!important;padding:4px!important;clip:auto!important;clip-path:none!important;overflow:visible!important;white-space:normal!important;font-size:16px!important;text-align:center}}
