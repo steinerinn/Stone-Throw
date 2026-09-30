@@ -12,7 +12,7 @@ export function resultAwards(db,id){const r=db.prepare('SELECT value FROM profil
 export function accumulateProfile(db,d,facts,expected=facts.length){
  if(d.mode==='Story'||db.prepare('SELECT 1 FROM profile_aggregated_matches WHERE match_id=?').get(d.id))return;
  const rows=db.prepare('SELECT * FROM stat_participants WHERE match_id=? ORDER BY seat').all(d.id),global=globalAggregate(db);global.battles++;global.participants+=rows.length;
- for(const row of rows){const s=parse(row.summary);if(!s||!Number.isFinite(s.unitsKilled)||!Number.isFinite(s.biggestChain))global.complete=false;else{global.units+=s.unitsKilled;global.chain=Math.max(global.chain,s.biggestChain);}}
+ for(const row of rows){const s=parse(row.summary);if(!s||!Number.isFinite(s.unitsKilled)||!Number.isFinite(s.biggestChain))global.complete=false;else{global.units+=s.unitsKilled;if(s.biggestChain>global.chain||s.biggestChain===global.chain&&!global.chainHolder){const p=d.participants.find(p=>p.actor===row.actor);global.chainHolder={playerId:row.player_id||null,displayName:p?.displayName||'Player',country:p?.country||null};}global.chain=Math.max(global.chain,s.biggestChain);}}
  const faction=db.prepare("SELECT 1 FROM sqlite_master WHERE name='stat_factions'").get()?parse(db.prepare('SELECT value FROM stat_factions WHERE match_id=?').get(d.id)?.value):null;if(faction){global.playerUnits+=faction.playerUnits;global.aiUnits+=faction.aiUnits;global.qualifyingMatchCount++;}
  let result=null;if(facts.length===expected&&d.finalResult?.placements&&d.participants.every(p=>Number.isInteger(d.finalResult.placements[p.actor]))){const summary=summarizeMatch({participants:d.participants.map(p=>({...p,kind:'guest',cutoff:undefined}))},facts);result=awards.flatMap(([name,metric,unit])=>{const winners=d.participants.filter(p=>summary[p.actor].awards.includes(name));return winners.length?[{name,unit,value:summary[winners[0].actor][metric],winners:winners.map(p=>p.seat)}]:[];});}
  db.prepare('INSERT INTO profile_result_awards VALUES(?,?)').run(d.id,JSON.stringify(result));
@@ -35,10 +35,10 @@ export function rebuildProfileAggregates(db){
  // Rebuildable derived data only. Protected facts/results/review tables are never mutated.
  for(const table of ['profile_recent','profile_totals','profile_friends','profile_result_awards','profile_global','profile_aggregated_matches'])db.exec('DELETE FROM '+table);
  for(const row of db.prepare("SELECT id,descriptor,event_cursor FROM stat_matches WHERE finalized=1 AND mode<>'Story' ORDER BY ended_at,id").all()){const d=parse(row.descriptor),facts=db.prepare("SELECT payload FROM stat_facts WHERE match_id=? AND kind='event' ORDER BY sequence").all(row.id).map(r=>parse(r.payload));accumulateProfile(db,d,facts,row.event_cursor);}
- db.exec('DELETE FROM profile_aggregate_dirty; INSERT OR REPLACE INTO profile_aggregate_meta VALUES(1,3)');
+ db.exec('DELETE FROM profile_aggregate_dirty; INSERT OR REPLACE INTO profile_aggregate_meta VALUES(1,4)');
 }
 export function ensureProfileAggregates(db){
- if(db.prepare('SELECT 1 FROM profile_aggregate_meta WHERE id=1 AND version=3').get()&&!db.prepare('SELECT 1 FROM profile_aggregate_dirty LIMIT 1').get())return;
+ if(db.prepare('SELECT 1 FROM profile_aggregate_meta WHERE id=1 AND version=4').get()&&!db.prepare('SELECT 1 FROM profile_aggregate_dirty LIMIT 1').get())return;
  db.exec('SAVEPOINT profile_rebuild');try{rebuildProfileAggregates(db);db.exec('RELEASE profile_rebuild');}catch(e){db.exec('ROLLBACK TO profile_rebuild; RELEASE profile_rebuild');throw e;}
 }
 export function migrateProfileAggregates(db){
