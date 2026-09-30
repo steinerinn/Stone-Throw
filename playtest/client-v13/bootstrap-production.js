@@ -49,7 +49,7 @@ function confirmLeave(){return confirmMatchAction({id:'stLeaveMatchConfirm',labe
 function reloadToMainMenu(){location.reload();}
 let leavingMatch=false;
 window.__stoneThrowLeaveMatch=async({fromResult=false}={})=>{
- if(localContext&&!fromResult){window.__stoneThrowOpenMainMenu?.();return;}
+ if(localContext){if(fromResult)document.getElementById('resultOverlay').style.display='none';window.__stoneThrowOpenMainMenu?.();return;}
  if(leavingMatch||(!fromResult&&!await confirmLeave()))return;
  leavingMatch=true;const uncover=fromResult?coverRematch():null;
  try{await session.request('leave-match');browserClient?.unmount();reloadToMainMenu();}
