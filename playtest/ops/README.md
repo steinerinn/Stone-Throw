@@ -4,8 +4,8 @@ After owner-approved local testing and commit/push, use `chainsiege-deploy <full
 The tool fetches and verifies the explicit commit while production runs. It stops
 only CHAIN SIEGE, switches Git, starts it, and verifies direct and HTTPS health,
 canonical/foreign Origins, foreign Host rejection and exclusive loopback binding.
-nginx stays running. The Registry, checkpoint and journal are never opened,
-backed up, copied, compacted or migrated by this deployment tool.
+nginx stays running. On normal versioned deployments, the Registry, checkpoint and journal are never
+opened, backed up, copied, compacted or migrated by this deployment tool.
 
 `--verify` checks the running installation. `--dry-run <full-sha>` also fetches,
 stages and validates the target without stopping production. `--recover` retries
@@ -44,6 +44,9 @@ invalid cache affects speed, not match recovery. Backup restoration to a differe
 journal inode safely falls back to streaming replay.
 
 First adoption may replay the existing journal once before a cache is available.
+It receives a 120-second health window; normal versioned deploys retain 20 seconds.
+These are failure deadlines, not imposed waits. Live read-only measurement of the
+legacy 2.7 GB journal took 35 seconds.
 Normal cached restart time depends on live state size and host storage; under ten
 seconds is a target, not an unconditional guarantee. Health reports cache use and
 replayed record/byte counts. Scheduled backups remain disaster recovery.
@@ -58,3 +61,20 @@ and verifies current HTTPS production. It restores the old tool if verification
 fails. Existing old tools/recovery evidence remain intact but are superseded;
 unresolved old transactions prevent installation. After this one-time operation,
 all routine deployments use the single standard command above.
+
+## Initial legacy rollback safeguard
+
+The unversioned reader reads the entire journal into a single string. It cannot
+restart with the present multi-gigabyte journal. Only when a first-adoption deploy
+FAILS and must return to that unversioned reader, the tool invokes its verified
+legacy recovery helper. The helper reads the latest authoritative state using the
+staged streaming/cache reader, writes a checksummed legacy-compatible snapshot,
+and atomically retains the original checkpoint and journal in
+`state/.deploy-legacy-rollback-<transaction>`. It never copies/restores Registry.
+All original evidence remains available. Rename interruptions are resumable;
+rerunning recovery does not replace newer state after successful recovery.
+The pending record and staged reader are retained until recovery succeeds.
+
+This fallback is not run on successful deployment, and is never used between
+versioned builds. It is necessary solely to recover the old reader's large-file
+limitation. No commit-specific exception or build-hash migration is involved.

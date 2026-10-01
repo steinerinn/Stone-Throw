@@ -1,5 +1,5 @@
 #!/usr/bin/python3
-"""One-command deployment. No state/Registry copying, migration or compaction."""
+"""Normal deploys reuse state; only first-upgrade legacy rollback may repack state."""
 import datetime,fcntl,hashlib,http.client,json,os,pathlib,pwd,re,signal,socket,ssl,subprocess,sys,tempfile,time,urllib.parse
 REPO=pathlib.Path('/home/steinerinn/chainsiege-live')
 ROOT=pathlib.Path('/var/lib/chainsiege-deploy-v2')
@@ -110,7 +110,7 @@ def checks(origin,build,expected):
     if not active('chainsiege.service') or not active('nginx.service'):raise RuntimeError('Services are not active.')
 
 def wait_health(t,old=False):
-    build=t['old_build'] if old else t['new_build'];expected=t['old_contract'] if old else t['new_contract'];deadline=time.monotonic()+20
+    build=t['old_build'] if old else t['new_build'];expected=t['old_contract'] if old else t['new_contract'];deadline=time.monotonic()+(120 if t['old_contract'] is None else 20)
     while True:
         try:checks(t['origin'],build,expected);return
         except Exception:
@@ -126,10 +126,21 @@ def start():
     run(['systemctl','start','chainsiege.service'],timeout=20)
 def finish(t,result):
     save(ROOT/(t['id']+'.json'),{**t,'result':result});PENDING.unlink(missing_ok=True);sync(ROOT)
-    log(result,previous=t['previous'],target=t['target'],registry='untouched',state='reused unchanged by deploy tool')
+    log(result,previous=t['previous'],target=t['target'],registry='untouched',state='legacy recovery snapshot; original files retained' if t.get('legacyRecovery') else 'reused unchanged by deploy tool')
 def recover(t):
     log('rollback-start',previous=t['previous'])
-    stop();clean();git('checkout','--detach',t['previous']);start();wait_health(t,old=True);finish(t,'rollback-pass')
+    stop();clean()
+    state=pathlib.Path('/home/steinerinn/chainsiege-data/state')
+    evidence=state/('.deploy-legacy-rollback-'+t['id'])
+    journal=state/'checkpoint.journal'
+    if t['old_contract'] is None and (evidence.exists() or (journal.exists() and journal.stat().st_size>=256*1024*1024)):
+        helper=pathlib.Path('/usr/local/libexec/chainsiege-deploy-v2/legacy-rollback.mjs')
+        if sha(helper)!=t['legacy_helper_sha']:raise RuntimeError('Reviewed legacy recovery helper changed; evidence preserved.')
+        t['legacyRecovery']=True;save(PENDING,t)
+        log('legacy-reader-recovery',reason='Previous reader cannot safely load this large journal',evidence=str(evidence))
+        result=run([t['node'],str(helper),str(pathlib.Path(t['stage'])/'playtest/server/store.mjs'),str(state),t['old_build'],t['id']],user=True,timeout=180)
+        log('legacy-reader-recovery-pass',detail=result.stdout.strip())
+    git('checkout','--detach',t['previous']);start();wait_health(t,old=True);finish(t,'rollback-pass')
 
 def deploy(t):
     # Persist only a tiny control record. Never open/copy/rewrite game state.
@@ -170,13 +181,15 @@ def main(args):
         run([node,str(stage/'playtest/tools/verify.mjs')],user=True)
         if git('rev-parse','HEAD')!=previous:raise RuntimeError('Checkout changed during preflight.')
         clean()
-        t={'id':ident,'previous':previous,'target':target,'origin':origin,'old_build':old_build,'new_build':sha(stage/'playtest/build-manifest.json'),'old_contract':old_contract,'new_contract':new_contract}
+        t={'id':ident,'previous':previous,'target':target,'origin':origin,'old_build':old_build,'new_build':sha(stage/'playtest/build-manifest.json'),'old_contract':old_contract,'new_contract':new_contract,'node':node,'stage':str(stage),'legacy_helper_sha':sha('/usr/local/libexec/chainsiege-deploy-v2/legacy-rollback.mjs')}
         if dry:log('dry-run-pass',previous=previous,target=target,contract=new_contract);return
         deploy(t)
     finally:
         # A staging cleanup failure must never trigger production rollback.
-        result=run(['git','-C',str(REPO),'worktree','remove',str(stage)],user=True,check=False)
-        if result.returncode:log('staging-retained',path=str(stage))
+        if PENDING.exists():log('staging-retained',path=str(stage),reason='Required for pending recovery')
+        else:
+            result=run(['git','-C',str(REPO),'worktree','remove',str(stage)],user=True,check=False)
+            if result.returncode:log('staging-retained',path=str(stage))
 
 def cli():
     if os.geteuid()!=0:raise SystemExit('Run as root.')

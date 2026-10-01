@@ -39,6 +39,17 @@ class Deployment(unittest.TestCase):
             with patch.object(d,'PENDING',pending),patch.object(d,'save',lambda p,t:p.write_text(json.dumps(t))),patch.object(d,'stop',side_effect=RuntimeError('stop failed')),patch.object(d,'log'):
                 with self.assertRaisesRegex(RuntimeError,'stop failed'):d.deploy({'previous':'old','target':'new'})
             self.assertTrue(pending.exists())
+    def test_first_upgrade_waits_for_large_journal_replay(self):
+        t={'old_build':'old','new_build':'new','old_contract':None,'new_contract':d.INITIAL,'origin':'https://chainsiege.com'}
+        clock=[0]
+        def checks(*a):
+            if clock[0]<35:raise RuntimeError('Still restoring')
+        with patch.object(d.time,'monotonic',lambda:clock[0]),patch.object(d.time,'sleep',lambda n:clock.__setitem__(0,clock[0]+n)),patch.object(d,'checks',checks):d.wait_health(t)
+        self.assertGreaterEqual(clock[0],35)
+        t['old_contract']=d.INITIAL;clock[0]=0
+        with patch.object(d.time,'monotonic',lambda:clock[0]),patch.object(d.time,'sleep',lambda n:clock.__setitem__(0,clock[0]+n)),patch.object(d,'checks',checks):
+            with self.assertRaisesRegex(RuntimeError,'Still restoring'):d.wait_health(t)
+        self.assertLess(clock[0],21)
     def test_requests_are_read_only_and_origin_method_valid(self):
         calls=[]
         class Connection:
@@ -50,8 +61,9 @@ class Deployment(unittest.TestCase):
         a,k=calls[0];self.assertEqual(a,('POST','/api/read'));self.assertEqual(k['body'],b'{');self.assertEqual(k['headers']['Origin'],'https://invalid.example');self.assertEqual(k['headers']['Host'],'chainsiege.com')
     def test_no_maintenance_or_registry_operations(self):
         text=source.read_text()
-        for forbidden in ('copytree','copy2','compact.mjs','checkpoint.journal','registry.sqlite','systemctl\',\'stop\',\'nginx','git reset','--hard'):self.assertNotIn(forbidden,text)
+        for forbidden in ('copytree','copy2','compact.mjs','registry.sqlite','systemctl\',\'stop\',\'nginx','git reset','--hard'):self.assertNotIn(forbidden,text)
         self.assertNotIn('e723ec5',text)
+        self.assertNotIn('checkpoint.journal',text[text.index('def deploy('):text.index('def main(')])
     def test_host_and_origin_fail_closed(self):
         def response(origin,path='/health',proxy=False,bad_origin=False,bad_host=False):
             if bad_host:return 403,{'error':'invalid-host'}

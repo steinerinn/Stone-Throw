@@ -4,13 +4,14 @@ import datetime,fcntl,hashlib,json,os,pathlib,re,subprocess,sys,tempfile
 REPO='/home/steinerinn/chainsiege-live'
 DEST=pathlib.Path('/usr/local/sbin/chainsiege-deploy')
 ROOT=pathlib.Path('/var/lib/chainsiege-deploy-v2')
+HELPER=pathlib.Path('/usr/local/libexec/chainsiege-deploy-v2/legacy-rollback.mjs')
 def git(*args):return subprocess.check_output(['runuser','-u','steinerinn','--','git','-C',REPO,*args])
-def replace(data,mode):
-    fd,name=tempfile.mkstemp(prefix='.chainsiege-deploy-',dir=DEST.parent)
+def replace(data,mode,dest=DEST):
+    fd,name=tempfile.mkstemp(prefix='.chainsiege-deploy-',dir=dest.parent)
     try:
         with os.fdopen(fd,'wb') as f:f.write(data);f.flush();os.fsync(f.fileno())
-        os.chmod(name,mode);os.replace(name,DEST)
-        fd=os.open(DEST.parent,os.O_RDONLY|os.O_DIRECTORY)
+        os.chmod(name,mode);os.replace(name,dest)
+        fd=os.open(dest.parent,os.O_RDONLY|os.O_DIRECTORY)
         try:os.fsync(fd)
         finally:os.close(fd)
     finally:
@@ -26,6 +27,8 @@ def main():
     manifest=json.loads(git('show',ref+':playtest/build-manifest.json'))
     source=git('show',ref+':playtest/ops/chainsiege-deploy.py')
     if hashlib.sha256(source).hexdigest()!=manifest['files']['ops/chainsiege-deploy.py']:raise RuntimeError('Deploy tool manifest mismatch.')
+    helper=git('show',ref+':playtest/ops/legacy-rollback.mjs')
+    if hashlib.sha256(helper).hexdigest()!=manifest['files']['ops/legacy-rollback.mjs']:raise RuntimeError('Recovery helper manifest mismatch.')
     source=source.replace(b'\r\n',b'\n');compile(source,str(DEST),'exec')
     ROOT.mkdir(mode=0o700,exist_ok=True);DEST.parent.mkdir(exist_ok=True)
     old=DEST.read_bytes() if DEST.exists() else None
@@ -35,14 +38,18 @@ def main():
         backup=ROOT/('previous-tool-'+stamp)
         fd=os.open(backup,os.O_WRONLY|os.O_CREAT|os.O_EXCL,0o600)
         with os.fdopen(fd,'wb') as f:f.write(old);f.flush();os.fsync(f.fileno())
+    HELPER.parent.mkdir(mode=0o755,parents=True,exist_ok=True)
+    oldhelper=HELPER.read_bytes() if HELPER.exists() else None
+    if oldhelper is not None:(ROOT/('previous-helper-'+stamp)).write_bytes(oldhelper)
+    replace(helper,0o644,HELPER)
     replace(source,0o755)
-    # Release installer lock before the tool takes the same deployment lock.
-    return old,oldmode,stamp
+    # The caller verifies in-process while retaining the deployment lock.
+    return old,oldmode,stamp,oldhelper
 if __name__=='__main__':
     lock=pathlib.Path('/var/lib/chainsiege-deploy/deploy.lock');lock.parent.mkdir(mode=0o700,exist_ok=True)
     with lock.open('a') as stream:
         fcntl.flock(stream,fcntl.LOCK_EX|fcntl.LOCK_NB)
-        old,mode,stamp=main()
+        old,mode,stamp,oldhelper=main()
         # Run read-only verification in the same process while holding the lock.
         try:
             scope={'__name__':'chainsiege_installer_verify'}
@@ -51,5 +58,7 @@ if __name__=='__main__':
         except BaseException:
             if old is not None:replace(old,mode)
             else:DEST.unlink()
+            if oldhelper is not None:replace(oldhelper,0o644,HELPER)
+            else:HELPER.unlink()
             raise
         print(json.dumps({'installed':str(DEST),'verified':True,'productionUnchanged':True,'evidence':str(ROOT),'sourceCommit':sys.argv[1]}))
