@@ -1,3 +1,4 @@
+import {persistenceContract} from './persistence-contract.mjs';
 import {registryClientIp} from './client-ip.mjs';
 import {protectServerRecovery} from './shared-incidents.mjs';
 import {persistenceDetails} from './durable-file.mjs';
@@ -99,7 +100,7 @@ export async function startServer({registryDir=registryDirectory(),port=3211,bet
    if(!(publicOrigin?req.headers.host===new URL(publicOrigin).host:addresses.some(a=>req.headers.host===a+':'+server.address().port)))return reply(403,{error:'invalid-host'});
    const url=new URL(req.url,origin);
    if(fatal||stopping)return reply(503,{error:'server-recovering'});
-   if(url.pathname==='/health'&&req.method==='GET')return reply(200,{healthy:true,checkpoint:checkpointId,build,mode:development?'development':'production',recovery,uptimeSeconds:Math.floor((Date.now()-started)/1000),sessions:sessions.size,games:pvp.rooms.size});
+   if(url.pathname==='/health'&&req.method==='GET')return reply(200,{healthy:true,checkpoint:checkpointId,build,persistence:persistenceContract,stateRecovery:store?.diagnostics,mode:development?'development':'production',recovery,uptimeSeconds:Math.floor((Date.now()-started)/1000),sessions:sessions.size,games:pvp.rooms.size});
    if(!url.pathname.startsWith('/api/')){let name=decodeURIComponent(url.pathname.slice(1));if(!name)name='StoneThrow-v1.427-stage13-'+(development?'development':'production')+'.html';if(req.method!=='GET'||!staticFiles.has(name))return reply(404,{error:'not-found'});const file=path.join(root,name);if(path.extname(file)==='.mp3')return serveMusic(req,res,file);res.writeHead(200,{...(path.extname(file)==='.wav'?{'Content-Length':fs.statSync(file).size}:{}),'Content-Type':({'.html':'text/html','.js':'text/javascript','.mjs':'text/javascript','.css':'text/css','.jpeg':'image/jpeg','.png':'image/png','.wav':'audio/wav','.webp':'image/webp','.svg':'image/svg+xml','.json':'application/json'})[path.extname(file)],'Cache-Control':'no-store','X-Content-Type-Options':'nosniff'});return res.end(fs.readFileSync(file));}
    if(req.method!=='POST')return reply(405,{error:'method-not-allowed'});
    if(req.headers.origin&&req.headers.origin!==(publicOrigin||'http://'+req.headers.host))return reply(403,{error:'invalid-origin'});
