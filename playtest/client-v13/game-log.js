@@ -1,8 +1,8 @@
 // Optional Game Log. Collect only explicitly selected public fields and numeric timings.
 let lastObservation=null,localMode='Single Player';
-let enabled=false,match=null,seat=null,phase=null,serial=0,action=0,requestSerial=0,context={},lastState='',publicSequence=0,lastInput=null,activeAction=null;
+let enabled=true,match=null,seat=null,phase=null,serial=0,action=0,requestSerial=0,context={},lastState='',publicSequence=0,lastInput=null,activeAction=null;
 const preferenceKey='stoneThrow.gameLog.enabled.v1';
-try{enabled=localStorage.getItem(preferenceKey)==='1';}catch{}
+try{enabled=localStorage.getItem(preferenceKey)!=='0';}catch{}
 export function gameLogEnabled(){return enabled;}
 function syncSetting(){const b=document.getElementById('stGameLogSetting');if(b){b.textContent=enabled?'ON':'OFF';b.classList.toggle('on',enabled);b.setAttribute('aria-pressed',String(enabled));}syncLog();}
 function setEnabled(value){const wasEnabled=enabled;enabled=!!value;try{localStorage.setItem(preferenceKey,enabled?'1':'0');}catch{}if(!enabled){pending.length=0;activeAction=null;if(panel){panel.hidden=true;panel.style.display='none';}}if(enabled&&!wasEnabled&&lastObservation){phase=null;lastState='';observeLog(lastObservation);}syncSetting();}
@@ -40,7 +40,7 @@ export function paintLog(s){if(!betaEnabled())return;for(const e of s.groupLog||
 export function dragLog(event,data={}){logEvent(event,data);}
 if(typeof document!=='undefined'){
  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',installSetting,{once:true});else installSetting();
- window.addEventListener('storage',e=>{if(e.key===preferenceKey||e.key===null){let value=false;try{value=localStorage.getItem(preferenceKey)==='1';}catch{}setEnabled(value);}});
+ window.addEventListener('storage',e=>{if(e.key===preferenceKey||e.key===null){let value=true;try{value=localStorage.getItem(preferenceKey)!=='0';}catch{}setEnabled(value);}});
  for(const type of ['pointerdown','click','pointerup'])document.addEventListener(type,e=>{if(!betaEnabled()||e.target.closest('#stBetaGameLogPanel'))return;const c=e.target.closest('#playerGrid .cell,#enemyGrid .cell'),unit=e.target.closest('#playerUnitStrip [data-unit]');if(c||unit)logEvent(type.toUpperCase(),{grid:c?.parentElement.id,cell:c?{x:Number(c.dataset.x),y:Number(c.dataset.y)}:undefined,unit:unit?.dataset.unit});},true);
  // State changes and one-shot input-ready latency are separate: an unlocked
  // non-interactive state must retire the request without forcing repeated rows.

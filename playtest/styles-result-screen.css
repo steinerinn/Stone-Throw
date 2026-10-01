@@ -64,3 +64,54 @@
 .cs-medal.cs-simple-medal{background-image:url('assets/result-screen/badges-simple-v2.png');background-size:355.555556% 237.037037%;clip-path:circle(50%);aspect-ratio:1}
 .cs-badged-avatar .cs-avatar-badge{height:auto;aspect-ratio:1}
 .cs-award-seal .cs-simple-medal{height:auto;aspect-ratio:1}
+
+/* Keep the desktop heading, scores and actions together at laptop heights. */
+@media(min-width:851px) and (max-height:1000px){
+ .cs-results{padding-top:10px;padding-bottom:12px}
+ .cs-result-rule{margin-top:12px}
+ .cs-place:not(.cs-crowded-place){margin-bottom:35px}
+ .cs-place-1:not(.cs-crowded-place){height:260px}
+ .cs-place-1[data-occupants="2"]:not(.cs-crowded-place){height:275px}
+ .cs-results .cs-result-heading h1{font-size:36px}
+ .cs-award-title{margin-top:0}
+ .cs-place-4:not(.cs-crowded-place){height:190px;width:250px;margin-top:0}
+ .cs-place-4 .cs-portrait{height:68px}
+ .cs-place-4 .cs-podium-person{width:68px}
+ .cs-award{min-height:76px;padding-top:7px;padding-bottom:7px}
+ .cs-award-seal{top:6px}
+ .cs-result-actions{margin-top:10px}
+ .cs-results .cs-result-button{min-height:44px;padding-top:12px;padding-bottom:12px}
+ .cs-result-kicker{margin-bottom:5px}
+}
+
+.cs-podium-identity{display:flex;align-items:center;justify-content:center;gap:5px;margin:4px -22px 2px;background:linear-gradient(90deg,transparent,#000b 18% 82%,transparent)}
+.cs-podium-identity .cs-podium-name{margin:0;min-width:0;background:none}
+.cs-podium-identity .cs-podium-country{height:auto;margin:0;flex:none;line-height:18px}
+.cs-podium-identity .cs-podium-country:empty{display:none}
+.cs-podium-identity .cs-podium-country img{display:block}
+@media(max-width:650px){.cs-podium-identity{margin-left:-12px;margin-right:-12px;gap:4px}.cs-podium-identity .cs-podium-country img{width:18px;height:13px}}
+
+/* Compensate for transparent bottom padding in the supplied podium images. */
+.cs-place-2 .cs-place-scores,.cs-place-3 .cs-place-scores{transform:translateY(-18px)}
+.cs-place-4 .cs-place-scores{transform:translateY(-38px)}
+
+@media(min-width:851px) and (max-height:820px){
+ .cs-results{padding-top:6px;padding-bottom:6px}
+ .cs-results .cs-result-heading h1{font-size:30px}
+ .cs-result-rule{margin-top:8px}
+ .cs-podium{margin-top:6px}
+ .cs-place-1:not(.cs-crowded-place){width:300px;height:220px}
+ .cs-place-1[data-occupants="2"]:not(.cs-crowded-place){width:340px;height:235px}
+ .cs-place-2:not(.cs-crowded-place),.cs-place-3:not(.cs-crowded-place){width:220px;height:205px}
+ .cs-place-1 .cs-portrait,.cs-place-1[data-occupants="2"] .cs-portrait{height:105px}
+ .cs-place-1[data-occupants="2"] .cs-podium-people{padding-top:15px}
+ .cs-place-2 .cs-portrait,.cs-place-3 .cs-portrait{height:95px}
+ .cs-place-4:not(.cs-crowded-place){width:210px;height:145px;margin-bottom:0}
+ .cs-place-4 .cs-portrait{height:58px}
+ .cs-place-4 .cs-place-scores{transform:translateY(-28px)}
+ .cs-award-title{font-size:20px;margin-bottom:6px}
+ .cs-award{min-height:70px;padding-top:5px;padding-bottom:5px}
+ .cs-award-seal{width:54px;height:54px;top:7px}
+ .cs-awards{gap:8px}
+ .cs-result-actions{margin-top:6px}
+}
