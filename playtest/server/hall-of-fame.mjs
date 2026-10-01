@@ -1,7 +1,7 @@
 import {HOF_FULL_GAMES as FULL} from './hof-eligibility.mjs';
 export const HOF_MODES=['Duel','3 Players','4 Players'];
 export const GLOBAL_HOF_MODES=['All',...HOF_MODES];
-export const HOF_CATEGORIES=[['Siege Champion','Most Wins','wins',false],['The Underdog','Most Losses','losses',false],['Highest Win Ratio','Wins / finalized games','winRatio',false],['Highest Loss Ratio','Losses / finalized games','lossRatio',false],['Game Master','Most fully completed games','full',false],['Stormtrooper Award','Lowest ordinary-shot Accuracy','accuracy',true]];
+export const HOF_CATEGORIES=[['The Hoarder','Highest total score','totalScore',false],['One Hit Wonder','Best chain','bestChain',false],['Siege Champion','Most Wins','wins',false],['The Underdog','Most Losses','losses',false],['Highest Win Ratio','Wins / finalized games','winRatio',false],['Highest Loss Ratio','Losses / finalized games','lossRatio',false],['Game Master','Most fully completed games','full',false],['Stormtrooper Award','Lowest ordinary-shot Accuracy','accuracy',true]];
 export function rankHallOfFame(rows,mode,viewerId,{qualification=new Map()}={}){
  if(!GLOBAL_HOF_MODES.includes(mode))throw Error('invalid-hof-mode');
  const own=rows.find(r=>r.playerId===viewerId),viewer=qualification.get(viewerId)||{full:0,storyFinished:false,eligible:false},full=viewer.full;

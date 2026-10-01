@@ -21,6 +21,8 @@ export function globalHallOfFame(db,mode,viewerId,{now=Date.now()}={}){
   if(Number.isFinite(summary?.biggestChain)&&summary.biggestChain>0)chains.push({...identity,value:summary.biggestChain,endedAt:row.ended_at});
  }
  const top=(start,records=eligible)=>{const best=new Map();for(const r of records)if(qualification.get(r.playerId)?.eligible&&r.endedAt>=start&&(!best.has(r.playerId)||r.value>best.get(r.playerId).value))best.set(r.playerId,r);return [...best.values()].sort((a,b)=>b.value-a.value||a.playerId.localeCompare(b.playerId)).slice(0,3).map(({endedAt,...r},i)=>({...r,rank:i+1,own:r.playerId===viewerId}));};
+ for(const r of eligible){const career=careers.get(r.playerId)?.career;if(career)career.totalScore=(career.totalScore||0)+r.value;}
+ for(const r of chains){const career=careers.get(r.playerId)?.career;if(career)career.bestChain=Math.max(career.bestChain||0,r.value);}
  const ranked=rankHallOfFame([...careers.values()],mode,viewerId,{qualification});
  return {...ranked,topScores:{month:top(month),year:top(year),all:top(-Infinity)},topChains:{month:top(month,chains),year:top(year,chains),all:top(-Infinity,chains)},periods:{month:new Date(month).toISOString(),year:new Date(year).toISOString(),timezone:'UTC'},coverage:{retainedOnly:true,excludedUnclassifiedOrMissingSummaries:excluded}};
 }

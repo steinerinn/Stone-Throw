@@ -15,3 +15,5 @@ img.cs-hof-flag{display:inline-block;width:24px;height:18px;object-fit:contain;v
 @media(max-width:480px){#csHofDialog h2{font-size:23px}#csHofDialog .cs-hof-cards{grid-template-columns:1fr}#csHofDialog .cs-hof-periods{grid-template-columns:1fr}#csHofDialog .cs-hof-period .cs-hof-row{grid-template-columns:26px minmax(0,1fr) auto}#csHofDialog .cs-hof-period .cs-hof-value{grid-column:auto;text-align:right}#csHofDialog .cs-hof-tabs button{font-size:11px}}
 
 #csHofDialog .cs-hof-records{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}#csHofDialog .cs-hof-records .cs-hof-periods{gap:6px}@media(max-width:1100px){#csHofDialog .cs-hof-records{grid-template-columns:1fr}}
+
+#csHofDialog .cs-hof-cards{grid-template-columns:repeat(4,minmax(0,1fr))}#csHofDialog .cs-hof-column{display:grid;grid-template-rows:repeat(2,1fr);gap:12px;min-width:0}#csHofDialog .cs-hof-column .cs-hof-card{flex:1}@media(max-width:1000px){#csHofDialog .cs-hof-cards{grid-template-columns:repeat(2,minmax(0,1fr))}}@media(max-width:480px){#csHofDialog .cs-hof-cards{grid-template-columns:1fr}}
