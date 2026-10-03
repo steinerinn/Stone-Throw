@@ -1,3 +1,4 @@
+import {compactJournal} from './compact-journal.mjs';
 import {journalJson,journalBuffers,appendBuffers} from './journal-json.mjs';
 import {stateVersion,readableStateVersion} from './persistence-contract.mjs';
 import {journalRecords} from './journal-reader.mjs';
@@ -10,8 +11,9 @@ import {measured} from './beta-metrics.mjs';
 import {journalArchiveEncoder,archiveDecoder} from './archive-wire.mjs';
 const digest=s=>createHash('sha256').update(s).digest('hex');
 export const checkpointId='controlled-playtest-v1';
-export function openStore(directory,build,mode,{journalEnabled=true}={}){
+export function openStore(directory,build,mode,{journalEnabled=true,journalMaxBytes=256*1024*1024}={}){
  if(!directory)return null;
+ if(!Number.isSafeInteger(journalMaxBytes)||journalMaxBytes<1024)throw Error('Invalid journal size limit');
  const dir=path.resolve(directory),file=path.join(dir,'checkpoint.json'),journal=path.join(dir,'checkpoint.journal'),lock=path.join(dir,'server.lock');
  fs.mkdirSync(dir,{recursive:true,mode:0o700});
  if(fs.existsSync(lock)){let pid;try{pid=JSON.parse(fs.readFileSync(lock,'utf8')).pid;if(!Number.isInteger(pid)||pid<=0)throw Error();}catch{throw Error('state-locked');}let alive=true;try{process.kill(pid,0);}catch(e){if(e.code==='ESRCH')alive=false;}if(alive)throw Error('state-locked');fs.unlinkSync(lock);}
@@ -33,7 +35,7 @@ export function openStore(directory,build,mode,{journalEnabled=true}={}){
    measured('disk-write-fsync',()=>{durableReplace(file,JSON.stringify({format:checkpointId,stateVersion,build:storageBuild,producerBuild:build,mode,sha256,payload}));});
    lastValue=sha256;
   }catch(error){failed=true;throw error;}}};
-  const cacheFile=path.join(dir,'recovery-cache.json');let end=0;
+  const cacheFile=path.join(dir,'recovery-cache.json');let end=0,compactAt=journalMaxBytes;
   if(fs.existsSync(journal)){
    const cached=loadRecoveryCache(cacheFile,journal,stateVersion,mode,storageBuild);
    if(cached)try{value=decode(cached.packet);sequence=cached.sequence;previous=cached.previous;end=cached.end;diagnostics.cacheUsed=true;}catch{decode=archiveDecoder();sequence=0;previous='';end=0;}
@@ -56,7 +58,15 @@ export function openStore(directory,build,mode,{journalEnabled=true}={}){
     written=appendBuffers(fs,journalFd,buffers);retryFile('fsync-journal',journal,()=>fs.fsyncSync(journalFd));
     if(!journalRequired){const saved=JSON.parse(fs.readFileSync(file,'utf8'));durableReplace(file,JSON.stringify({...saved,journal:true}));journalRequired=true;}
    });
-   sequence++;previous=sha256;lastValue=valueText;reset=false;const start=end;end+=written;cacheWriter.record({sequence,previous,start,end});
+   sequence++;previous=sha256;lastValue=valueText;reset=false;const start=end;end+=written;
+   if(end>=compactAt){
+    const started=performance.now(),before=end;
+    const anchor=compactJournal(journal,{format:checkpointId,stateVersion,build:storageBuild,producerBuild:build,mode,reset:true,packet:encode.checkpoint()},next,()=>{cacheWriter.close();if(journalFd!==null){fs.closeSync(journalFd);journalFd=null;}});
+    sequence=anchor.sequence;previous=anchor.previous;end=anchor.end;
+    compactAt=Math.max(journalMaxBytes,end*4);
+    diagnostics.compactions=(diagnostics.compactions||0)+1;diagnostics.compactedFromBytes=before;diagnostics.compactedToBytes=end;diagnostics.compactionMs=Math.round(performance.now()-started);
+    cacheWriter=recoveryCacheWriter(cacheFile,journal,stateVersion,mode,()=>encode.checkpoint());cacheWriter.record(anchor);
+   }else cacheWriter.record({sequence,previous,start,end});
    }catch(error){failed=true;throw error;}
   }};
  }catch(e){release();throw e;}
