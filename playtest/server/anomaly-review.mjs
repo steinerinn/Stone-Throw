@@ -8,6 +8,10 @@ export function migrateReview(db){db.exec(`
  CREATE INDEX IF NOT EXISTS review_signals_player ON review_signals(player_id,id);
  CREATE TRIGGER IF NOT EXISTS review_signals_no_delete BEFORE DELETE ON review_signals BEGIN SELECT RAISE(ABORT,'Review signal audit is append-only'); END;
  CREATE TRIGGER IF NOT EXISTS review_signals_no_update BEFORE UPDATE ON review_signals BEGIN SELECT RAISE(ABORT,'Review signal audit is append-only'); END;
+ CREATE TABLE IF NOT EXISTS review_case_decisions(id INTEGER PRIMARY KEY,signal_id INTEGER NOT NULL REFERENCES review_signals(id),developer_id TEXT NOT NULL REFERENCES accounts(id),action TEXT NOT NULL CHECK(action IN ('OK','NOT OK','CHECK LATER')),created_at INTEGER NOT NULL);
+ CREATE INDEX IF NOT EXISTS review_case_latest ON review_case_decisions(signal_id,id);
+ CREATE TRIGGER IF NOT EXISTS review_case_no_delete BEFORE DELETE ON review_case_decisions BEGIN SELECT RAISE(ABORT,'Case history is append-only'); END;
+ CREATE TRIGGER IF NOT EXISTS review_case_no_update BEFORE UPDATE ON review_case_decisions BEGIN SELECT RAISE(ABORT,'Case history is append-only'); END;
  CREATE TABLE IF NOT EXISTS review_accounts(player_id TEXT PRIMARY KEY REFERENCES accounts(id),status TEXT NOT NULL CHECK(status IN ('NORMAL','REVIEW','CLEARED')),revision INTEGER NOT NULL DEFAULT 0,cleared_through INTEGER NOT NULL DEFAULT 0);
  CREATE TABLE IF NOT EXISTS review_decisions(id INTEGER PRIMARY KEY,player_id TEXT NOT NULL REFERENCES accounts(id),developer_id TEXT NOT NULL REFERENCES accounts(id),action TEXT NOT NULL,created_at INTEGER NOT NULL,signal_watermark INTEGER NOT NULL);
  CREATE TRIGGER IF NOT EXISTS review_decisions_no_delete BEFORE DELETE ON review_decisions BEGIN SELECT RAISE(ABORT,'Review decision audit is append-only'); END;
@@ -52,12 +56,12 @@ export function reviewStore(db,{now=Date.now,policy=REVIEW_POLICY}={}){
   }
  }
  function backfill(){for(const m of all("SELECT m.id FROM stat_matches m WHERE finalized=1 AND NOT EXISTS(SELECT 1 FROM review_retention r WHERE r.match_id=m.id) AND EXISTS(SELECT 1 FROM stat_participants p WHERE p.match_id=m.id AND p.kind='account')"))retain(m.id);}
- function account(id){const s=state(id),signals=all('SELECT id,match_id AS matchId,type,reason,weight,created_at AS timestamp,measurements FROM review_signals WHERE player_id=? ORDER BY id DESC',id).map(r=>({...r,measurements:parse(r.measurements)}));const matches=all('SELECT r.match_id,m.mode,m.player_count,m.ended_at,r.value FROM review_metrics r JOIN stat_matches m ON m.id=r.match_id WHERE player_id=? ORDER BY m.ended_at DESC',id).map(r=>({...r,metrics:parse(r.value),value:undefined}));
+ function account(id){const s=state(id),signals=all('SELECT s.id,s.match_id AS matchId,s.type,s.reason,s.weight,s.created_at AS timestamp,s.measurements,m.mode FROM review_signals s JOIN stat_matches m ON m.id=s.match_id WHERE s.player_id=? ORDER BY s.id DESC',id).map(r=>({...r,measurements:parse(r.measurements)}));const matches=all('SELECT r.match_id,m.mode,m.player_count,m.ended_at,r.value FROM review_metrics r JOIN stat_matches m ON m.id=r.match_id WHERE player_id=? ORDER BY m.ended_at DESC',id).map(r=>({...r,metrics:parse(r.value),value:undefined}));
   const relations=all("SELECT b.player_id AS playerId,count(*) AS matches,sum(CASE WHEN a.outcome='Win' THEN 1 ELSE 0 END) AS wins,sum(CASE WHEN a.outcome='Win' AND b.reliability='Quit' THEN 1 ELSE 0 END) AS winsAfterOtherQuit FROM stat_participants a JOIN stat_participants b ON b.match_id=a.match_id AND b.player_id<>a.player_id WHERE a.player_id=? AND b.kind='account' GROUP BY b.player_id",id);
   const recent=matches.slice(0,20),shots=recent.reduce((n,r)=>n+r.metrics.shots,0),hits=recent.reduce((n,r)=>n+r.metrics.hits,0);
   return {player:one('SELECT id AS playerId,display_name AS displayName FROM accounts WHERE id=?',id),...s,totalSignals:signals.length,technicalSignals:signals.filter(s=>s.type==='TECHNICAL').length,statisticalSignals:signals.filter(s=>s.type==='STATISTICAL').length,reviewWeight:signals.filter(r=>r.id>s.cleared_through).reduce((n,r)=>n+r.weight,0),signals,matches,relationships:relations,rolling:{matches:recent.length,shots,hits,ratio:shots?hits/shots:null},decisions:all('SELECT developer_id AS developerId,action,created_at AS timestamp,signal_watermark FROM review_decisions WHERE player_id=? ORDER BY id',id)};
  }
- function detail(id){const m=one('SELECT id,mode,player_count,rules_version,build,started_at,ended_at,descriptor FROM stat_matches WHERE id=?',id);if(!m)return null;const d=parse(m.descriptor);return {matchId:m.id,mode:m.mode,participantCount:m.player_count,rulesVersion:m.rules_version,build:m.build,startedAt:m.started_at,endedAt:m.ended_at,coverage:one('SELECT coverage FROM review_retention WHERE match_id=?',id)?.coverage,participants:all('SELECT actor,player_id AS playerId,kind,seat,outcome,reliability,placement,summary,match_score,score_components FROM stat_participants WHERE match_id=?',id).map(p=>({...p,summary:parse(p.summary),score_components:parse(p.score_components),shots:p.kind==='account'?ordinaryShots(db,m,d.participants.find(x=>x.actor===p.actor)):[]})),signals:all('SELECT player_id AS playerId,type,reason,weight,measurements FROM review_signals WHERE match_id=?',id).map(r=>({...r,measurements:parse(r.measurements)})),resultReference:id,replayAvailable:!!one('SELECT 1 FROM stat_replays WHERE match_id=?',id)};}
+ function detail(id){const m=one('SELECT id,mode,player_count,rules_version,build,started_at,ended_at,descriptor FROM stat_matches WHERE id=?',id);if(!m)return null;const d=parse(m.descriptor);return {matchId:m.id,mode:m.mode,participantCount:m.player_count,rulesVersion:m.rules_version,build:m.build,startedAt:m.started_at,endedAt:m.ended_at,coverage:one('SELECT coverage FROM review_retention WHERE match_id=?',id)?.coverage,participants:all('SELECT actor,player_id AS playerId,kind,seat,outcome,reliability,placement,summary,match_score,score_components FROM stat_participants WHERE match_id=?',id).map(p=>({...p,displayName:d.participants.find(x=>x.actor===p.actor)?.displayName||one('SELECT display_name FROM accounts WHERE id=?',p.playerId)?.display_name||'Player '+(p.seat+1),summary:parse(p.summary),score_components:parse(p.score_components),shots:p.kind==='account'?ordinaryShots(db,m,d.participants.find(x=>x.actor===p.actor)):[]})),signals:all('SELECT player_id AS playerId,type,reason,weight,measurements FROM review_signals WHERE match_id=?',id).map(r=>({...r,measurements:parse(r.measurements)})),resultReference:id,replayAvailable:!!one('SELECT 1 FROM stat_replays WHERE match_id=?',id)};}
  function decide(id,developer,action){if(!['REVIEW','CLEAR','KEEP UNDER REVIEW'].includes(action)||!one('SELECT 1 FROM accounts WHERE id=?',id))throw Object.assign(Error('Invalid review decision.'),{status:400});const previous=state(id),watermark=one('SELECT coalesce(max(id),0) n FROM review_signals WHERE player_id=?',id).n;if(action==='KEEP UNDER REVIEW'&&previous.status!=='REVIEW')throw Object.assign(Error('Account is not under review.'),{status:400});
   run('INSERT INTO review_decisions(player_id,developer_id,action,created_at,signal_watermark) VALUES(?,?,?,?,?)',id,developer,action,now(),watermark);
   const status=action==='CLEAR'?'CLEARED':'REVIEW';run('INSERT INTO review_accounts VALUES(?,?,?,?) ON CONFLICT(player_id) DO UPDATE SET status=excluded.status,revision=excluded.revision,cleared_through=excluded.cleared_through',id,status,previous.revision+(status!==previous.status?1:0),action==='CLEAR'?watermark:previous.cleared_through);
@@ -72,6 +76,40 @@ export function reviewStore(db,{now=Date.now,policy=REVIEW_POLICY}={}){
   if(!one('SELECT 1 FROM stat_matches WHERE id=? AND finalized=0',matchId)||!one('SELECT 1 FROM accounts WHERE id=?',playerId))return;
   run("INSERT OR IGNORE INTO review_signals(player_id,match_id,type,reason,weight,created_at,measurements) VALUES(?,?,'TECHNICAL','fresh-off-board-shot',?,?,?)",playerId,matchId,policy.illegalTargetWeight,now(),JSON.stringify({x:c.x,y:c.y,size,policyVersion:policy.version}));
  }
- function search({metric='matchScore',limit=50}={}){const allowed=['matchScore','biggestChain','firstHeroShot','firstBlindHeroShot','firstTwoIndependentCore','longestHiddenHitStreak','longestCoreHitStreak','hitsBeforeFirstMiss','hitRatio'];if(!allowed.includes(metric)||!Number.isInteger(limit)||limit<1||limit>100)throw Object.assign(Error('Invalid anomaly query.'),{status:400});return all('SELECT r.player_id AS playerId,r.match_id AS matchId,r.value,m.mode,m.player_count AS participantCount FROM review_metrics r JOIN stat_matches m ON m.id=r.match_id').map(r=>({...r,metrics:parse(r.value),value:undefined})).filter(r=>r.metrics[metric]!==null).sort((a,b)=>(metric.startsWith('first')&&metric!=='firstTwoIndependentCore'?1:-1)*(Number(a.metrics[metric])-Number(b.metrics[metric]))||a.matchId.localeCompare(b.matchId)).slice(0,limit);}
- return {retain,backfill,account,detail,decide,rejected,search,notice:id=>state(id).status==='REVIEW'?{status:'REVIEW',revision:state(id).revision}:null};
+ // Owner case notes deliberately do not call decide(): no account hold, clear or score effect.
+ function decideCase(id,developer,action){if(!Number.isSafeInteger(id)||!['OK','NOT OK','CHECK LATER'].includes(action)||!one('SELECT 1 FROM review_signals WHERE id=?',id))throw Object.assign(Error('Invalid case decision.'),{status:400});run('INSERT INTO review_case_decisions(signal_id,developer_id,action,created_at) VALUES(?,?,?,?)',id,developer,action,now());return {saved:true};}
+ function search({metric='matchScore',limit=50,scope}={}){
+  if(scope==='cases'){
+   const items=all(`SELECT s.id,s.player_id AS playerId,a.display_name AS displayName,s.match_id AS matchId,s.reason,s.measurements,m.mode,s.created_at AS timestamp,
+    coalesce((SELECT action FROM review_case_decisions WHERE signal_id=s.id ORDER BY id DESC LIMIT 1),CASE WHEN s.id<=coalesce(r.cleared_through,0) THEN 'OK' ELSE 'CHECK LATER' END) AS decision,
+    EXISTS(SELECT 1 FROM stat_replays WHERE match_id=s.match_id) AND m.finalized=1 AS replayAvailable
+    FROM review_signals s JOIN accounts a ON a.id=s.player_id JOIN stat_matches m ON m.id=s.match_id
+    LEFT JOIN review_accounts r ON r.player_id=s.player_id ORDER BY s.created_at DESC,s.id DESC`).map(r=>({...r,measurements:parse(r.measurements),status:r.decision==='CHECK LATER'?'Needs Review':r.decision}));
+   const counts={needs:0,ok:0,notOk:0};for(const item of items)counts[item.status==='OK'?'ok':item.status==='NOT OK'?'notOk':'needs']++;
+   return {items,counts};
+  }
+  if(scope==='flags'){
+   const items=all(`SELECT s.id,s.player_id AS playerId,a.display_name AS displayName,s.match_id AS matchId,
+    s.type,s.reason,m.mode,s.created_at AS timestamp,
+    CASE WHEN s.id<=coalesce(r.cleared_through,0) THEN 'CLEARED'
+         WHEN r.status='REVIEW' THEN 'UNDER REVIEW' ELSE 'FLAGGED' END AS status
+    FROM review_signals s JOIN accounts a ON a.id=s.player_id JOIN stat_matches m ON m.id=s.match_id
+    LEFT JOIN review_accounts r ON r.player_id=s.player_id ORDER BY s.created_at DESC,s.id DESC`);
+   const counts={attention:0,review:0,cleared:0,all:items.length};
+   for(const item of items){if(item.status!=='CLEARED')counts.attention++;if(item.status==='UNDER REVIEW')counts.review++;if(item.status==='CLEARED')counts.cleared++;}
+   return {items,counts};
+  }
+  if(scope!==undefined){if(scope!=='attention'||!Number.isInteger(limit)||limit<1||limit>100)throw Object.assign(Error('Invalid anomaly query.'),{status:400});
+   // Clearing acknowledges signals through the recorded watermark; later signals remain unresolved.
+   const rows=all(`SELECT a.id AS playerId,a.display_name AS displayName,coalesce(r.status,'NORMAL') AS status,
+    count(s.id) AS unresolvedSignals,sum(CASE WHEN s.type='TECHNICAL' THEN 1 ELSE 0 END) AS technicalSignals,
+    sum(CASE WHEN s.type='STATISTICAL' THEN 1 ELSE 0 END) AS statisticalSignals,max(s.created_at) AS latestSignal
+    FROM accounts a LEFT JOIN review_accounts r ON r.player_id=a.id
+    LEFT JOIN review_signals s ON s.player_id=a.id AND s.id>coalesce(r.cleared_through,0)
+    GROUP BY a.id HAVING count(s.id)>0 OR r.status='REVIEW'
+    ORDER BY count(s.id) DESC,a.id`);
+   return {items:rows.slice(0,limit),unresolvedSignals:rows.reduce((n,r)=>n+r.unresolvedSignals,0),attentionAccounts:rows.length};
+  }
+const allowed=['matchScore','biggestChain','firstHeroShot','firstBlindHeroShot','firstTwoIndependentCore','longestHiddenHitStreak','longestCoreHitStreak','hitsBeforeFirstMiss','hitRatio'];if(!allowed.includes(metric)||!Number.isInteger(limit)||limit<1||limit>100)throw Object.assign(Error('Invalid anomaly query.'),{status:400});return all('SELECT r.player_id AS playerId,r.match_id AS matchId,r.value,m.mode,m.player_count AS participantCount FROM review_metrics r JOIN stat_matches m ON m.id=r.match_id').map(r=>({...r,metrics:parse(r.value),value:undefined})).filter(r=>r.metrics[metric]!==null).sort((a,b)=>(metric.startsWith('first')&&metric!=='firstTwoIndependentCore'?1:-1)*(Number(a.metrics[metric])-Number(b.metrics[metric]))||a.matchId.localeCompare(b.matchId)).slice(0,limit);}
+ return {retain,backfill,account,detail,decide,decideCase,rejected,search,notice:id=>state(id).status==='REVIEW'?{status:'REVIEW',revision:state(id).revision}:null};
 }

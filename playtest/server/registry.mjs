@@ -1,8 +1,11 @@
+import {migrateDashboard,dashboardStore} from './dashboard-store.mjs';
+import {migratePlayerCorrections,playerAdminStore} from './dev-players.mjs';
+import {migrateDevRoom,welcomeMessage,saveWelcomeMessage} from './dev-room.mjs';
 import {profileAggregate} from './profile-aggregates.mjs';
 import {migrateFeedback,feedbackStore} from './feedback.mjs';
 import {migrateReview,reviewStore} from './anomaly-review.mjs';
 import {profileReadModel} from './profile-read-model.mjs';
-import {migrateReplays} from './replay-store.mjs';
+import {migrateReplays,repairReplayPresentation} from './replay-store.mjs';
 import {storyUnlocks,mergeStoryUnlocks} from './story-progress.mjs';
 import {DEFAULT_AVATAR,avatarById} from '../assets/avatars/catalog.mjs';
 import {migrateScores} from './score-store.mjs';
@@ -18,6 +21,7 @@ const fail=(message,status=400)=>{throw Object.assign(Error(message),{status});}
 export function nameKey(value){if(typeof value!=='string'||value!==value.trim())fail('Use 3–14 letters or numbers, without surrounding spaces.');const n=value.normalize('NFC');if([...n].length<3||[...n].length>14||!/^\p{L}[\p{L}\p{M}\p{N}]*$|^\p{N}[\p{L}\p{M}\p{N}]*$/u.test(n))fail('Use 3–14 letters or numbers.');return [n,n.toUpperCase().toLowerCase().normalize('NFC')];}
 function password(p){if(typeof p!=='string'||[...p].length<8||p.length>256||!/[\p{Lu}]/u.test(p)||!/[\p{Ll}]/u.test(p)||!/[\p{N}]/u.test(p))fail('Password needs 8+ characters, uppercase, lowercase and a number (maximum 256).');}
 function email(e){if(e===undefined||e==='')return '';if(typeof e!=='string'||e.length>254||!/^\S+@[^\s@]+\.[^\s@]+$/.test(e))fail('Enter a valid optional email.');return e;}
+function validateBio(value){if(typeof value!=='string'||[...value].length>280||/[<>\u0000-\u0008\u000b\u000c\u000e-\u001f]/.test(value))fail('Bio must be plain text, up to 280 characters.');}
 function country(c){if(!countries.includes(c))fail('Select a country.');return c;}
 const publicAccount=a=>({playerId:a.id,username:a.username,displayName:a.display_name,country:a.country,bio:a.bio,avatarId:a.avatar_id});
 const accountView=a=>({...publicAccount(a),email:a.email,emailVerified:!!a.email_verified,createdAt:a.created_at,lastLogin:a.last_login,currentStreak:a.streak,longestStreak:a.longest_streak,lastLoginDay:a.last_day,displayNameChanges:a.name_changes,gamesUntilNameChange:a.name_changes===0?0:Math.max(0,a.next_name_at-a.qualifying_games),countryChanges:a.country_changes,avatarUnlockRule:'Finish Story OR win 5 games',avatarUnlocked:!!a.avatar_unlocked});
@@ -31,7 +35,7 @@ export function openRegistry(directory,{now=Date.now}={}){
  CREATE TABLE IF NOT EXISTS challenges(id TEXT PRIMARY KEY,browser_hash TEXT NOT NULL,answer_hash TEXT NOT NULL,expires INTEGER NOT NULL);
  CREATE TABLE IF NOT EXISTS limits(key TEXT PRIMARY KEY,count INTEGER NOT NULL,reset INTEGER NOT NULL);
 `);
- let migrationBackup;try{migrationBackup=migrateStatistics(db,directory);if(!db.prepare('PRAGMA table_info(stat_participants)').all().some(c=>c.name==='score_components')){const backups=path.join(directory,'backups');fs.mkdirSync(backups,{recursive:true,mode:0o700});db.prepare('VACUUM INTO ?').run(path.join(backups,'registry-before-match-score-'+randomUUID()+'.sqlite'));}db.exec('BEGIN IMMEDIATE');try{migrateScores(db);migrateReplays(db);migrateReview(db);migrateFeedback(db);db.exec('COMMIT');}catch(e){db.exec('ROLLBACK');throw e;}}catch(error){db.close();throw error;}const feedback=feedbackStore(db,{now});const review=reviewStore(db,{now});db.exec('BEGIN IMMEDIATE');try{review.backfill();db.exec('COMMIT');}catch(e){db.exec('ROLLBACK');db.close();throw e;}const statistics=statisticsStore(db,{review,onFinalized:ids=>{for(const id of ids)refreshAvatar(id);}});
+ let migrationBackup;try{migrationBackup=migrateStatistics(db,directory);if(!db.prepare('PRAGMA table_info(stat_participants)').all().some(c=>c.name==='score_components')){const backups=path.join(directory,'backups');fs.mkdirSync(backups,{recursive:true,mode:0o700});db.prepare('VACUUM INTO ?').run(path.join(backups,'registry-before-match-score-'+randomUUID()+'.sqlite'));}db.exec('BEGIN IMMEDIATE');try{migrateScores(db);migrateReplays(db);migrateReview(db);migrateFeedback(db);migrateDevRoom(db);migrateDashboard(db,now());migratePlayerCorrections(db);db.exec('COMMIT');}catch(e){db.exec('ROLLBACK');throw e;}}catch(error){db.close();throw error;}const dashboard=dashboardStore(db,{now});const players=playerAdminStore(db,{now,nameKey,validateBio});const feedback=feedbackStore(db,{now});const review=reviewStore(db,{now});db.exec('BEGIN IMMEDIATE');try{review.backfill();db.exec('COMMIT');}catch(e){db.exec('ROLLBACK');db.close();throw e;}const statistics=statisticsStore(db,{review,onFinalized:ids=>{for(const id of ids)refreshAvatar(id);}});
  const q=(sql,...args)=>db.prepare(sql).get(...args),run=(sql,...args)=>db.prepare(sql).run(...args);
  const tx=fn=>{db.exec('BEGIN IMMEDIATE');try{const result=fn();db.exec('COMMIT');return result;}catch(e){db.exec('ROLLBACK');throw e;}};
  // Existing reserved columns suffice; only unset legacy defaults receive the stable Peasant fallback.
@@ -40,37 +44,53 @@ export function openRegistry(directory,{now=Date.now}={}){
   if(!a.avatar_unlocked){const wins=db.prepare("SELECT value FROM stat_career WHERE player_id=? AND mode IN ('Single Player','Duel','3 Players','4 Players')").all(id).reduce((n,r)=>n+(JSON.parse(r.value).wins||0),0),progress=q('SELECT progress_json FROM story_progress WHERE player_id=?',id);if(wins>=5||progress&&JSON.parse(progress.progress_json).finished===true){run('UPDATE accounts SET avatar_unlocked=1 WHERE id=?',id);a.avatar_unlocked=1;}}
   return a;
  }
- function ownAccount(a){return {...accountView(refreshAvatar(a.id)),reviewNotice:review.notice(a.id)};}
+ function ownAccount(a){return {...accountView(refreshAvatar(a.id)),fieldLocks:players.locks(a.id),reviewNotice:review.notice(a.id)};}
  function validateAvatar(id,unlocked=false){const a=avatarById(id);if(!a||!(a.access==='peasant'||a.access==='hero'&&unlocked))fail('Avatar is not available for this account.');return a.id;}
  function rate(key,max,period){const t=now();run('DELETE FROM limits WHERE reset <= ?',t);const old=q('SELECT * FROM limits WHERE key=?',key);if(old?.count>=max)fail('Too many attempts. Please try again later.',429);run('INSERT INTO limits VALUES(?,?,?) ON CONFLICT(key) DO UPDATE SET count=count+1',key,1,t+period);}
  function streak(id){const a=q('SELECT * FROM accounts WHERE id=?',id),day=new Date(now()).toISOString().slice(0,10);let changed=false;if(!a.last_day||day>a.last_day){const yesterday=new Date(now()-86400000).toISOString().slice(0,10),count=a.last_day===yesterday?a.streak+1:1;run('UPDATE accounts SET streak=?,longest_streak=?,last_day=?,last_login=? WHERE id=?',count,Math.max(count,a.longest_streak),day,now(),id);changed=true;}return {account:ownAccount(q('SELECT * FROM accounts WHERE id=?',id)),newDay:changed};}
  function session(token){if(typeof token!=='string'||!/^[a-f0-9]{64}$/.test(token))return null;const a=q('SELECT a.* FROM sessions s JOIN accounts a ON a.id=s.player_id WHERE s.token_hash=? AND s.expires>? AND a.status=?',hash(token),now(),'active');return a||null;}
+ function requireDeveloper(token){const a=session(token);if(!a||!['developer','admin'].includes(a.moderation_role))fail('Developer access required.',403);return {playerId:a.id,displayName:a.display_name};}
  function loginSession(id,previous){if(previous)run('DELETE FROM sessions WHERE token_hash=?',hash(previous));run('DELETE FROM sessions WHERE expires<=?',now());const token=randomBytes(32).toString('hex');run('INSERT INTO sessions VALUES(?,?,?)',hash(token),id,now()+30*86400000);run('UPDATE accounts SET last_login=? WHERE id=?',now(),id);return {token,...streak(id)};}
  let hashing=0;async function key(p,s){if(hashing>=2)fail('Please try again shortly.',429);hashing++;try{return await derive(p,s,64,{N:32768,r:8,p:3,maxmem:64*1024*1024});}finally{hashing--;}}
  const multiplayerIdentity=a=>a?{kind:'account',playerId:a.id,displayName:a.display_name,avatarId:a.avatar_id,country:a.country||null,rewards:profileAggregate(db,a.id).rewards}:null;
  const storyProgress=id=>{const row=q('SELECT progress_json FROM story_progress WHERE player_id=?',id);return row?JSON.parse(row.progress_json):null;};
  const storyState=id=>{const row=q('SELECT * FROM story_runs WHERE player_id=?',id),old=storyProgress(id);return row?{runId:row.run_id,progress:JSON.parse(row.progress_json),lifetime:mergeStoryUnlocks(JSON.parse(row.lifetime_json),storyUnlocks(old))}:{runId:'legacy',progress:old,lifetime:storyUnlocks(old)};};
  const saveRun=(id,state)=>run('INSERT INTO story_runs VALUES(?,?,?,?) ON CONFLICT(player_id) DO UPDATE SET run_id=excluded.run_id,progress_json=excluded.progress_json,lifetime_json=excluded.lifetime_json',id,state.runId,JSON.stringify(state.progress),JSON.stringify(state.lifetime));
- return {file,statistics,recordRejectedReview:review.rejected,migrationBackup,storyProgress,storyState,completeStory:(id,progress,runId='legacy')=>tx(()=>{if(!q('SELECT id FROM accounts WHERE id=? AND status=?',id,'active'))return;const current=storyState(id);if(current.runId!==runId)return;saveRun(id,{...current,progress:!current.progress||progress.battle>=current.progress.battle?progress:current.progress,lifetime:mergeStoryUnlocks(current.lifetime,storyUnlocks(progress))});run('INSERT INTO story_progress VALUES(?,?,?,?) ON CONFLICT(player_id) DO UPDATE SET battle=excluded.battle,progress_json=excluded.progress_json,updated_at=excluded.updated_at WHERE excluded.battle>=story_progress.battle',id,progress.battle,JSON.stringify(progress),now());refreshAvatar(id);}),close:()=>db.close(),publicAccount,identity:token=>multiplayerIdentity(session(token)),identityById:id=>multiplayerIdentity(q('SELECT * FROM accounts WHERE id=? AND status=?',id,'active')),
+ return {dashboard,welcomeMessage:()=>welcomeMessage(db),setWelcomeMessage:(token,text)=>{const d=requireDeveloper(token);return tx(()=>saveWelcomeMessage(db,text,d.playerId,now()));},requireDeveloper,devRoomCounts:token=>{requireDeveloper(token);const day=new Date(now()).toISOString().slice(0,10),start=Date.parse(day+'T00:00:00Z'),end=start+86400000;return {day,newAccountsToday:q('SELECT count(*) n FROM accounts WHERE created_at>=? AND created_at<?',start,end).n,gamesToday:q('SELECT count(*) n FROM stat_matches WHERE finalized=1 AND ended_at>=? AND ended_at<?',start,end).n,usage:Array.from({length:7},(_,i)=>{const from=start-(6-i)*86400000,to=from+86400000;return {day:new Date(from).toISOString().slice(0,10),games:q('SELECT count(*) n FROM stat_matches WHERE finalized=1 AND ended_at>=? AND ended_at<?',from,to).n,accounts:q('SELECT count(*) n FROM accounts WHERE created_at>=? AND created_at<?',from,to).n};})};},file,statistics,recordRejectedReview:review.rejected,migrationBackup,storyProgress,storyState,completeStory:(id,progress,runId='legacy')=>tx(()=>{if(!q('SELECT id FROM accounts WHERE id=? AND status=?',id,'active'))return;const current=storyState(id);if(current.runId!==runId)return;saveRun(id,{...current,progress:!current.progress||progress.battle>=current.progress.battle?progress:current.progress,lifetime:mergeStoryUnlocks(current.lifetime,storyUnlocks(progress))});run('INSERT INTO story_progress VALUES(?,?,?,?) ON CONFLICT(player_id) DO UPDATE SET battle=excluded.battle,progress_json=excluded.progress_json,updated_at=excluded.updated_at WHERE excluded.battle>=story_progress.battle',id,progress.battle,JSON.stringify(progress),now());refreshAvatar(id);}),close:()=>db.close(),publicAccount,identity:token=>multiplayerIdentity(session(token)),identityById:id=>multiplayerIdentity(q('SELECT * FROM accounts WHERE id=? AND status=?',id,'active')),
  async handle(action,b,{token,browser,ip,feedbackContext={}}){
+  if(action.startsWith('dev-player-')){const developer=requireDeveloper(token);
+   if(action==='dev-player-search'&&Object.keys(b).every(k=>k==='query'))return players.search(b.query);
+   if(action==='dev-player-get'&&Object.keys(b).join(',')==='playerId'){const d=players.detail(b.playerId);return {...d,flags:review.search({scope:'cases'}).items.filter(r=>r.playerId===b.playerId),feedback:feedback.forPlayer(b.playerId)};}
+   if(action==='dev-player-moderate')return tx(()=>players.moderate(b,developer.playerId));
+   if(action==='dev-player-correct')return tx(()=>players.correct(b,developer.playerId));
+   fail('Invalid player request.');
+  }
   if(action==='feedback-submit'){const a=session(token);rate('feedback:'+(a?.id||hash(browser||'anonymous')),10,3600000);return tx(()=>feedback.submit(b,{...feedbackContext,playerId:a?.id||null}));}
-  if(action.startsWith('dev-feedback-')){const a=session(token);if(!a||!['developer','admin'].includes(a.moderation_role))fail('Developer access required.',403);
-   if(action==='dev-feedback-list'&&Object.keys(b).every(k=>['type','status','offset'].includes(k)))return {items:feedback.list(b)};
+  if(action.startsWith('dev-feedback-')){const developer=requireDeveloper(token);
+   if(action==='dev-feedback-list'&&Object.keys(b).every(k=>['type','status','offset'].includes(k)))return {items:feedback.list(b),counts:feedback.counts(),inboxCounts:feedback.inboxCounts()};
    if(action==='dev-feedback-get'&&Object.keys(b).join(',')==='id')return feedback.get(b.id);
-   if(action==='dev-feedback-status'&&Object.keys(b).sort().join(',')==='id,status')return tx(()=>feedback.mark(b.id,b.status,a.id));
+   if(action==='dev-feedback-status'&&Object.keys(b).sort().join(',')==='id,status')return tx(()=>feedback.mark(b.id,b.status,developer.playerId));
    fail('Invalid feedback request.');
   }
   if(action==='review-notice'){if(Object.keys(b).length)fail('Invalid request.');const a=session(token);return {notice:a?review.notice(a.id):null,playerId:a?.id||null};}
-  if(action.startsWith('dev-review-')){const a=session(token);if(!a||!['developer','admin'].includes(a.moderation_role))fail('Developer access required.',403);
-   if(action==='dev-review-search'&&Object.keys(b).every(k=>['metric','limit'].includes(k)))return review.search(b);
+  if(action.startsWith('dev-review-')){const developer=requireDeveloper(token);
+   if(action==='dev-review-decide'&&Object.keys(b).sort().join(',')==='action,caseId')return tx(()=>review.decideCase(b.caseId,developer.playerId,b.action));
+   if(action==='dev-review-result'&&Object.keys(b).join(',')==='matchId'&&typeof b.matchId==='string'&&b.matchId.length<=200){
+    statistics.ensureAggregates();for(const row of db.prepare("SELECT player_id FROM stat_participants WHERE match_id=? AND kind='account'").all(b.matchId)){try{return profileReadModel(db,statistics,row.player_id,{section:'result',matchId:b.matchId});}catch(e){if(e.status!==404)throw e;}}
+    fail('Result unavailable',404);
+   }
+   if(action==='dev-review-replay'&&Object.keys(b).join(',')==='matchId'&&typeof b.matchId==='string'&&b.matchId.length<=200){const row=q('SELECT r.payload FROM stat_replays r JOIN stat_matches m ON m.id=r.match_id WHERE m.id=? AND m.finalized=1',b.matchId);if(!row)fail('Replay unavailable',404);return repairReplayPresentation(db,JSON.parse(row.payload));}
+
+   if(action==='dev-review-search'&&Object.keys(b).every(k=>['metric','limit','scope'].includes(k)))return review.search(b);
    if(action==='dev-review-account'&&Object.keys(b).join(',')==='playerId'&&typeof b.playerId==='string')return review.account(b.playerId);
-   if(action==='dev-review-match'&&Object.keys(b).join(',')==='matchId'&&typeof b.matchId==='string')return review.detail(b.matchId);
-   if(action==='dev-review-decide'&&Object.keys(b).sort().join(',')==='action,playerId'&&typeof b.playerId==='string')return tx(()=>review.decide(b.playerId,a.id,b.action));
+   if(action==='dev-review-match'&&Object.keys(b).join(',')==='matchId'&&typeof b.matchId==='string'){const detail=review.detail(b.matchId);if(!detail)fail('Match not found.',404);return detail;}
+   if(action==='dev-review-decide'&&Object.keys(b).sort().join(',')==='action,playerId'&&typeof b.playerId==='string')return tx(()=>review.decide(b.playerId,developer.playerId,b.action));
    fail('Invalid review request.');
   }
   if(action==='profile-view'){statistics.ensureAggregates();return profileReadModel(db,statistics,session(token)?.id,b);}
   if(action==='story-restart'){if(Object.keys(b).length)fail('Invalid Story restart request.');const a=session(token);if(!a)fail('Log in to restart account Story.',401);return tx(()=>{const state={...storyState(a.id),runId:randomUUID(),progress:null};saveRun(a.id,state);return {playerId:a.id,...state};});}
   if(action==='story-progress'){if(Object.keys(b).length)fail('Invalid Story progress request.');const a=session(token);return {playerId:a?.id||null,...(a?storyState(a.id):{progress:null,lifetime:null,runId:null})};}
+  if(action==='usage-visit'){if(Object.keys(b).length)fail('Invalid visit.');rate('usage:'+ip,24000,3600000);dashboard.visit(browser,session(token)?.id||null);return {recorded:true};}
   if(action==='me'){const a=session(token);return a?streak(a.id):{account:null};}
   if(action==='logout'){if(token)run('DELETE FROM sessions WHERE token_hash=?',hash(token));return {account:null,clearCookie:true};}
   if(action==='challenge'){rate('challenge:'+ip,100,3600000);run('DELETE FROM challenges WHERE expires<=?',now());const a=randomInt(1,10),c=randomInt(1,10),id=randomBytes(24).toString('hex');run('INSERT INTO challenges VALUES(?,?,?,?)',id,hash(browser),hash(String(a+c)),now()+600000);return {id,question:`What is ${a} + ${c}?`};}
@@ -96,10 +116,10 @@ export function openRegistry(directory,{now=Date.now}={}){
    run('INSERT INTO profile_saved_battles VALUES(?,?,?,?,?,?)',a.id,b.matchId,now(),JSON.stringify(summary),JSON.stringify(result),JSON.stringify(replay));return {saved:true};
   });
   if(action==='avatar')return tx(()=>{if(Object.keys(b).length!==1||!Object.hasOwn(b,'avatarId'))fail('Invalid avatar request.');const current=refreshAvatar(a.id),id=validateAvatar(b.avatarId,!!current.avatar_unlocked);run('UPDATE accounts SET avatar_id=? WHERE id=?',id,a.id);return {account:ownAccount(q('SELECT * FROM accounts WHERE id=?',a.id))};});
-  if(action==='profile')return tx(()=>{const current=q('SELECT * FROM accounts WHERE id=?',a.id);if(Object.keys(b).some(k=>!['displayName','country','confirmCountryChange','bio','email'].includes(k)))fail('Unsupported profile field.');
+  if(action==='profile')return tx(()=>{const current=q('SELECT * FROM accounts WHERE id=?',a.id),locks=players.locks(a.id);for(const [field,column]of [['username','username'],['displayName','display_name'],['bio','bio']])if(b[field]!==undefined&&b[field]!==current[column]&&locks[field])fail('This field has been locked by the game administrator.',403);if(Object.keys(b).some(k=>!['displayName','country','confirmCountryChange','bio','email'].includes(k)))fail('Unsupported profile field.');
    if(b.displayName!==undefined&&b.displayName!==current.display_name){const [n,k]=nameKey(b.displayName);if(current.name_changes>0&&current.qualifying_games<current.next_name_at)fail(`You need to fully play ${current.next_name_at-current.qualifying_games} more games to change your name.`);if(q('SELECT id FROM accounts WHERE display_key=? AND id<>?',k,a.id))fail('Display name is already taken.');run('UPDATE accounts SET display_name=?,display_key=?,name_changes=name_changes+1,next_name_at=qualifying_games+100 WHERE id=?',n,k,a.id);}
    if(b.country!==undefined&&b.country!==current.country){country(b.country);if(current.country_changes>=1)fail('Nationality can only be changed once.');if(b.confirmCountryChange!==true)fail('Confirm that nationality cannot be changed again.');run('UPDATE accounts SET country=?,country_changes=country_changes+1 WHERE id=?',b.country,a.id);}
-   if(b.bio!==undefined){if(typeof b.bio!=='string'||[...b.bio].length>280||/[<>\u0000-\u0008\u000b\u000c\u000e-\u001f]/.test(b.bio))fail('Bio must be plain text, up to 280 characters.');run('UPDATE accounts SET bio=? WHERE id=?',b.bio,a.id);}
+   if(b.bio!==undefined){validateBio(b.bio);run('UPDATE accounts SET bio=? WHERE id=?',b.bio,a.id);}
    if(b.email!==undefined){const em=email(b.email);if(em!==current.email)run('UPDATE accounts SET email=?,email_verified=0 WHERE id=?',em,a.id);}
    return {account:ownAccount(q('SELECT * FROM accounts WHERE id=?',a.id))};
   });

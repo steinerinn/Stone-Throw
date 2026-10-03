@@ -4,7 +4,7 @@ import {acceptCommand} from '../canonical/compiled/host/lifecycle.js';
 import {normalTarget} from '../canonical/compiled/host/ring.js';
 import {prepareStatistics} from '../server/statistics-capture.mjs';
 // Isolated test Registry only; every match is finalized through the existing host/capture path.
-export async function profileFixture(directory){
+export async function profileFixture(directory,{disconnects=false}={}){
  const registry=openRegistry(directory),users=[];
  for(const username of ['TestRaven','TestMatti','TestCruns']){const options={browser:'a'.repeat(48),ip:'profile-test'},c=await registry.handle('challenge',{},options),n=c.question.match(/\d+/g);const r=await registry.handle('register',{username,password:'Password42',confirmPassword:'Password42',country:'IS',challengeId:c.id,answer:String(+n[0]+ +n[1])},options);users.push(r);}
  let time=1790000000000;
@@ -16,6 +16,7 @@ export async function profileFixture(directory){
   for(let i=0;i<n;i++)command({kind:'place',placement:{unitId:'u'+i,ownerId:'p'+i,boardId:'b'+i,type:'inf',cells:[{x:2,y:2}]}});
   command({kind:'start'});
   if(match===0||match===4)participants[0].afkIncidents=2;
+  if(disconnects&&match===2)participants[0].disconnects=2;
   for(let guard=0;h.status!=='complete';guard++){if(guard>30)throw Error('fixture did not finish');if(h.status==='awaiting-turn')command({kind:'advance-turn'});else command({kind:'shoot',actorId:h.activePlayerId,boardId:normalTarget(h.state,h.activePlayerId).boardId,cell:{x:2,y:2}});}
   capture();time+=86400000;
  }

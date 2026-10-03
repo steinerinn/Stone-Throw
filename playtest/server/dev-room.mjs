@@ -1,0 +1,31 @@
+import os from 'node:os';
+import fs from 'node:fs';
+// Metadata only. Never return session keys, host state, placements or RNG.
+export async function devRoomGames(rooms,sessions,spectatorEnabled){
+ const games=[];
+ for(const room of rooms.values()){
+  if(room.closed||room.host.status==='complete')continue;
+  games.push({code:room.code,mode:'Multiplayer',status:room.host.status,round:room.host.round,
+   players:room.seats.map(s=>({name:s?.name||'Waiting for player',ai:s?.controller==='ai'})),spectate:!!spectatorEnabled});
+ }
+ for(const entry of sessions.values()){
+  if(!['single','story'].includes(entry.mode))continue;
+  const slot=entry.slots?.[entry.mode];if(!slot)continue;
+  const {snapshot:s}=await slot.session.client.read();
+  if(['placement','finished'].includes(s.phase))continue;
+  games.push({code:null,mode:entry.mode==='story'?'Story':'Single Player',status:s.phase,round:s.round??null,
+   players:[{name:slot.statIdentity?.displayName||'Player',ai:false},...(slot.configuration.singlePlayer?.npcNames||['AI']).map(name=>({name,ai:true}))],spectate:false});
+ }
+ return games;
+}
+
+// Host resource readings only; no process list, paths, credentials or configuration.
+export function devRoomHealthReader(){
+ const sample=()=>os.cpus().reduce((s,c)=>({idle:s.idle+c.times.idle,total:s.total+Object.values(c.times).reduce((a,b)=>a+b,0)}),{idle:0,total:0});let prior=null;
+ return directory=>{const current=sample(),elapsed=prior?current.total-prior.total:0,cpu=elapsed>0?Math.max(0,Math.min(100,100*(1-(current.idle-prior.idle)/elapsed))):null;prior=current;let disk=null;try{const d=fs.statfsSync(directory);disk={total:d.blocks*d.bsize,available:d.bavail*d.bsize};}catch{}
+ return {cpuPercent:cpu,ram:{total:os.totalmem(),available:os.freemem()},disk,hostUptimeSeconds:Math.floor(os.uptime()),healthy:true};};
+}
+
+export function migrateDevRoom(db){db.exec(`CREATE TABLE IF NOT EXISTS dev_room_messages(id INTEGER PRIMARY KEY,text TEXT NOT NULL,developer_id TEXT NOT NULL REFERENCES accounts(id),created_at INTEGER NOT NULL);`);}
+export function welcomeMessage(db){return {text:db.prepare('SELECT text FROM dev_room_messages ORDER BY id DESC LIMIT 1').get()?.text||''};}
+export function saveWelcomeMessage(db,text,developer,now){if(typeof text!=='string'||text.length>500)throw Object.assign(Error('Use a message up to 500 characters.'),{status:400});db.prepare('INSERT INTO dev_room_messages(text,developer_id,created_at) VALUES(?,?,?)').run(text.trim(),developer,now);return welcomeMessage(db);}
