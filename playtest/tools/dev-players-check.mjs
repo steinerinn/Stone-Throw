@@ -6,6 +6,27 @@ try{
  for(const token of [null,normal.token,'f'.repeat(64)])for(const [action,body]of [['dev-player-search',{query:'Test'}],['dev-player-get',{playerId:id}],['dev-player-correct',{}],['dev-review-result',{matchId:'anything'}]]){await assert.rejects(api(action,body,token),e=>e.status===403);checks++;}
  for(const token of [owner.token,admin.token]){assert.equal((await api('dev-player-get',{playerId:id},token)).player.username,'TestRaven');checks++;}
  db.prepare('UPDATE accounts SET display_name=?,display_key=? WHERE id=?').run('RavenChanged','ravenchanged',id);assert.equal((await api('dev-player-search',{query:'ravenchanged'})).items[0].username,'TestRaven');assert.equal((await api('dev-player-search',{query:'testraven'})).items[0].displayName,'RavenChanged');assert.equal((await api('dev-player-search',{query:'NO_MATCH'})).items.length,0);checks+=3;
+ // Registration totals are global, with an authoritative rolling seven-day window.
+ const {playerAdminStore}=await import('../server/dev-players.mjs'),clock=1800000000000,week=7*86400000;
+ const savedDates=db.prepare('SELECT id,created_at FROM accounts').all();
+ db.prepare('UPDATE accounts SET created_at=? WHERE id=?').run(clock-week-1,owner.account.playerId);
+ db.prepare('UPDATE accounts SET created_at=? WHERE id=?').run(clock-week,admin.account.playerId);
+ db.prepare('UPDATE accounts SET created_at=? WHERE id=?').run(clock,normal.account.playerId);
+ const store=playerAdminStore(db,{now:()=>clock});
+ assert.deepEqual(store.search().counts,{total:3,new:2});
+ assert.equal(store.search('',true).items.length,2);
+ assert.deepEqual(store.search('NO_MATCH',true).counts,{total:3,new:2});
+ assert.equal(store.search('NO_MATCH',true).items.length,0);
+ assert.equal(store.search('Raven',true).items.length,0);
+ assert.equal(store.search('Matti',true).items.length,1);
+ assert.equal(store.search().items.find(p=>p.playerId===id).isNew,false);
+ db.prepare('UPDATE accounts SET created_at=? WHERE id=?').run(clock+1,normal.account.playerId);
+ assert.equal(store.search().counts.new,1);
+ assert.throws(()=>store.search('', 'yes'),/Invalid registration filter/);
+ for(const row of savedDates)db.prepare('UPDATE accounts SET created_at=? WHERE id=?').run(row.created_at,row.id);
+ const filtered=await api('dev-player-search',{query:'NO_MATCH',newOnly:true});assert.equal(filtered.counts.total,3);assert.equal(filtered.items.length,0);
+ await assert.rejects(api('dev-player-search',{newOnly:true},normal.token),e=>e.status===403);
+ checks+=12;
  let d=await get();assert.ok(!/password|salt|token|recovery|session/i.test(JSON.stringify(d)));assert.equal(d.penalties.filter(p=>p.kind==='AFK').length,2);assert.equal(d.penalties.filter(p=>p.kind==='Disconnect').length,1);checks+=3;
  const protectedTables=['stat_matches','stat_participants','stat_facts','stat_career','stat_factions','review_accounts','review_decisions','review_signals','profile_saved_battles'];const protectedData=()=>JSON.stringify(protectedTables.map(t=>db.prepare('SELECT * FROM '+t).all()));const beforeProtected=protectedData(),beforeStats=d.stats,globalBefore=r.statistics.globalMenuStats(),hofBefore=r.statistics.globalHallOfFame('All',id,{now:1800000000000}),afk=d.penalties.find(p=>p.kind==='AFK'),disconnect=d.penalties.find(p=>p.kind==='Disconnect');
  await api('dev-player-correct',edit(d,{streak:4,bestStreak:7,penalties:[{matchId:afk.matchId,excluded:true},{matchId:disconnect.matchId,excluded:true}]}),admin.token);let after=await get();assert.equal(after.editable.streak,4);assert.equal(after.editable.bestStreak,7);assert.equal(after.reliability.AFK,1);assert.equal(after.reliability.Disconnect,0);assert.equal(after.penalties.find(p=>p.matchId===afk.matchId).excluded,true);assert.ok(after.audit.some(a=>a.field==='Current login streak'&&a.oldValue==='1'&&a.newValue==='4'&&a.developer==='TestMatti'));assert.ok(after.audit.some(a=>a.field==='Disconnect penalties'&&a.oldValue==='1'&&a.newValue==='0'));checks+=7;
@@ -20,6 +41,13 @@ try{
  // Idempotent save, unsupported modifications rejected, old audit cannot be rewritten.
  const auditCount=restored.audit.length;await api('dev-player-correct',edit(restored));assert.equal((await get()).audit.length,auditCount);assert.throws(()=>db.exec("UPDATE dev_player_corrections SET new_value='0'"),/append-only/);checks+=2;
  const match=restored.recent[0].matchId;const result=await api('dev-review-result',{matchId:match});const original=await api('profile-view',{playerId:id,section:'result',matchId:match});assert.deepEqual(result,original);await assert.rejects(api('dev-review-result',{matchId:'missing'}),e=>e.status===404&&e.message==='Result unavailable');checks+=2;
+ const exported=await api('dev-review-game-log',{matchId:match});assert.ok(exported.text.startsWith('CHAIN SIEGE'));assert.ok(exported.text.includes(match));assert.ok(exported.text.includes('No submitted browser timing log'));assert.match(exported.filename,/^ChainSiege-game-log-[a-f0-9]{16}\.txt$/);assert.ok(!/password|salt|token|email|rng|seed/i.test(exported.text));
+ for(const token of [null,normal.token,'f'.repeat(64)])await assert.rejects(api('dev-review-game-log',{matchId:match},token),e=>e.status===403);
+ await assert.rejects(api('dev-review-game-log',{matchId:'missing'}),e=>e.status===404);
+ assert.ok((await api('dev-review-game-log',{matchId:match},admin.token)).text.includes(match));
+ db.prepare('DELETE FROM stat_replays WHERE match_id=?').run(match);assert.ok((await api('dev-review-game-log',{matchId:match})).text.includes('Replay: unavailable'));
+ db.prepare("INSERT INTO feedback(id,type,status,created_at,build,description,match_id,game_log) VALUES('log-fixture','BUG','NEW',?,'test','lag',?,?)").run(Date.now(),match,'CHAIN SIEGE — GAME LOG\nNETWORK RESPONSE 500ms');
+ assert.ok((await api('dev-review-game-log',{matchId:match})).text.includes('NETWORK RESPONSE 500ms'));checks+=12;
  console.log(JSON.stringify({passed:true,checks,dir,authoritativeRecordsUnchanged:true,reliabilityRebuildStable:true,rollback:true,retainedResultReused:true}));
 }finally{db.close();r.close();}
 

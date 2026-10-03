@@ -1,6 +1,6 @@
 {
   "deployProtocol": 1,
-  "state": "chainsiege-state-v1",
+  "state": "chainsiege-state-v2",
   "registry": "chainsiege-registry-v1",
   "semantics": "chainsiege-persistence-v1",
   "checkpointFormat": "controlled-playtest-v1"

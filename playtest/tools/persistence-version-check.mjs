@@ -10,9 +10,9 @@ const checkpoint=fs.readFileSync(dir+'/checkpoint.json'),journal=fs.readFileSync
 s=openStore(dir,'build-B','production');eq(s.value,value);eq(s.diagnostics.cacheUsed,true);eq(s.diagnostics.replayedRecords,0);eq(fs.readFileSync(dir+'/checkpoint.json'),checkpoint);eq(fs.readFileSync(dir+'/checkpoint.journal'),journal);
 value={...value,host:host(8)};s.write(value);await s.cacheReady();s.release();
 s=openStore(dir,'build-A','production');eq(s.value,value);s.release();
-// Existing legacy reader must read all new writes for first-install rollback.
+// A v1-only reader must refuse v2 state, rather than silently losing references.
 const legacyPath=new URL('../server/.legacy-store-check.mjs',import.meta.url);
-try{let legacy=execFileSync('git',['show','HEAD:playtest/server/store.mjs'],{encoding:'utf8'});fs.writeFileSync(legacyPath,legacy);const {openStore:old}=await import(legacyPath.href);s=old(dir,'build-A','production');eq(s.value,value);s.release();}finally{fs.unlinkSync(legacyPath);}
+try{let legacy=execFileSync('git',['show','HEAD:playtest/server/store.mjs'],{encoding:'utf8'});legacy=legacy.replace("import {stateVersion} from './persistence-contract.mjs';","const stateVersion='chainsiege-state-v1';");fs.writeFileSync(legacyPath,legacy);const {openStore:old}=await import(legacyPath.href);assert.throws(()=>old(dir,'build-A','production'),/incompatible/);checks++;}finally{fs.unlinkSync(legacyPath);}
 // Cache plus archive deltas, replacements, removals and reset packets.
 const enc=archiveEncoder({prune:true}),dec=archiveDecoder();enc({host:host(4)});eq(dec(enc.checkpoint()),{host:host(4)});eq(dec(enc({host:host(7)})),{host:host(7)});eq(dec(enc({host:host(2)})),{host:host(2)});eq(dec(enc({gone:true})),{gone:true});
 const cached=fs.readFileSync(dir+'/recovery-cache.json');s=openStore(dir,'C','production');value={host:host(10)};s.write(value);s.release();fs.writeFileSync(dir+'/recovery-cache.json',cached);s=openStore(dir,'D','production');eq(s.value,value);eq(s.diagnostics.replayedRecords,1);s.release();
@@ -25,4 +25,4 @@ const lines=[...journalRecords(dir+'/checkpoint.journal')];const last=JSON.parse
 const large=root+'/large.journal',fd=fs.openSync(large,'w'),row=JSON.stringify({text:'í'.repeat(32768)})+'\n';for(let i=0;i<8200;i++)fs.writeSync(fd,row);fs.closeSync(fd);let count=0;for(const record of journalRecords(large)){assert.equal(JSON.parse(record.line).text.length,32768);count++;}eq(count,8200);fs.unlinkSync(large);
 // Snapshot mode remains cross-build compatible without touching a journal.
 s=openStore(root+'/snapshot','A','production',{journalEnabled:false});s.write({x:1});s.release();s=openStore(root+'/snapshot','B','production',{journalEnabled:false});eq(s.value,{x:1});s.release();
-console.log(JSON.stringify({passed:true,checks,largeJournalBytes:Buffer.byteLength(row)*8200,legacyRollback:true,cacheAndTail:true,evidence:root}));
+console.log(JSON.stringify({passed:true,checks,largeJournalBytes:Buffer.byteLength(row)*8200,legacyReaderFailsSafely:true,cacheAndTail:true,evidence:root}));

@@ -1,3 +1,4 @@
+import {readableStateVersion} from './persistence-contract.mjs';
 import fs from 'node:fs';
 import {createHash} from 'node:crypto';
 import {Worker} from 'node:worker_threads';
@@ -6,10 +7,10 @@ const hash=s=>createHash('sha256').update(s).digest('hex');
 const identity=stat=>({dev:stat.dev,ino:stat.ino});
 export function loadRecoveryCache(file,journal,stateVersion,mode,storageBuild){
  try{const envelope=JSON.parse(fs.readFileSync(file,'utf8'));if(hash(envelope.payload)!==envelope.sha256)return null;const c=JSON.parse(envelope.payload),s=fs.statSync(journal);
-  if(c.format!=='chainsiege-recovery-cache-v1'||c.stateVersion!==stateVersion||c.mode!==mode||c.journal.dev!==s.dev||c.journal.ino!==s.ino||!Number.isSafeInteger(c.sequence)||c.sequence<1||!Number.isSafeInteger(c.start)||c.start<0||!Number.isSafeInteger(c.end)||c.end<=c.start||c.end>s.size)return null;
+  if(c.format!=='chainsiege-recovery-cache-v1'||!readableStateVersion(c.stateVersion)||c.mode!==mode||c.journal.dev!==s.dev||c.journal.ino!==s.ino||!Number.isSafeInteger(c.sequence)||c.sequence<1||!Number.isSafeInteger(c.start)||c.start<0||!Number.isSafeInteger(c.end)||c.end<=c.start||c.end>s.size)return null;
   const lines=journalRecords(journal,c.start);let anchor;try{anchor=lines.next().value;}finally{lines.return();}
   if(!anchor||anchor.end!==c.end)return null;const r=JSON.parse(anchor.line);if(r.sequence!==c.sequence||r.sha256!==c.previous||hash(r.payload)!==r.sha256)return null;
-  const entry=JSON.parse(r.payload);if(entry.mode!==mode||entry.build!==storageBuild||entry.format!=='controlled-playtest-v1'||(entry.stateVersion!==undefined&&entry.stateVersion!==stateVersion))return null;
+  const entry=JSON.parse(r.payload);if(entry.mode!==mode||entry.build!==storageBuild||entry.format!=='controlled-playtest-v1'||!readableStateVersion(entry.stateVersion))return null;
   return c;
  }catch{return null;}
 }

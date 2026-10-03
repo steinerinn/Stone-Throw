@@ -59,7 +59,7 @@ export function openRegistry(directory,{now=Date.now}={}){
  return {dashboard,welcomeMessage:()=>welcomeMessage(db),setWelcomeMessage:(token,text)=>{const d=requireDeveloper(token);return tx(()=>saveWelcomeMessage(db,text,d.playerId,now()));},requireDeveloper,devRoomCounts:token=>{requireDeveloper(token);const day=new Date(now()).toISOString().slice(0,10),start=Date.parse(day+'T00:00:00Z'),end=start+86400000;return {day,newAccountsToday:q('SELECT count(*) n FROM accounts WHERE created_at>=? AND created_at<?',start,end).n,gamesToday:q('SELECT count(*) n FROM stat_matches WHERE finalized=1 AND ended_at>=? AND ended_at<?',start,end).n,usage:Array.from({length:7},(_,i)=>{const from=start-(6-i)*86400000,to=from+86400000;return {day:new Date(from).toISOString().slice(0,10),games:q('SELECT count(*) n FROM stat_matches WHERE finalized=1 AND ended_at>=? AND ended_at<?',from,to).n,accounts:q('SELECT count(*) n FROM accounts WHERE created_at>=? AND created_at<?',from,to).n};})};},file,statistics,recordRejectedReview:review.rejected,migrationBackup,storyProgress,storyState,completeStory:(id,progress,runId='legacy')=>tx(()=>{if(!q('SELECT id FROM accounts WHERE id=? AND status=?',id,'active'))return;const current=storyState(id);if(current.runId!==runId)return;saveRun(id,{...current,progress:!current.progress||progress.battle>=current.progress.battle?progress:current.progress,lifetime:mergeStoryUnlocks(current.lifetime,storyUnlocks(progress))});run('INSERT INTO story_progress VALUES(?,?,?,?) ON CONFLICT(player_id) DO UPDATE SET battle=excluded.battle,progress_json=excluded.progress_json,updated_at=excluded.updated_at WHERE excluded.battle>=story_progress.battle',id,progress.battle,JSON.stringify(progress),now());refreshAvatar(id);}),close:()=>db.close(),publicAccount,identity:token=>multiplayerIdentity(session(token)),identityById:id=>multiplayerIdentity(q('SELECT * FROM accounts WHERE id=? AND status=?',id,'active')),
  async handle(action,b,{token,browser,ip,feedbackContext={}}){
   if(action.startsWith('dev-player-')){const developer=requireDeveloper(token);
-   if(action==='dev-player-search'&&Object.keys(b).every(k=>k==='query'))return players.search(b.query);
+   if(action==='dev-player-search'&&Object.keys(b).every(k=>['query','newOnly'].includes(k)))return players.search(b.query,b.newOnly);
    if(action==='dev-player-get'&&Object.keys(b).join(',')==='playerId'){const d=players.detail(b.playerId);return {...d,flags:review.search({scope:'cases'}).items.filter(r=>r.playerId===b.playerId),feedback:feedback.forPlayer(b.playerId)};}
    if(action==='dev-player-moderate')return tx(()=>players.moderate(b,developer.playerId));
    if(action==='dev-player-correct')return tx(()=>players.correct(b,developer.playerId));
@@ -78,6 +78,23 @@ export function openRegistry(directory,{now=Date.now}={}){
    if(action==='dev-review-result'&&Object.keys(b).join(',')==='matchId'&&typeof b.matchId==='string'&&b.matchId.length<=200){
     statistics.ensureAggregates();for(const row of db.prepare("SELECT player_id FROM stat_participants WHERE match_id=? AND kind='account'").all(b.matchId)){try{return profileReadModel(db,statistics,row.player_id,{section:'result',matchId:b.matchId});}catch(e){if(e.status!==404)throw e;}}
     fail('Result unavailable',404);
+   }
+   if(action==='dev-review-game-log'){
+    if(Object.keys(b).join(',')!=='matchId'||typeof b.matchId!=='string'||!b.matchId||b.matchId.length>200)fail('Invalid match.');
+    const match=q('SELECT id AS matchId,mode,started_at AS startedAt,ended_at AS endedAt FROM stat_matches WHERE id=? AND finalized=1',b.matchId);if(!match)fail('Completed match unavailable',404);
+    const participants=db.prepare("SELECT p.seat,a.display_name AS name,p.kind,p.outcome,p.placement,p.match_score AS score,p.reliability FROM stat_participants p LEFT JOIN accounts a ON a.id=p.player_id WHERE p.match_id=? ORDER BY p.seat").all(b.matchId);
+    const retained=q('SELECT payload FROM stat_replays WHERE match_id=?',b.matchId),replay=retained?repairReplayPresentation(db,JSON.parse(retained.payload)):null;
+    // Feedback is already bounded to 8 MiB per submitted log. Cap each export too.
+    const available=q('SELECT count(*) AS n FROM feedback WHERE match_id=? AND game_log IS NOT NULL',b.matchId).n;
+    const submitted=db.prepare('SELECT created_at AS submittedAt,game_log AS text FROM feedback WHERE match_id=? AND game_log IS NOT NULL ORDER BY created_at DESC,id DESC LIMIT 2').all(b.matchId);
+    const lines=['CHAIN SIEGE — GAME LOG EXPORT','Source: retained server match records and public replay; submitted browser logs included only when available.',
+     'Coverage: this is not a server request trace. Browser/network/frame timings cannot be reconstructed from replay events.',
+     'Replay: '+(replay?'available':'unavailable; no event history invented'),
+     'Submitted browser logs: '+submitted.length+' of '+available+(available>submitted.length?' (latest two included)':''),
+     ...(!submitted.length?['No submitted browser timing log is available for this match.']:[]),
+     '\nMATCH',JSON.stringify(match),'\nPARTICIPANTS',JSON.stringify(participants),'\nPUBLIC REPLAY',JSON.stringify(replay)];
+    for(const log of submitted)lines.push('\nSUBMITTED BROWSER LOG '+new Date(log.submittedAt).toISOString(),log.text);
+    return {filename:'ChainSiege-game-log-'+hash(b.matchId).slice(0,16)+'.txt',text:lines.join('\n')+'\n'};
    }
    if(action==='dev-review-replay'&&Object.keys(b).join(',')==='matchId'&&typeof b.matchId==='string'&&b.matchId.length<=200){const row=q('SELECT r.payload FROM stat_replays r JOIN stat_matches m ON m.id=r.match_id WHERE m.id=? AND m.finalized=1',b.matchId);if(!row)fail('Replay unavailable',404);return repairReplayPresentation(db,JSON.parse(row.payload));}
 
