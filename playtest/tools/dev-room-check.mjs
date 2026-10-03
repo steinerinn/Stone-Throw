@@ -20,7 +20,7 @@ const serve=process.argv.includes('--serve');
 const app=await startServer({port:serve?3214:0,lan:true,bind:'127.0.0.1',registryDir:dir,logger:()=>{}});
 if(serve){console.log(JSON.stringify({url:app.origin+'/dev-room',login:app.origin,username:'TestRaven',password:'Password42',isolatedRegistry:dir}));for(const sig of ['SIGINT','SIGTERM'])process.on(sig,async()=>{await app.close();process.exit();});}
 else{
-let checks=0,browser;
+let checks=0,browser,heartbeat;
 const request=async(route,data={},token,extra={})=>fetch(app.origin+route,{method:'POST',headers:{Origin:app.origin,'Content-Type':'application/json',...(token?{Cookie:'csAccount='+token}:{}),...extra},body:JSON.stringify(data)});
 const actions=[['dev-player-search',{query:'Test'}],['dev-player-get',{playerId:developer.account.playerId}],['dev-review-result',{matchId:reviewMatch}],['dev-review-replay',{matchId:reviewMatch}],['dev-feedback-list',{}],['dev-feedback-get',{id:report.id}],['dev-feedback-status',{id:report.id,status:'REVIEWED'}],['dev-review-search',{}],['dev-review-account',{playerId:player.account.playerId}],['dev-review-match',{matchId:reviewMatch}],['dev-review-decide',{playerId:player.account.playerId,action:'REVIEW'}]];
 try{
@@ -43,10 +43,15 @@ try{
  const opened=await request('/api/open');const cookies=opened.headers.getSetCookie().map(c=>c.split(';')[0]).join('; ');
  const made=await request('/api/pvp/make',{slots:['human','human','ai','ai']},undefined,{Cookie:cookies});assert.equal(made.status,200);const code=(await made.json()).update.lan.code;
  const room=app.pvp.rooms.get(code),before=JSON.stringify(room.seats);
- const games=await (await request('/api/dev-room/games',{},developer.token)).json();assert.equal(games.games[0].code,code);assert.equal(games.games[0].players.length,4);
+ const games=await (await request('/api/dev-room/games',{},developer.token)).json();assert.equal(games.games.length,0);assert.equal((await (await request('/api/dev-room/overview',{},developer.token)).json()).activeGames,0);
  assert.ok(!/token|binding|rng|cells|password|salt|email|guestId/.test(JSON.stringify(games)));
  const view=await (await request('/api/dev-room/spectate',{code},developer.token)).json();assert.deepEqual(view,spectatorView(room));assert.equal(JSON.stringify(room.seats),before);assert.ok(view.boards.every(b=>b.cells.length===0));checks+=7;
- const local=await devRoomGames(new Map(),new Map([['SECRET',{mode:'single',slots:{single:{configuration:{singlePlayer:{npcNames:['Snurk']}},statIdentity:{displayName:'Local'},session:{client:{read:async()=>({snapshot:{phase:'battle',round:3,owned:[{secret:'placement'}]}})}}}}}]]),true);assert.equal(local[0].spectate,false);assert.ok(!JSON.stringify(local).includes('secret'));checks+=2;
+ const local=await devRoomGames(new Map(),new Map([['SECRET',{mode:'single',slots:{single:{configuration:{singlePlayer:{npcNames:['Snurk']}},statIdentity:{displayName:'Local'},session:{client:{read:async()=>({snapshot:{phase:'battle',round:3,owned:[{secret:'placement'}]}})}}}}}]]),true,Date.now(),()=>true);assert.equal(local[0].spectate,false);assert.ok(!JSON.stringify(local).includes('secret'));checks+=2;
+ // Spectate stays unchanged; the Live Games fixture must now be a started battle.
+ const owner=room.seats[0],joined=await app.pvp.lobby('join',{code,name:'Other human'},'other-browser');
+ for(const [token,binding]of [[owner.token,owner.binding],[joined.token,'other-browser']])for(const intent of [{kind:'random-placement'},{kind:'start'}]){const {snapshot:s}=await app.pvp.route(token,binding,'read');await app.pvp.route(token,binding,'command',{contract:s.contract,battle:s.battle,revision:s.revision,intent});}
+ heartbeat=setInterval(()=>{for(const seat of room.seats)if(seat?.controller==='human')app.pvp.heartbeat(seat.token,seat.binding);},1000);
+ assert.equal((await (await request('/api/dev-room/games',{},developer.token)).json()).games[0].code,code);checks++;
  for(const [action,data]of actions){assert.equal((await request('/api/registry/'+action,data,developer.token)).status,200);checks++;}
  assert.equal((await request('/api/registry/dev-review-decide',{playerId:player.account.playerId,action:'CLEAR'},admin.token)).status,200);checks++;
  assert.deepEqual(await (await request('/api/registry/global-stats')).json(),publicBefore);checks++;
@@ -86,5 +91,5 @@ try{
  await page.getByRole('button',{name:'Overview',exact:true}).click();await page.getByText('Signed in as TestRaven').waitFor();await page.screenshot({path:path.join(dir,'dev-room-desktop.png')});assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth),false);assert.deepEqual(errors,[]);checks+=2;
  const revoked=new DatabaseSync(path.join(dir,'registry.sqlite'));revoked.prepare("UPDATE accounts SET moderation_role='player' WHERE id=?").run(developer.account.playerId);revoked.close();await page.getByRole('button',{name:'Refresh',exact:true}).click();await page.getByText('Developer access required.',{exact:true}).waitFor();assert.equal(await page.locator('#content').innerText(),'');checks++;
  console.log(JSON.stringify({passed:true,checks,isolatedStorage:dir,screenshot:path.join(dir,'dev-room-desktop.png')}));
-}finally{await browser?.close();await app.close();}
+}finally{clearInterval(heartbeat);await browser?.close();await app.close();}
 }

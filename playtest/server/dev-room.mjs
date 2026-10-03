@@ -1,16 +1,28 @@
 import os from 'node:os';
 import fs from 'node:fs';
+import {presence} from './disconnect-policy.mjs';
+import {afkInfo,afkSeatActive} from './afk-policy.mjs';
+// Local games have no seat heartbeat/AFK policy. Count recent accepted play only;
+// never persist this observation or derive activity from a restored checkpoint.
+export const LOCAL_PLAY_WINDOW_MS=120000;
+export function localPlayActivity(now=Date.now){
+ const seen=new WeakMap();
+ return {observe:slot=>seen.set(slot,now()),forget:slot=>seen.delete(slot),active:slot=>seen.has(slot)&&now()-seen.get(slot)<LOCAL_PLAY_WINDOW_MS};
+}
 // Metadata only. Never return session keys, host state, placements or RNG.
-export async function devRoomGames(rooms,sessions,spectatorEnabled){
+export async function devRoomGames(rooms,sessions,spectatorEnabled,now=Date.now(),localActive=()=>false){
  const games=[];
  for(const room of rooms.values()){
-  if(room.closed||room.host.status==='complete')continue;
+  if(room.closed||!['awaiting-command','awaiting-decision','awaiting-turn','running'].includes(room.host.status))continue;
+  const connected=presence(room,now);
+  if(!room.seats.some((s,i)=>s?.controller==='human'&&connected[i].connected&&afkSeatActive(room,i)))continue;
+  if(afkInfo(room,0,now)?.episode)continue;
   games.push({code:room.code,mode:'Multiplayer',status:room.host.status,round:room.host.round,
    players:room.seats.map(s=>({name:s?.name||'Waiting for player',ai:s?.controller==='ai'})),spectate:!!spectatorEnabled});
  }
  for(const entry of sessions.values()){
   if(!['single','story'].includes(entry.mode))continue;
-  const slot=entry.slots?.[entry.mode];if(!slot)continue;
+  const slot=entry.slots?.[entry.mode];if(!slot||!localActive(slot))continue;
   const {snapshot:s}=await slot.session.client.read();
   if(['placement','finished'].includes(s.phase))continue;
   games.push({code:null,mode:entry.mode==='story'?'Story':'Single Player',status:s.phase,round:s.round??null,

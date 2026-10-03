@@ -90,7 +90,7 @@ export function openRegistry(directory,{now=Date.now}={}){
   if(action==='profile-view'){statistics.ensureAggregates();return profileReadModel(db,statistics,session(token)?.id,b);}
   if(action==='story-restart'){if(Object.keys(b).length)fail('Invalid Story restart request.');const a=session(token);if(!a)fail('Log in to restart account Story.',401);return tx(()=>{const state={...storyState(a.id),runId:randomUUID(),progress:null};saveRun(a.id,state);return {playerId:a.id,...state};});}
   if(action==='story-progress'){if(Object.keys(b).length)fail('Invalid Story progress request.');const a=session(token);return {playerId:a?.id||null,...(a?storyState(a.id):{progress:null,lifetime:null,runId:null})};}
-  if(action==='usage-visit'){if(Object.keys(b).length)fail('Invalid visit.');rate('usage:'+ip,24000,3600000);dashboard.visit(browser,session(token)?.id||null);return {recorded:true};}
+  if(action==='usage-visit'){if(Object.keys(b).some(k=>k!=='playing')||b.playing!==undefined&&typeof b.playing!=='boolean')fail('Invalid visit.');rate('usage:'+ip,24000,3600000);dashboard.visit(browser,session(token)?.id||null);return {recorded:true};}
   if(action==='me'){const a=session(token);return a?streak(a.id):{account:null};}
   if(action==='logout'){if(token)run('DELETE FROM sessions WHERE token_hash=?',hash(token));return {account:null,clearCookie:true};}
   if(action==='challenge'){rate('challenge:'+ip,100,3600000);run('DELETE FROM challenges WHERE expires<=?',now());const a=randomInt(1,10),c=randomInt(1,10),id=randomBytes(24).toString('hex');run('INSERT INTO challenges VALUES(?,?,?,?)',id,hash(browser),hash(String(a+c)),now()+600000);return {id,question:`What is ${a} + ${c}?`};}

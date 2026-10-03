@@ -13,13 +13,17 @@ if(gate?.isConnected){
 }
 
 // Presence is a visible game-tab heartbeat, not a login or an IP-based visitor count.
-// No game actions, identities or credentials are sent in the payload.
-let visitPending=false,lastVisit=0;
+// The view hint can only clear local dashboard activity; it cannot create active play.
+let visitPending=false,lastVisit=0,lastPlaying;
+const playing=()=>document.visibilityState==='visible'&&!gate?.isConnected&&!document.body.classList.contains('st-main-menu-mode');
 async function recordVisit(){
- if(document.visibilityState!=='visible'||visitPending||Date.now()-lastVisit<30000)return;
- visitPending=true;lastVisit=Date.now();
- try{await fetch('/api/registry/usage-visit',{method:'POST',headers:{'Content-Type':'application/json'},body:'{}'});}catch{}finally{visitPending=false;}
+ const current=playing();
+ if(visitPending||current===lastPlaying&&(document.visibilityState!=='visible'||Date.now()-lastVisit<30000))return;
+ visitPending=true;lastVisit=Date.now();lastPlaying=current;
+ try{await fetch('/api/registry/usage-visit',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({playing:current})});}catch{}finally{visitPending=false;if(playing()!==lastPlaying)void recordVisit();}
 }
 startupAccount.finally(recordVisit);
 setInterval(recordVisit,60000);
 document.addEventListener('visibilitychange',recordVisit);
+
+new MutationObserver(()=>{if(playing()!==lastPlaying)void recordVisit();}).observe(document.body,{attributes:true,attributeFilter:['class']});

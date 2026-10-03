@@ -1,4 +1,4 @@
-import {devRoomGames,devRoomHealthReader} from './dev-room.mjs';
+import {devRoomGames,devRoomHealthReader,localPlayActivity} from './dev-room.mjs';
 import {persistenceContract} from './persistence-contract.mjs';
 import {registryClientIp} from './client-ip.mjs';
 import {protectServerRecovery} from './shared-incidents.mjs';
@@ -38,6 +38,7 @@ export async function startServer({registryDir=registryDirectory(),port=3211,bet
  if(publicOrigin){const u=new URL(publicOrigin);if(!['http:','https:'].includes(u.protocol)||u.origin!==publicOrigin)throw Error('invalid-public-origin');secureCookies=u.protocol==='https:';}
  const log=(event,extra={})=>logger({event,...extra});
  const build=createHash('sha256').update(fs.readFileSync(path.join(root,'build-manifest.json'))).digest('hex'),started=Date.now();let recovery='disabled',fatal=false,stopping=false,requestQueue=Promise.resolve(),mutationPending=false;
+ const localActivity=localPlayActivity(now);
  const sessions=new Map(),pvp=createPvpService(roster,{seed,now,stateDir,reliability:id=>getRegistry().statistics.reliability(id),refreshIdentity:i=>i?.kind==='account'?(getRegistry().identityById(i.playerId)||i):i});let origin;const addresses=['127.0.0.1',...Object.values(os.networkInterfaces()).flat().filter(a=>a?.family==='IPv4').map(a=>a.address)];const address=bind||(lan?'0.0.0.0':'127.0.0.1');if(!['0.0.0.0',...addresses].includes(address))throw Error('Select a local interface');if(!lan&&address!=='127.0.0.1')throw Error('Non-loopback bind requires --lan');
  // Persist browser credentials across a browser close; revocation remains authoritative.
  const cookieFlags='; HttpOnly; SameSite=Strict; Path=/'+(secureCookies?'; Secure':'');
@@ -121,9 +122,9 @@ let body;try{body=JSON.parse(req.intake||Buffer.alloc(0));if(!body||typeof body!
     if(req.headers.origin!==(publicOrigin||'http://'+req.headers.host))return reply(403,{error:'invalid-origin'});
     const accountToken=(req.headers.cookie||'').split(';').map(x=>x.trim()).find(x=>x.startsWith('csAccount='))?.slice(10);
     try{const developer=getRegistry().requireDeveloper(accountToken);
-     if(url.pathname==='/api/dev-room/overview'&&Object.keys(body).every(k=>k==='range')){const games=await devRoomGames(pvp.rooms,sessions,lan);return reply(200,{developer,build,version:JSON.parse(fs.readFileSync(path.join(root,'package.json'),'utf8')).version,uptimeSeconds:Math.floor((Date.now()-started)/1000),...getRegistry().devRoomCounts(accountToken),dashboard:getRegistry().dashboard.read(body.range??'24h',started),dashboardIssue,health:currentHealth||devHealth(registryDir),healthAt,announcement:getRegistry().welcomeMessage(),activeGames:games.length});}
+     if(url.pathname==='/api/dev-room/overview'&&Object.keys(body).every(k=>k==='range')){const games=await devRoomGames(pvp.rooms,sessions,lan,now(),localActivity.active);return reply(200,{developer,build,version:JSON.parse(fs.readFileSync(path.join(root,'package.json'),'utf8')).version,uptimeSeconds:Math.floor((Date.now()-started)/1000),...getRegistry().devRoomCounts(accountToken),dashboard:getRegistry().dashboard.read(body.range??'24h',started),dashboardIssue,health:currentHealth||devHealth(registryDir),healthAt,announcement:getRegistry().welcomeMessage(),activeGames:games.length});}
      if(url.pathname==='/api/dev-room/message'&&Object.keys(body).join(',')==='text')return reply(200,getRegistry().setWelcomeMessage(accountToken,body.text));
-     if(url.pathname==='/api/dev-room/games'&&Object.keys(body).length===0)return reply(200,{games:await devRoomGames(pvp.rooms,sessions,lan)});
+     if(url.pathname==='/api/dev-room/games'&&Object.keys(body).length===0)return reply(200,{games:await devRoomGames(pvp.rooms,sessions,lan,now(),localActivity.active)});
      if(url.pathname==='/api/dev-room/spectate'&&Object.keys(body).join(',')==='code'&&typeof body.code==='string'&&/^[A-Z0-9]{6}$/.test(body.code)){if(!lan)return reply(403,{error:'lan-disabled'});const room=pvp.getRoom(body.code);if(!room)return reply(404,{error:'bad-game-code'});return reply(200,spectatorView(room));}
      return reply(400,{error:'invalid-request'});
     }catch(e){return reply(e.status||503,{error:e.status?e.message:'Dev Room temporarily unavailable.'});}
@@ -135,6 +136,7 @@ let body;try{body=JSON.parse(req.intake||Buffer.alloc(0));if(!body||typeof body!
     let browser=cookies.csRegistryBrowser;const setCookies=[];
     if(!/^[a-f0-9]{48}$/.test(browser||'')){browser=randomBytes(24).toString('hex');setCookies.push('csRegistryBrowser='+browser+cookieFlags+'; Max-Age=2592000');}
     try{if(url.pathname==='/api/registry/global-stats'){if(Object.keys(body).length)return reply(400,{error:'malformed-request'});return reply(200,getRegistry().statistics.globalMenuStats());}if(url.pathname==='/api/registry/reliability'){if(Object.keys(body).length)return reply(400,{error:'malformed-request'});const identity=getRegistry().identity(cookies.csAccount);return reply(200,getRegistry().statistics.reliability(identity?.playerId));}if(url.pathname==='/api/registry/hall-of-fame'){if(Object.keys(body).some(k=>k!=='mode')||!['All','Duel','3 Players','4 Players'].includes(body.mode))return reply(400,{error:'malformed-request'});const identity=getRegistry().identity(cookies.csAccount);return reply(200,getRegistry().statistics.globalHallOfFame(body.mode,identity?.playerId||null,{}));}if(url.pathname==='/api/registry/statistics'){if(!statisticsInspector||publicOrigin)return reply(404,{error:'not-found'});if(Object.keys(body).length!==0)return reply(400,{error:'malformed-request'});const identity=getRegistry().identity(cookies.csAccount);return reply(200,getRegistry().statistics.inspect(identity?.playerId||null));}const result=await getRegistry().handle(url.pathname.slice('/api/registry/'.length),body,{token:cookies.csAccount,browser,ip:registryClientIp(req,trustLoopbackProxy),feedbackContext:feedbackContext(cookies)});
+     if(url.pathname==='/api/registry/usage-visit'&&body.playing===false){const e=sessions.get(cookies.st11sid);for(const slot of Object.values(e?.slots||{}))localActivity.forget(slot);}
      if(url.pathname==='/api/registry/me')result.statisticsInspector=!!statisticsInspector&&!publicOrigin;
      if(result.token){setCookies.push('csAccount='+result.token+cookieFlags+'; Max-Age=2592000');delete result.token;}
      if(result.clearCookie){setCookies.push('csAccount='+cookieFlags+'; Max-Age=0');delete result.clearCookie;}
@@ -218,6 +220,7 @@ let body;try{body=JSON.parse(req.intake||Buffer.alloc(0));if(!body||typeof body!
     if(body.mode==='story'&&slots(entry).story?.storyOwnerId!==undefined&&(slots(entry).story?.storyOwnerId||null)!==(onlineIdentity()?.playerId||null))return reply(200,{available:false});
     const target=slots(entry)[body.mode];if(!target||!resumable(target,await target.session.client.read()))return reply(200,{available:false});
     if(!select(entry,body.mode))return reply(200,{available:false});
+    localActivity.observe(target);
     return reply(200,{available:true,configuration:entry.configuration,storyContext:slots(entry)[body.mode]?.storyContext,update:await entry.session.client.read()});
    }
    if(url.pathname==='/api/pvp/leave'){if(lan&&seatToken){try{const out=await pvp.route(seatToken,token,'leave');detachFormerPlayers();if(out.reclaimable){entry.mode='multiplayer';log('game-left-reclaimable');return reply(200,out);}if(out.mainMenu){entry.mode='main-menu';entry.seatToken=null;res.setHeader('Set-Cookie','st12seat='+cookieFlags+'; Max-Age=0');return reply(200,out);}}catch{}}if(entry){entry.mode='multiplayer-menu';entry.seatToken=null;}res.setHeader('Set-Cookie','st12seat='+cookieFlags+'; Max-Age=0');log('game-left');return reply(200,{left:true});}
@@ -240,7 +243,7 @@ let body;try{body=JSON.parse(req.intake||Buffer.alloc(0));if(!body||typeof body!
     if(url.pathname==='/api/read'){if(Object.keys(body).some(k=>k!=='after'))return reply(400,{error:'malformed-request'});try{return reply(200,await entry.session.client.read(body.after??0));}catch{return reply(400,{error:'invalid-cursor'});}}
     if(url.pathname==='/api/command'){
      const slot=slots(entry)[modeOf(entry.configuration)];if(!slot.matchStatistics?.startedAt)slot.statIdentity=onlineIdentity();
-     const bindStory=update=>{if(slot.configuration.story&&update.accepted&&body.intent?.kind==='start'){try{getRegistry().dashboard.storyStart();}catch{dashboardIssue=true;log('dashboard-recording-failed');}if(slot.storyOwnerId===undefined)slot.storyOwnerId=onlineIdentity()?.playerId||null;if(slot.storyRunId===undefined)slot.storyRunId=slot.storyOwnerId?getRegistry().storyState(slot.storyOwnerId).runId:null;}return update;};
+     const bindStory=update=>{if(update.accepted)localActivity.observe(slot);if(slot.configuration.story&&update.accepted&&body.intent?.kind==='start'){try{getRegistry().dashboard.storyStart();}catch{dashboardIssue=true;log('dashboard-recording-failed');}if(slot.storyOwnerId===undefined)slot.storyOwnerId=onlineIdentity()?.playerId||null;if(slot.storyRunId===undefined)slot.storyRunId=slot.storyOwnerId?getRegistry().storyState(slot.storyOwnerId).runId:null;}return update;};
      if(req.headers.accept!=='application/x-ndjson')return reply(200,bindStory(await entry.session.client.dispatch(body)));
      const send=value=>{if(res.destroyed)return;if(!res.headersSent){res.writeHead(200,{'Content-Type':'application/x-ndjson','Cache-Control':'no-store','X-Content-Type-Options':'nosniff'});res.flushHeaders();}res.write(JSON.stringify(value.type==='result'?{...value,commandTiming:commandTiming(),...(betaGameLog&&metricsContext.getStore()?{betaGameLog:betaData()}:{})}:value)+'\n');};
      const update=bindStory(await entry.session.dispatchWithProgress(body,async frame=>{send({type:'preview',frame:nameDoublePlague(frame,entry)});await new Promise(resolve=>setImmediate(resolve));}));

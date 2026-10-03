@@ -1,5 +1,6 @@
 // Private server-only review foundation. Signals never change account status.
-export const REVIEW_POLICY=Object.freeze({version:1,illegalTargetWeight:10,independentOpeningWeight:10,heroFirstWeight:2,heroEarlyWeight:1,highAccuracyWeight:2,highAccuracyMinimumShots:50,highAccuracyRatio:0.8,hiddenStreak:8,coreStreak:10,extremeScore:2500,extremeChain:150});
+import {processedChainCells} from '../canonical/compiled/combat/chain-statistics.js';
+export const REVIEW_POLICY=Object.freeze({version:2,illegalTargetWeight:10,independentOpeningWeight:10,heroFirstWeight:2,heroEarlyWeight:1,highAccuracyWeight:2,highAccuracyMinimumShots:50,highAccuracyRatio:0.8,hiddenStreak:8,coreStreak:10,extremeScore:2500,extremeChain:200,repeatedChain:150,chainWindowDays:7});
 const parse=value=>value?JSON.parse(value):null;
 export function migrateReview(db){db.exec(`
  CREATE TABLE IF NOT EXISTS review_retention(match_id TEXT PRIMARY KEY REFERENCES stat_matches(id),version INTEGER NOT NULL,coverage TEXT NOT NULL);
@@ -51,11 +52,29 @@ export function reviewStore(db,{now=Date.now,policy=REVIEW_POLICY}={}){
    const metrics={shots:shots.length,hits:shots.filter(s=>s.hit).length,hitRatio:shots.length?shots.filter(s=>s.hit).length/shots.length:null,firstHeroShot:shots.find(s=>s.hit&&s.type==='hero')?.index??null,firstBlindHeroShot:shots.find(s=>s.hit&&s.type==='hero'&&s.previouslyKnown===false&&s.unitPreviouslyKnown===false)?.index??null,independentCoreDiscoveries:discoveries,firstTwoIndependentCore:shots.length>=2&&shots.slice(0,2).every(s=>s.hit&&s.core&&s.previouslyKnown===false&&s.unitPreviouslyKnown===false)&&shots[0].unitId!==shots[1].unitId,longestHiddenHitStreak:longestHidden,longestCoreHitStreak:longestCore,hitsBeforeFirstMiss:beforeMiss,matchScore:row?.match_score??null,biggestChain:summary.biggestChain??null,knowledgeCoveredShots:shots.filter(s=>s.knowledgeCoverage==='pre-shot-authority').length,complete};
    run('INSERT INTO review_metrics VALUES(?,?,?)',m.id,p.playerId,JSON.stringify(metrics));
    const signal=(reason,weight,measurements)=>run("INSERT OR IGNORE INTO review_signals(player_id,match_id,type,reason,weight,created_at,measurements) VALUES(?,?,'STATISTICAL',?,?,?,?)",p.playerId,m.id,reason,weight,m.ended_at,JSON.stringify({policyVersion:policy.version,...measurements}));
-   if(complete){if(metrics.firstTwoIndependentCore)signal('two-independent-unknown-core-openers',policy.independentOpeningWeight,{shotIndexes:[1,2]});if(metrics.firstBlindHeroShot<=3&&metrics.firstBlindHeroShot!==null)signal('early-blind-hero',metrics.firstBlindHeroShot===1?policy.heroFirstWeight:policy.heroEarlyWeight,{shot:metrics.firstBlindHeroShot});if(metrics.shots>=policy.highAccuracyMinimumShots&&metrics.hitRatio>=policy.highAccuracyRatio)signal('high-ordinary-accuracy',policy.highAccuracyWeight,{shots:metrics.shots,hits:metrics.hits,ratio:metrics.hitRatio});if(longestHidden>=policy.hiddenStreak)signal('long-hidden-hit-streak',1,{length:longestHidden});if(longestCore>=policy.coreStreak)signal('long-core-hit-streak',1,{length:longestCore,includesKnownFollowups:true});if(metrics.matchScore>=policy.extremeScore)signal('high-score-observation',1,{score:metrics.matchScore});if(metrics.biggestChain>=policy.extremeChain)signal('large-chain-observation',1,{cells:metrics.biggestChain});}
+   if(complete){if(metrics.firstTwoIndependentCore)signal('two-independent-unknown-core-openers',policy.independentOpeningWeight,{shotIndexes:[1,2]});if(metrics.firstBlindHeroShot<=3&&metrics.firstBlindHeroShot!==null)signal('early-blind-hero',metrics.firstBlindHeroShot===1?policy.heroFirstWeight:policy.heroEarlyWeight,{shot:metrics.firstBlindHeroShot});if(metrics.shots>=policy.highAccuracyMinimumShots&&metrics.hitRatio>=policy.highAccuracyRatio)signal('high-ordinary-accuracy',policy.highAccuracyWeight,{shots:metrics.shots,hits:metrics.hits,ratio:metrics.hitRatio});if(longestHidden>=policy.hiddenStreak)signal('long-hidden-hit-streak',1,{length:longestHidden});if(longestCore>=policy.coreStreak)signal('long-core-hit-streak',1,{length:longestCore,includesKnownFollowups:true});if(metrics.matchScore>=policy.extremeScore)signal('high-score-observation',1,{score:metrics.matchScore});if(metrics.biggestChain>=policy.extremeChain)signal('large-chain-observation',1,{cells:metrics.biggestChain});
+    else if(metrics.biggestChain>=policy.repeatedChain){
+     // Reuse authoritative processed-cell accounting, including separate chains
+     // within one battle. Historical metrics provide one verified maximum per match.
+     const roots=new Map();
+     for(const row of all("SELECT payload FROM stat_facts WHERE match_id=? AND kind='event' ORDER BY sequence",m.id)){
+      const f=parse(row.payload),e=f.event,s=e.statistics||{},key=f.chainId||e.rootId;
+      if(!key)continue;let root=roots.get(key);if(!root){root={actor:f.originActor||s.rootActorId,index:f.index,cells:0};roots.set(key,root);}root.actor??=f.originActor||s.rootActorId;
+      if(!s.environmental)root.cells+=processedChainCells(e);
+     }
+     const current=[...roots.values()].filter(r=>r.actor===p.actor&&(p.cutoff===undefined||r.index<p.cutoff)&&r.cells>=policy.repeatedChain).map(r=>({matchId:m.id,cells:r.cells,endedAt:m.ended_at}));
+     if(!current.length)current.push({matchId:m.id,cells:metrics.biggestChain,endedAt:m.ended_at});
+     const prior=all(`SELECT r.match_id AS matchId,m.ended_at AS endedAt,json_extract(r.value,'$.biggestChain') AS cells
+      FROM review_metrics r JOIN stat_matches m ON m.id=r.match_id JOIN review_retention t ON t.match_id=m.id
+      WHERE r.player_id=? AND r.match_id<>? AND m.finalized=1 AND t.coverage='ordered-facts-complete'
+      AND m.ended_at BETWEEN ? AND ? AND json_extract(r.value,'$.biggestChain')>=?
+      ORDER BY m.ended_at DESC,m.id LIMIT 1`,p.playerId,m.id,m.ended_at-policy.chainWindowDays*86400000,m.ended_at,policy.repeatedChain);
+     if(current.length+prior.length>=2)signal('repeated-large-chains',1,{chains:[...current,...prior].slice(0,2),windowDays:policy.chainWindowDays});
+    }}
    if(state(p.playerId).status==='REVIEW')run("INSERT OR IGNORE INTO review_pending VALUES(?,?,'PENDING REVIEW')",p.playerId,m.id);
   }
  }
- function backfill(){for(const m of all("SELECT m.id FROM stat_matches m WHERE finalized=1 AND NOT EXISTS(SELECT 1 FROM review_retention r WHERE r.match_id=m.id) AND EXISTS(SELECT 1 FROM stat_participants p WHERE p.match_id=m.id AND p.kind='account')"))retain(m.id);}
+ function backfill(){for(const m of all("SELECT m.id FROM stat_matches m WHERE finalized=1 AND NOT EXISTS(SELECT 1 FROM review_retention r WHERE r.match_id=m.id) AND EXISTS(SELECT 1 FROM stat_participants p WHERE p.match_id=m.id AND p.kind='account') ORDER BY m.ended_at,m.id"))retain(m.id);}
  function account(id){const s=state(id),signals=all('SELECT s.id,s.match_id AS matchId,s.type,s.reason,s.weight,s.created_at AS timestamp,s.measurements,m.mode FROM review_signals s JOIN stat_matches m ON m.id=s.match_id WHERE s.player_id=? ORDER BY s.id DESC',id).map(r=>({...r,measurements:parse(r.measurements)}));const matches=all('SELECT r.match_id,m.mode,m.player_count,m.ended_at,r.value FROM review_metrics r JOIN stat_matches m ON m.id=r.match_id WHERE player_id=? ORDER BY m.ended_at DESC',id).map(r=>({...r,metrics:parse(r.value),value:undefined}));
   const relations=all("SELECT b.player_id AS playerId,count(*) AS matches,sum(CASE WHEN a.outcome='Win' THEN 1 ELSE 0 END) AS wins,sum(CASE WHEN a.outcome='Win' AND b.reliability='Quit' THEN 1 ELSE 0 END) AS winsAfterOtherQuit FROM stat_participants a JOIN stat_participants b ON b.match_id=a.match_id AND b.player_id<>a.player_id WHERE a.player_id=? AND b.kind='account' GROUP BY b.player_id",id);
   const recent=matches.slice(0,20),shots=recent.reduce((n,r)=>n+r.metrics.shots,0),hits=recent.reduce((n,r)=>n+r.metrics.hits,0);

@@ -8,6 +8,7 @@ export function flagReason({reason,measurements:m={}}){
  case 'long-hidden-hit-streak':return number(m.length)?m.length+' blind hits in a row':'Long run of blind hits';
  case 'long-core-hit-streak':return number(m.length)?m.length+' core hits in a row':'Long run of core hits';
  case 'high-score-observation':return number(m.score)?'Match score of '+m.score.toLocaleString():'Unusually high match score';
+ case 'repeated-large-chains':return 'Two chains of 150+ cells within '+(number(m.windowDays)||'7')+' days';
  case 'large-chain-observation':return number(m.cells)?m.cells+' cells in one chain':'Unusually large chain';
  case 'fresh-off-board-shot':return 'Invalid off-board shot request';
  default:return 'Flag needs a closer look';
