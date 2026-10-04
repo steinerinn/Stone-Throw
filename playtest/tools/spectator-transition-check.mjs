@@ -13,6 +13,8 @@ try{for(const width of [1440,390]){const p=await browser.newPage({viewport:{widt
  await render([3,2],false);assert.equal(await p.locator('.st-boards').isVisible(),false);assert.deepEqual(await visible(),[2,3]);assert.equal(await p.locator('#stOnlineOverview').getAttribute('data-survivors'),'2');checks++;
  await p.screenshot({path:path.join(out,'two-survivors-'+width+'.png')});
  await render([3,2],true);assert.deepEqual(await visible(),[2,3]);checks++;
+ const moves=await p.evaluate(()=>{const host=document.querySelector('.st-secondary-boards'),observer=new MutationObserver(()=>{});observer.observe(host,{childList:true});for(let i=0;i<20;i++)window.overview.render(window.sample([3,2]),true);const count=observer.takeRecords().length;observer.disconnect();return count;});assert.equal(moves,0,'unchanged spectator map order must not detach/reinsert panels');checks++;
+
  await render([3],false,true);assert.deepEqual(await visible(),[2,3],'final reveal waits until animation completes');checks++;
  await render([3],true,true);assert.deepEqual(await visible(),[0,1,2,3]);assert.equal(await p.locator('.st-turn-dial').isVisible(),false);checks++;
  await render([0,1,3,2],true);assert.equal(await p.locator('.st-boards').isVisible(),true);assert.deepEqual(await visible(),[2,3]);checks++;

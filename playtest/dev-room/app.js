@@ -44,7 +44,8 @@ async function feedbackDetail(root,id,back=render){
  const pairs=[['Status',feedbackLabels[d.inboxStatus]],['From',d.displayName||'Guest'],['Submitted',stamp(d.timestamp)]];if(d.matchId)pairs.push(['Match',shortId(d.matchId)]);if(d.mode)pairs.push(['Mode',d.mode]);root.append(descriptionList(pairs),el('h3','Message'),el('p',d.description,'description'));
  const actions=el('div',undefined,'actions');for(const [label,status]of [['LOOK INTO','TODO'],['IGNORE','IGNORED'],['DONE','FINISHED']])actions.append(button(label,async()=>{await registry('dev-feedback-status',{id,status});await back();}));root.append(actions);
  if(d.screenshot){const img=el('img');img.className='attachment';img.alt='Feedback screenshot';img.src='data:'+d.screenshot.mime+';base64,'+d.screenshot.data;root.append(img);}
- const {screenshot,...metadata}=d;root.append(technical(metadata));
+ if(d.gameLog)root.append(button('SAVE GAME LOG',()=>downloadText(d.gameLog,'ChainSiege-feedback-'+d.id+'.txt')));else root.append(el('p','No game log attached.'));
+ const {screenshot,gameLog,...metadata}=d;root.append(technical(metadata));
 }
 function filterGroup(label,values,current,change){const group=el('div',undefined,'filter-group');group.setAttribute('role','group');group.setAttribute('aria-label',label);for(const [value,text,count]of values){const b=button(text+' ('+count+')',()=>change(value));b.setAttribute('aria-pressed',String(value===current));group.append(b);}return group;}
 async function feedback(root){
@@ -58,7 +59,8 @@ function technical(data){const d=el('details');d.append(el('summary','Technical 
 function descriptionList(pairs){const dl=el('dl',undefined,'facts');for(const [key,value]of pairs)dl.append(el('dt',key),el('dd',value??'Unavailable'));return dl;}
 async function updateBadge(){const data=await registry('dev-review-search',{scope:'cases'});const badge=document.querySelector('#review-count');if(badge){badge.textContent=data.counts.needs;badge.title='Cases needing review';}return data;}
 function caseActions(row,refresh){const actions=el('div',undefined,'case-actions');for(const action of ['OK','NOT OK'])actions.append(button(action,async()=>{await registry('dev-review-decide',{caseId:row.id,action});await updateBadge();await refresh();}));return actions;}
-async function saveGameLog(matchId){const data=await registry('dev-review-game-log',{matchId}),url=URL.createObjectURL(new Blob([data.text],{type:'text/plain;charset=utf-8'})),link=el('a');link.href=url;link.download=data.filename;document.body.append(link);link.click();link.remove();setTimeout(()=>URL.revokeObjectURL(url),10000);}
+function downloadText(text,filename){const url=URL.createObjectURL(new Blob([text],{type:'text/plain;charset=utf-8'})),link=el('a');link.href=url;link.download=filename;document.body.append(link);link.click();link.remove();setTimeout(()=>URL.revokeObjectURL(url),10000);}
+async function saveGameLog(matchId){const data=await registry('dev-review-game-log',{matchId});downloadText(data.text,data.filename);}
 function matchActions(root,row,parent){const actions=el('div',undefined,'match-actions');actions.append(button('VIEW RESULT',()=>viewResult(root,row.matchId,parent)));if(row.replayAvailable)actions.append(button('WATCH REPLAY',()=>watchReplay(root,row.matchId,parent)));else actions.append(el('small','Replay unavailable'));actions.append(button('SAVE GAME LOG',()=>saveGameLog(row.matchId)));return actions;}
 function caseTable(rows,root,parent,refresh){return table(['Player','Match','Result / Replay','Reason','Mode','Date / time','Status',''],rows.map(row=>[button(row.displayName,()=>playerCases(root,row.playerId,row.displayName)),shortId(row.matchId),matchActions(root,row,parent),flagReason(row),row.mode,stamp(row.timestamp),row.status,caseActions(row,refresh)]));}
 function backToPlayer(root,parent){return parent.admin?playerDetail(root,parent.playerId):playerCases(root,parent.playerId,parent.name);}
