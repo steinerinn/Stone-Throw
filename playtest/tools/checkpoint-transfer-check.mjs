@@ -1,0 +1,17 @@
+import assert from 'node:assert/strict';
+import {checkpointStringEncoder,checkpointStringDecoder} from '../server/checkpoint-transfer.mjs';
+const encode=checkpointStringEncoder(),decode=checkpointStringDecoder();
+let value={local:[{token:'a',checkpoint:'retained'.repeat(10000),slots:{single:{checkpoint:'retained'.repeat(10000),label:'old'},story:{checkpoint:{mutable:1}}}}],other:new Map([['value',1]])};
+let packet=encode(value);assert.equal(packet.strings.length,2);assert.deepEqual(decode(structuredClone(packet)),value);
+packet=encode(value);assert.equal(packet.strings.length,0);assert.ok(JSON.stringify(packet).length<1000);assert.deepEqual(decode(structuredClone(packet)),value);
+value.local[0].slots.story.checkpoint.mutable=2;value.local[0].slots.single.label='new';
+assert.deepEqual(decode(structuredClone(encode(value))),value);
+value.local[0].checkpoint='changed';assert.deepEqual(decode(structuredClone(encode(value))),value);
+delete value.local[0].slots.single;packet=encode(value);assert.equal(packet.released.length,1);assert.deepEqual(decode(structuredClone(packet)),value);
+value.local.push({token:'b',checkpoint:'other'});assert.deepEqual(decode(structuredClone(encode(value))),value);
+value.local.reverse();assert.deepEqual(decode(structuredClone(encode(value))),value);
+value.local.pop();assert.deepEqual(decode(structuredClone(encode(value))),value);
+value={local:[]};packet=encode(value);assert.equal(packet.released.length,1);assert.deepEqual(decode(structuredClone(packet)),value);
+assert.throws(()=>checkpointStringDecoder()({checkpointStrings:1,value:{local:[{checkpoint:null}]},strings:[],refs:[[0,null,1]],released:[]}),/Invalid/);
+const invalid=checkpointStringEncoder()({local:[{checkpoint:'x'}]});invalid.refs.push(invalid.refs[0]);assert.throws(()=>checkpointStringDecoder()(invalid),/Invalid/);
+console.log(JSON.stringify({passed:true,unchangedStringTransferredOnce:true,inPlaceObjectsAlwaysTransferred:true,slotChangesPreserved:true,releasedStringsDropped:true,corruptReferencesRejected:true}));

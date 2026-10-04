@@ -17,7 +17,10 @@ try{
  try{assert.equal((await post('open')).status,200);assert.equal((await post('pvp/make',{slots:['human','human','empty','empty'],visibility:'private'})).status,200);
  fs.renameSync=(a,b)=>{if(b.endsWith('liveness.json'))throw failure('EPERM');return rename(a,b);};assert.equal((await post('read')).status,200);assert.ok(logs.some(e=>e.event==='liveness-recovered'));assert.ok(logs.some(e=>e.event==='liveness-write-failed'&&e.file==='liveness.json'&&e.operation==='rename'&&e.attempts===5));checks+=3;
  fs.renameSync=rename;assert.equal((await post('read')).status,200);checks++;
- fs.renameSync=(a,b)=>{if(b.endsWith('liveness.json')||b.endsWith('checkpoint.json'))throw failure('EPERM');return rename(a,b);};
+ fs.renameSync=(a,b)=>{if(b.endsWith('liveness.json'))throw failure('EPERM');return rename(a,b);};
+ // The persistence worker has its own fs module: cause a real isolated write
+ // failure there instead of relying on this thread's injected rename hook.
+ fs.mkdirSync(path.join(dir,'http','checkpoint.json.tmp'));
  // Advance heartbeat so liveness must write even when no game command is pending.
  await new Promise(r=>setTimeout(r,20));const failed=await post('read');assert.equal(failed.status,503);assert.equal((await post('read')).status,503);checks+=2;
  }finally{fs.renameSync=rename;await app.close();}

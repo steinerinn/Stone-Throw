@@ -1,5 +1,5 @@
 import fs from 'node:fs';import assert from 'node:assert/strict';
-import {launch} from '../../../stage10/development-harness/browser-harness.mjs';
+import {launch} from './browser-harness.mjs';
 import {createHost,place} from '../canonical/compiled/host/initialization.js';
 import {publicUnitStrips} from '../canonical/compiled/local-host/unit-strip-disclosure.js';
 import {heroHit} from '../canonical/compiled/combat/units/hero.js';

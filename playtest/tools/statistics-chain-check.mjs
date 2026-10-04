@@ -1,14 +1,15 @@
+import {phase1Module} from './registry-phase1-fixture.mjs';
 import {publicStatistics,emptyStatistics} from '../canonical/compiled/local-host/public-statistics.js';
 import {groupStatistics} from '../server/group-statistics.mjs';
 import {serializeHost,deserializeHost} from '../canonical/compiled/host/serialization.js';
 import assert from 'node:assert/strict';
 import {createHost,place} from '../canonical/compiled/host/initialization.js';
 import {acceptCommand} from '../canonical/compiled/host/lifecycle.js';
-import {acceptCommand as legacyCommand} from '../../../registry-phase1/candidate/canonical/compiled/host/lifecycle.js';
+const {acceptCommand:legacyCommand}=await import(phase1Module('canonical/compiled/host/lifecycle.js'));
 import {startResolution,stepResolution} from '../canonical/compiled/combat/resolver.js';
 import {summarizeMatch,aggregate} from '../server/statistics-metrics.mjs';
 const descriptor={participants:[{actor:'a',kind:'guest',outcome:'Win',reliability:'Full'},{actor:'b',kind:'guest',outcome:'Loss',reliability:'Full'}]};
-const normalize=h=>JSON.parse(JSON.stringify(h,(k,v)=>['biggestAttack','longestChain','statisticsId'].includes(k)||k==='statistics'&&v?.version===1?undefined:v));
+const normalize=h=>JSON.parse(JSON.stringify(h,(k,v)=>['biggestAttack','longestChain','statisticsId','shotAudit'].includes(k)||k==='statistics'&&v?.version===1?undefined:v));
 let checks=0;
 function synthetic(root,groups){return groups.flatMap(([source,count,hits,owner],i)=>Array.from({length:count},(_,j)=>({event:{rootId:root,workId:'nested-'+i,kind:'impact',unitId:j<hits?'unit-'+i+'-'+j:null,cells:[{x:j,y:i}],meta:{ownerId:owner,source},statistics:{rootActorId:'a',unitType:j<hits?'inf':null,unitOwner:owner==='a'?'b':'a'}},chainId:'match:'+root,originActor:'a'})));}
 const full=synthetic('root-one',[['direct-human',1,1,'a'],['archer',6,1,'b'],['goblin',9,2,'a']]);

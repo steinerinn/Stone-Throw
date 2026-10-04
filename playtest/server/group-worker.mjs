@@ -1,3 +1,4 @@
+import {packWorkerPresentation} from './worker-presentation.mjs';
 import {archiveEncoder,archiveDecoder} from './archive-wire.mjs';
 import {metricsContext} from './beta-metrics.mjs';
 import {parentPort} from 'node:worker_threads';
@@ -16,6 +17,6 @@ await metricsContext.run(betaMetrics,async()=>{try{
  const cursors=r.host.config.players.map(p=>r.host.state.match.knowledge[p.id].events.length);
  const result=action==='tick'?await service.tick():await service.route(token,binding,action,body);service.finishProgress(room.code);
  const updates=await Promise.all(r.seats.map((s,i)=>s.controller==='human'&&s.token&&!s.left&&!s.absence?service.route(s.token,s.binding,'read',{after:cursors[i]}):null));
- lastJob=job;parentPort.postMessage(encodeArchive({type:'done',job,betaMetrics,room:service.exportState(true)[0],result,updates}));
+ lastJob=job;const finalRoom=service.exportState(true)[0],actor=r.seats.findIndex(s=>s.token===token);parentPort.postMessage(encodeArchive({type:'done',job,betaMetrics,room:finalRoom,publicUpdates:packWorkerPresentation(finalRoom,result,updates,actor)}));
  }catch(e){parentPort.postMessage({type:'failure',message:e.message,stack:e.stack});}});
 });

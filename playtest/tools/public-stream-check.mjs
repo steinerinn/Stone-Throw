@@ -1,0 +1,18 @@
+import assert from 'node:assert/strict';
+import {incrementalPublicStream} from '../server/public-stream.mjs';
+const frame={publicEvent:{id:'public:1',at:1},snapshot:{eventPosition:3,owned:[],opponent:[]},events:[]};
+const progress={type:'progress',update:{snapshot:frame.snapshot,presentation:[frame]}};
+const result={type:'result',update:{accepted:true,snapshot:{...frame.snapshot,revision:2},presentation:[structuredClone(frame)]}};
+const before=structuredClone([progress,result]),send=incrementalPublicStream(true);
+assert.equal(send(progress),progress);
+assert.deepEqual(send(result),{...result,update:{...result.update,presentation:[]}});
+assert.deepEqual([progress,result],before);
+assert.deepEqual(incrementalPublicStream(false)(result),result);
+assert.deepEqual(incrementalPublicStream(true)(result),result);
+const changed=structuredClone(result);changed.update.presentation[0].snapshot.revision=4;
+assert.deepEqual(send(changed),changed);
+const missingId=structuredClone(result);delete missingId.update.presentation[0].publicEvent;
+assert.deepEqual(send(missingId),missingId);
+assert.deepEqual(send({type:'error',error:'test'}),{type:'error',error:'test'});
+const observer=incrementalPublicStream(true);assert.deepEqual(observer(result),result);
+console.log('PASS: incremental public stream, exact-content deduplication, unchanged final snapshot, legacy fallback, observer isolation and no mutation.');

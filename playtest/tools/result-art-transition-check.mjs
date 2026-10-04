@@ -10,12 +10,12 @@ try{
  await p.evaluate(()=>show('loss'));await p.waitForFunction(()=>document.getElementById('art').style.visibility==='visible');checks++;
  await p.evaluate(()=>show('ongoing'));assert.equal(await p.locator('#art').getAttribute('src'),null);assert.equal(await p.locator('#art').evaluate(e=>e.style.visibility),'hidden');checks+=2;
  for(const outcome of ['win','loss','draw']){
-  const filename=outcome==='loss'?'lose':outcome;let release;const gate=new Promise(r=>release=r);
+  const filename=outcome==='loss'?'lose':outcome;await p.evaluate(()=>{const img=document.getElementById('art');window.originalDecode=img.decode.bind(img);img.decode=()=>new Promise(resolve=>window.releaseDecode=()=>originalDecode().then(resolve));});let release;const gate=new Promise(r=>release=r);
   await p.route('**/assets/results/'+filename+'.svg',async r=>{await gate;await r.continue();});
   await p.evaluate(o=>show(o),outcome);
   assert.equal(await p.locator('#art').evaluate(e=>e.style.visibility),'hidden');checks++;
   await p.waitForTimeout(100);assert.equal(await p.locator('#art').evaluate(e=>e.style.visibility),'hidden');checks++;
-  release();await p.waitForFunction(()=>document.getElementById('art').style.visibility==='visible');
+  release();await p.evaluate(()=>{const img=document.getElementById('art');img.decode=originalDecode;releaseDecode();});await p.waitForFunction(()=>document.getElementById('art').style.visibility==='visible');
   assert.ok((await p.locator('#art').getAttribute('src')).endsWith(filename+'.svg'));checks++;
   await p.unroute('**/assets/results/'+filename+'.svg');
  }

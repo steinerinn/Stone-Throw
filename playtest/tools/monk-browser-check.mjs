@@ -1,13 +1,13 @@
 import assert from 'node:assert/strict';import fs from 'node:fs';import path from 'node:path';import {fileURLToPath} from 'node:url';
 import {fixture,probe,project} from './monk-candidates-check.mjs';import {refreshHost} from '../canonical/compiled/host/refresh.js';
-import {launch} from '../../../stage10/development-harness/browser-harness.mjs';import {startServer} from '../server/main.mjs';
+import {launch} from './browser-harness.mjs';import {startServer} from '../server/main.mjs';
 const root=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'..'),dir=fs.mkdtempSync(path.resolve(root,'../monk-browser-')),app=await startServer({port:0,registryDir:path.join(dir,'registry'),stateDir:path.join(dir,'state'),playtestSnapshotOnly:true,logger:()=>{}}),browser=await launch();let checks=0;
 const worlds=[5,6].map(x=>{const h=probe(fixture(x));h.activePlayerId='p1';refreshHost(h);return project(h);});assert.deepEqual(worlds[0],worlds[1],'entire public payload must match');
 try{for(const mobile of [false,true]){const context=await browser.newContext({viewport:mobile?{width:390,height:844}:{width:1440,height:1000},hasTouch:mobile,isMobile:mobile}),p=await context.newPage(),errors=[];p.on('pageerror',e=>errors.push(e.message));await p.addInitScript(u=>window.__fixture=u,worlds[0]);
  await p.route('**/client-v13/bootstrap-production.js',r=>r.fulfill({contentType:'text/javascript',body:`import {mountClient} from './presentation.js';
 let current=structuredClone(window.__fixture),mounted;window.__commands=[];const transport={read:async()=>structuredClone(current),dispatch:async r=>{window.__commands.push(structuredClone(r));return {...structuredClone(current),accepted:false,error:'illegal'};}};
 const mount=()=>mountClient(transport,{configuration:()=>({story:false}),inputLocked:()=>!!window.__externalLock,blocked:()=>!!window.__blocked});
-mounted=await mount();document.body.classList.remove('st-main-menu-mode');window.__apply=async u=>{const terminal=current.snapshot.phase==='finished';current=structuredClone(u);if(terminal){mounted.unmount();mounted=await mount();}else await mounted.apply(current);};window.__remount=async()=>{mounted.unmount();mounted=await mount();};window.__ready=true;`}));
+mounted=await mount();document.getElementById('stStartup')?.remove();document.getElementById('stLoadingScreen')?.remove();document.body.classList.remove('st-main-menu-mode');window.__apply=async u=>{const terminal=current.snapshot.phase==='finished';current=structuredClone(u);if(terminal){mounted.unmount();mounted=await mount();}else await mounted.apply(current);};window.__remount=async()=>{mounted.unmount();mounted=await mount();};window.__ready=true;`}));
  await p.goto(app.origin);await p.waitForFunction(()=>window.__ready);let revision=worlds[0].snapshot.revision;
  const apply=async s=>{const u=structuredClone(worlds[0]);u.snapshot={...u.snapshot,...s,revision:++revision,eventPosition:revision};u.events=[];await p.evaluate(u=>window.__apply(u),u);};
  const html=()=>p.locator('#enemyGrid').innerHTML();const initial=await html();

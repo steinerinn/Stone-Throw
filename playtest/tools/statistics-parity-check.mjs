@@ -1,9 +1,10 @@
+import {phase1Module} from './registry-phase1-fixture.mjs';
 import assert from 'node:assert/strict';
-import * as original from '../../../registry-phase1/candidate/canonical/compiled/combat/resolver.js';
+const original=await import(phase1Module('canonical/compiled/combat/resolver.js'));
 import * as trial from '../canonical/compiled/combat/resolver.js';
-import {answerDecision as originalAnswer} from '../../../registry-phase1/candidate/canonical/compiled/combat/decisions.js';
+const {answerDecision:originalAnswer}=await import(phase1Module('canonical/compiled/combat/decisions.js'));
 import {answerDecision as trialAnswer} from '../canonical/compiled/combat/decisions.js';
-import {createHost,place} from '../../../registry-phase1/candidate/canonical/compiled/host/initialization.js';
+const {createHost,place}=await import(phase1Module('canonical/compiled/host/initialization.js'));
 import {serializeResolution,deserializeResolution} from '../canonical/compiled/combat/serialization.js';
 import {summarizeMatch} from '../server/statistics-metrics.mjs';
 const normalize=value=>JSON.parse(JSON.stringify(value,(k,v)=>k==='statisticsId'||k==='statistics'&&v?.version===1?undefined:v));

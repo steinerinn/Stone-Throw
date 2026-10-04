@@ -10,5 +10,9 @@ assert.throws(()=>appendBuffers({writevSync(){return 0;}},0,buffers),/short-writ
 let tries=0;assert.throws(()=>appendBuffers({writevSync(){tries++;throw Error('disk failure');}},0,buffers),/disk failure/);assert.equal(tries,1);checks+=2;
 // Reusing the same large strings under a small memory budget remains exact.
 for(let i=0;i<20;i++){const v={a:'old'.repeat(1000),b:String(i).repeat(2000)};assert.equal(Buffer.concat(prepare()(v).parts.map(p=>p.raw)).toString(),JSON.stringify(v));checks++;}
+// One-write live fragment reuse must preserve exact envelope bytes/checksums.
+for(const value of samples){const json=prepare(),live=json(value),envelope={before:1,packet:{value,updates:[{n:2}]},after:'end'},encoded=json(envelope,{value,parts:live.parts}),native=JSON.stringify(envelope);assert.equal(Buffer.concat(encoded.parts.map(p=>p.raw)).toString(),native);assert.equal(encoded.sha256,hash(native));assert.equal(JSON.parse(Buffer.concat(journalBuffers(1,'',encoded))).payload,native);checks+=3;}
+// An in-place edit on the next write must be re-encoded, never use an old cache.
+const mutable={rows:[{n:1}]};const first=prepare()(mutable);mutable.rows[0].n=2;const second=prepare()(mutable);assert.notEqual(first.sha256,second.sha256);assert.equal(Buffer.concat(second.parts.map(p=>p.raw)).toString(),JSON.stringify(mutable));checks+=2;
 console.log(JSON.stringify({passed:true,checks,byteExactV1:true,partialWrites:true,failedAppendsNotRetried:true}));
 

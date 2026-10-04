@@ -1,0 +1,14 @@
+import assert from 'node:assert/strict';
+import {packWorkerPresentation,unpackWorkerPresentation} from '../server/worker-presentation.mjs';
+const frame={publicEvent:{id:'visible:1'},snapshot:{eventPosition:2,owned:[],opponent:[]}};
+const room={presentation:[[frame],[]]},result={accepted:true,presentation:[structuredClone(frame)]},updates=[structuredClone(result),null];
+const packed=packWorkerPresentation(room,result,updates,0);
+assert.deepEqual(packed.result.refs,[0]);
+assert.deepEqual(unpackWorkerPresentation(room,structuredClone(packed)),{result,updates});
+const changed=structuredClone(result);changed.presentation[0].snapshot.eventPosition=3;
+assert.equal(packWorkerPresentation(room,changed,[],0).result.refs,undefined);
+assert.deepEqual(unpackWorkerPresentation(room,packWorkerPresentation(room,changed,[],0)).result,changed);
+assert.deepEqual(unpackWorkerPresentation(room,packWorkerPresentation(room,true,[null],-1)),{result:true,updates:[null]});
+const corrupt=structuredClone(packed);corrupt.result.refs=[2];
+assert.throws(()=>unpackWorkerPresentation(room,corrupt),/Invalid worker frame reference/);
+console.log('PASS: exact public frames round-trip, changed-content fallback, empty/tick updates and corrupt references.');

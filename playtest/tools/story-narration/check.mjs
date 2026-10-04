@@ -1,5 +1,5 @@
 import fs from 'node:fs';import path from 'node:path';import assert from 'node:assert/strict';import crypto from 'node:crypto';import {fileURLToPath} from 'node:url';
-import {launch} from '../../../../stage10/development-harness/browser-harness.mjs';
+import {launch} from '../browser-harness.mjs';
 import {startServer} from '../../server/main.mjs';
 const root=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'../..'),read=n=>fs.readFileSync(path.join(root,n),'utf8'),sha=b=>crypto.createHash('sha256').update(b).digest('hex');
 const manifest=JSON.parse(read('assets/story/audio/narration-manifest.json')),chapters=Object.values(manifest),approved=fs.readFileSync('C:/Users/Notandi/Downloads/STONE_THROW_STORY_NARRATION_AUDIO_CODEX_HANDOFF.md','utf8').replaceAll('\r\n','\n');

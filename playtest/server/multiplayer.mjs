@@ -20,6 +20,10 @@ export function createPvpService(roster,options){
   getRoom(code){hydrateCode(code);return ring.rooms.get(code)||two.rooms.get(code);},
   policyVersion:()=>JSON.stringify([...two.rooms.values(),...ring.rooms.values()].map(r=>[r.code,r.revision,r.closed,r.noticeSerial,r.deploymentDeadline,r.afk&&{...r.afk,observedAt:0},r.seats.map(s=>s&&[s.left,s.controller,s.absence])])),
   close:()=>ring.close(),
+  // Only established worker-backed combat commands are independent. Lobby,
+  // rematch, takeover, local and legacy Duel operations retain the global barrier.
+  commandLane:(token,binding)=>{if(owners.get(token)!==ring)return null;for(const r of ring.rooms.values())if(r.host.status!=='placement'&&r.host.status!=='complete'&&!r.closed&&r.seats.some(s=>s?.token===token&&s.binding===binding&&s.controller==='human'&&!s.left&&!s.absence))return r;return null;},
+  watchLane:(token,binding)=>{const service=owners.get(token);if(!service)return null;for(const r of service.rooms.values())if(r.seats.some(s=>s?.token===token&&s.binding===binding))return r;return null;},
   isGroup:token=>owners.get(token)===ring,
   isBusy:token=>owners.get(token)===ring&&ring.isBusy(token),
   heartbeat:(token,binding)=>{incidents();return ring.heartbeat(token,binding);},

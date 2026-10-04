@@ -1,4 +1,5 @@
-import {publicMonkClues as priorClues} from '../../../registry-phase1/candidate/canonical/compiled/local-host/monk-disclosure.js';
+import {phase1Module} from './registry-phase1-fixture.mjs';
+const {publicMonkClues:priorClues}=await import(phase1Module('canonical/compiled/local-host/monk-disclosure.js'));
 import assert from 'node:assert/strict';import fs from 'node:fs';
 import {createHost,place} from '../canonical/compiled/host/initialization.js';
 import {acceptCommand} from '../canonical/compiled/host/lifecycle.js';
@@ -6,7 +7,7 @@ import {refreshHost,observeRuleEvent} from '../canonical/compiled/host/refresh.j
 import {serializeHost,deserializeHost} from '../canonical/compiled/host/serialization.js';
 import {startResolution,stepResolution} from '../canonical/compiled/combat/resolver.js';
 import {answerDecision} from '../canonical/compiled/combat/decisions.js';
-import * as old from '../../../registry-phase1/candidate/canonical/compiled/combat/resolver.js';
+const old=await import(phase1Module('canonical/compiled/combat/resolver.js'));
 import {deduceMonkCandidates,updateMonkEvidence} from '../canonical/compiled/local-host/monk-deduction.js';
 import {emptyNormalMemory} from '../canonical/compiled/local-host/normal-policy.js';import {emptyStatistics} from '../canonical/compiled/local-host/public-statistics.js';
 import {projectSeat} from '../server/projection.mjs';
