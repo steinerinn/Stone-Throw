@@ -61,6 +61,8 @@ body.st-shell-active.resurrection-cursor #playerGrid .cell{cursor:url("assets/cu
  body.st-shell-active.st-full-battlefield{--cs-phone-cell:calc((100vw - 16px)/var(--board-track-count,15))}
  body.st-shell-active.st-full-battlefield #stoneThrowShell{width:calc(100vw - 8px)}
  body.st-shell-active.st-full-battlefield .st-boards,body.st-shell-active.st-full-battlefield .st-secondary-boards{display:flex!important;flex-direction:column;width:100%;padding:0!important;align-items:center}
+ /* Elimination/final visibility must override the phone column layout. */
+ body.st-shell-active.st-full-battlefield .st-boards.st-observer-hidden,body.st-shell-active.st-full-battlefield .st-boards.st-final-hidden{display:none!important}
  body.st-shell-active.st-full-battlefield .st-board-wrap,body.st-shell-active.st-full-battlefield .st-secondary-card{width:calc(100vw - 12px)!important;min-width:0;max-width:none!important;padding:0!important;box-sizing:border-box;--cell:var(--cs-phone-cell);border:0;box-shadow:none}
  body.st-shell-active.st-full-battlefield .st-grid-host{--cell:var(--cs-phone-cell);width:calc(100vw - 12px)!important;min-width:0!important;max-width:none!important;min-height:0!important;height:auto!important;padding:0!important;margin:0!important;border:0!important;box-shadow:none!important;background:none!important;left:auto!important;translate:none!important;box-sizing:border-box}
  body.st-shell-active.st-full-battlefield .st-grid-host::before,body.st-shell-active.st-full-battlefield .st-grid-host::after{display:none!important}
