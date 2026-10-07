@@ -5,9 +5,9 @@ export interface AnimationCue {targetSeat?:number;level?:number;pulseId?:string;
 /** Only resolved, publicly observable impact sites and the public reaction origin.
  * No planned random targets, private unit IDs or hidden geometry leave this adapter. */
 export function animationCue(h:HostState,events:InternalRuleEvent[],groups:Map<string,number>):AnimationCue|undefined{
- // A false resurrection candidate is still a visible Dragon path step; omitting its
- // cue splits the flight and makes the remaining diagonal replay from the origin.
- const e=events.find(e=>(e.kind==='impact'||e.kind==='suspect-eliminated'&&e.meta?.source==='dragon')&&e.meta&&(e.meta.source==='revolt'||e.statistics?.doublePlague||['direct-human','direct-ai','catapult-shot','wizard','archer','goblin','demon-blast','dragon','assassin','plague'].includes(e.meta.source)));if(!e?.meta||!e.cells[0])return;
+ // A rejected resurrection candidate is a resolved public attack step too.
+ // Keep its cue for every supported source so it cannot split/restart an attack.
+ const e=events.find(e=>(e.kind==='impact'||e.kind==='suspect-eliminated')&&e.meta&&(e.meta.source==='revolt'||e.statistics?.doublePlague||['direct-human','direct-ai','catapult-shot','wizard','archer','goblin','demon-blast','dragon','assassin','plague'].includes(e.meta.source)));if(!e?.meta||!e.cells[0])return;
  const m=e.meta,own=h.config.players.findIndex(p=>p.id===m.ownerId),target=h.config.players.findIndex(p=>p.id===m.targetPlayerId);if(m.source==='revolt'){const key=e.rootId+':revolt';if(!groups.has(key))groups.set(key,Math.max(0,...groups.values())+1);return {kind:'revolt',side:target===0?'self':'opponent',ownerSide:'self',origin:{...e.cells[0]},cell:{...e.cells[0]},group:groups.get(key)!,level:Number(e.statistics?.revoltLevel),pulseId:e.rootId,targetSeat:target};}if(own<0||target<0||own>1||target>1||m.source==='assassin'&&own===target)return;
  if(m.source.startsWith('direct-')&&(own!==1||target!==0))return;
  const kind=(e.statistics?.doublePlague?'double-plague':m.source.startsWith('direct-')?'enemy-shot':m.source==='catapult-shot'?'catapult':m.source==='demon-blast'?'demon':m.source) as AnimationCue['kind'];
