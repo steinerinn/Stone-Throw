@@ -45,5 +45,5 @@ export function repairReplayPresentation(db,replay){
  const facts=db.prepare("SELECT payload FROM stat_facts WHERE match_id=? AND kind='event' ORDER BY sequence").all(replay.matchId).map(r=>JSON.parse(r.payload));if(!facts.length||facts.length!==row.event_cursor)return replay;
  const kinds=new Set(['shot','contact','plague','catapult','revolt']),fresh=buildReplay(JSON.parse(row.descriptor),facts).timeline.filter(e=>kinds.has(e.kind)),old=replay.timeline.filter(e=>kinds.has(e.kind));
  if(old.length!==fresh.length||old.some((e,i)=>e.kind!==fresh[i].kind||e.board!==fresh[i].board||JSON.stringify(e.cells.map(c=>[c.x,c.y]))!==JSON.stringify(fresh[i].cells.map(c=>[c.x,c.y]))))return replay;
- const result=structuredClone(replay);let i=0;for(const e of result.timeline)if(kinds.has(e.kind)){const source=fresh[i++];e.cells=e.cells.map((c,j)=>source.cells[j].kind?{...c,...source.cells[j]}:c);}return result;
+ const result=structuredClone(replay);let i=0;for(const e of result.timeline)if(kinds.has(e.kind)){const source=fresh[i++];if(source.animation)e.animation=structuredClone(source.animation);e.cells=e.cells.map((c,j)=>source.cells[j].kind?{...c,...source.cells[j]}:c);}return result;
 }

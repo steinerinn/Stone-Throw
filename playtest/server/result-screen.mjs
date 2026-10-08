@@ -19,7 +19,7 @@ export function finalPlacements(host){
  const eliminated=new Map();let boundary=0;
  for(const row of host.events){const b=row.event.statistics?.eliminationBoundary;if(!b)continue;for(const id of b.dead)if(!eliminated.has(id))eliminated.set(id,{boundary,score:b.revoltScores?.[id]||null});boundary++;}
  const outcome=host.state.match.outcome;
- const values=host.config.players.map(p=>outcome.kind==='win'&&outcome.winnerIds.includes(p.id)?{boundary:Infinity,score:null}:eliminated.get(p.id)||{boundary:Infinity,score:null});
+ const values=host.config.players.map(p=>outcome.kind==='win'&&outcome.winnerIds.includes(p.id)?{boundary:Infinity,score:null}:eliminated.get(p.id)||{boundary:outcome.kind==='win'?-1:Infinity,score:null});
  const compare=(a,b)=>a.boundary!==b.boundary?(a.boundary>b.boundary?1:-1):a.score&&b.score?compareScore(a.score,b.score):0;
  const sorted=[...values].sort((a,b)=>compare(b,a)),ranks=[];for(const v of sorted)if(!ranks.length||compare(v,ranks.at(-1))!==0)ranks.push(v);
  return values.map(v=>ranks.findIndex(r=>compare(v,r)===0)+1);

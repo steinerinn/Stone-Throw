@@ -1,0 +1,11 @@
+import assert from 'node:assert/strict';
+import {finalPlacements} from '../server/result-screen.mjs';
+import {historicalPlacements,storedResultPlacements} from '../server/historical-placements.mjs';
+import {DatabaseSync} from 'node:sqlite';
+for(const winner of ['human','ai'])assert.deepEqual(finalPlacements({events:[],config:{players:[{id:'human'},{id:'ai'}]},state:{match:{outcome:{kind:'win',winnerIds:[winner]}}}}),winner==='human'?[1,2]:[2,1]);
+assert.deepEqual(finalPlacements({events:[],config:{players:[{id:'human'},{id:'ai'}]},state:{match:{outcome:{kind:'draw'}}}}),[1,1]);
+const d={finalResult:{outcome:'win',placements:{human:1,ai:1}},participants:[{actor:'human',seat:0,kind:'account',outcome:'Loss',placement:2,reliability:'Full'},{actor:'ai',seat:1,kind:'ai',outcome:null}]},before=JSON.stringify(d);
+assert.deepEqual(historicalPlacements(d),{human:2,ai:1});assert.equal(JSON.stringify(d),before);
+for(const edit of [x=>x.finalResult.outcome='draw',x=>x.participants[0].reliability='Disconnect',x=>x.participants[0].takeover='surrender',x=>x.participants.push({actor:'third',seat:2}),x=>x.participants[0].placement=null]){const x=structuredClone(d);edit(x);assert.equal(historicalPlacements(x),x.finalResult.placements);}
+const win=structuredClone(d);win.participants[0].outcome='Win';win.participants[0].placement=1;assert.deepEqual(historicalPlacements(win),{human:1,ai:2});
+const db=new DatabaseSync(':memory:');db.exec('CREATE TABLE stat_matches(id TEXT,descriptor TEXT)');db.prepare('INSERT INTO stat_matches VALUES(?,?)').run('match',before);const result={players:[{seat:0,placement:1,matchScore:848.763440860215},{seat:1,placement:1,matchScore:903}],awards:[]},original=JSON.stringify(result),fixed=storedResultPlacements(db,'match',result);assert.deepEqual(fixed.players.map(p=>p.placement),[2,1]);assert.equal(fixed.players[0].matchScore,result.players[0].matchScore);assert.equal(JSON.stringify(result),original);assert.equal(db.prepare('SELECT descriptor FROM stat_matches').get().descriptor,before);db.close();console.log('PASS: duel wins/losses/draws, historical and saved-result correction, partial/departed/multiplayer exclusions, unchanged scores and database');

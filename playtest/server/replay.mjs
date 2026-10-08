@@ -1,3 +1,4 @@
+import {createHash} from 'node:crypto';
 import {publicBoardView} from './board-overview.mjs';
 // Public replay format. This module never executes combat, policy or RNG.
 export const REPLAY_VERSION='CHAIN_SIEGE_PUBLIC_REPLAY_V1';
@@ -31,9 +32,10 @@ export function publicCheckpoint(h){
  })};
 }
 
-export function buildReplay(d,facts,checkpoints=[]){
+export function buildReplay(d,facts,checkpoints=[],{heroHits:priorHeroHits=[]}={}){
  const size=d.configuration?.size||15,seat=a=>d.participants.findIndex(p=>p.actor===a),board=b=>d.configuration?.players?.findIndex(p=>p.boardId===b)??-1;
- const timeline=[],byCursor=new Map(checkpoints.map(c=>[c.cursor,c.value]));let lastTurn=null;const heroHits=new Map();
+ const timeline=[],byCursor=new Map(checkpoints.map(c=>[c.cursor,c.value]));let lastTurn=null;const heroHits=new Map(priorHeroHits);
+ const animation=e=>{const m=e.meta||{},kind=({'direct-human':'enemy-shot','direct-ai':'enemy-shot','demon-blast':'demon','catapult-shot':'catapult'})[m.source]||m.source;if(!['enemy-shot','dragon','demon','wizard','archer','goblin','catapult','assassin','plague','revolt'].includes(kind))return undefined;const identity=(kind==='revolt'?[e.rootId,'revolt']:[e.rootId,e.workId,m.source,m.targetBoardId]).join(':');return {kind,...(kind==='revolt'?{level:e.statistics?.revoltLevel||1}:{}),group:createHash('sha256').update(identity).digest('hex').slice(0,24),...(validCell(m.origin,size)?{origin:{x:m.origin.x,y:m.origin.y}}:{})};};
  const checkpoint=cursor=>{const value=byCursor.get(cursor);if(value)timeline.push({kind:'checkpoint',...value});};checkpoint(0);
  for(const f of facts){const e=f.event,m=e.meta||{},s=e.statistics||{};
   if(Number.isInteger(f.turnIndex)&&f.turnIndex!==lastTurn){lastTurn=f.turnIndex;timeline.push({kind:'turn',turn:lastTurn});}
@@ -42,7 +44,7 @@ export function buildReplay(d,facts,checkpoints=[]){
   if(['impact','repeat-ignored','suspect-eliminated'].includes(e.kind)&&board(m.targetBoardId)>=0){
    const heroHit=e.kind==='impact'&&e.unitId&&s.unitType==='hero';if(heroHit)heroHits.set(e.unitId,(heroHits.get(e.unitId)||0)+1);
    const cells=e.cells.filter(c=>validCell(c,size)).map(c=>({x:c.x,y:c.y,...(heroHit?{kind:'hero',heroState:heroHits.get(e.unitId)>=3?'dead':heroHits.get(e.unitId)===2?'wounded':'hit'}:{}),...(e.kind==='impact'&&e.unitId&&immediateReplayKinds.has(s.unitType)?{kind:s.unitType,knownDestroyed:true,unitPresentation:{hit:true,scoutArt:false}}:{})}));
-   if(cells.length)timeline.push({kind:m.source==='revolt'?'revolt':m.source==='plague'?'plague':['direct-human','direct-ai'].includes(m.source)?'shot':m.source==='catapult-shot'?'catapult':'contact',actor:seat(m.ownerId),board:board(m.targetBoardId),observation:e.kind==='impact'?(e.unitId?'hit':'miss'):'repeat',cells});
+   if(cells.length)timeline.push({kind:m.source==='revolt'?'revolt':m.source==='plague'?'plague':['direct-human','direct-ai'].includes(m.source)?'shot':m.source==='catapult-shot'?'catapult':'contact',actor:seat(m.ownerId),board:board(m.targetBoardId),observation:e.kind==='impact'?(e.unitId?'hit':'miss'):'repeat',cells,...(animation(e)?{animation:animation(e)}:{})});
   }
   if(e.kind==='attack-started'&&['archer','catapult-shot','monk-deflect','goblin','dwarf','wizard','demon','dragon'].includes(e.reason))timeline.push({kind:'special',name:e.reason,actor:seat(m.ownerId)});
   // Announcement only: resurrection/Hero coordinates can still be secret.

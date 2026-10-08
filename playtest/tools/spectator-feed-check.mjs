@@ -1,0 +1,13 @@
+import assert from 'node:assert/strict';import {spectatorFeed} from '../server/spectator.mjs';
+const room={code:'PUBLIC',epoch:3,revision:1,seats:[{name:'One',controller:'human',token:'SECRET'},{name:'Two',controller:'ai'}],host:{round:1,turnIndex:1,status:'awaiting-command',activePlayerId:'p0',config:{size:5,players:[{id:'p0',boardId:'b0'},{id:'p1',boardId:'b1'}]},state:{match:{units:[{id:'private-unit',ownerId:'p1',type:'wizard',cells:[{x:4,y:4}]}]}},events:[]}};
+let v=spectatorFeed(room,{after:0,epoch:''});assert.equal(v.reset,true);assert.equal(v.cursor,0);assert.ok(v.boards.every(b=>b.cells.length===0));
+room.host.events.push({turnIndex:1,event:{kind:'impact',rootId:'PRIVATE_ROOT',workId:'PRIVATE_WORK',meta:{source:'archer',ownerId:'p0',targetPlayerId:'p1',targetBoardId:'b1',origin:{x:0,y:0}},cells:[{x:1,y:1}],statistics:{plannedCells:[{x:4,y:4}],rng:'SECRET'}}});
+const before=JSON.stringify(room);v=spectatorFeed(room,{after:0,epoch:'3'});assert.equal(v.reset,false);assert.equal(v.cursor,1);assert.equal(v.events.find(e=>e.kind==='contact').animation.kind,'archer');assert.ok(!/SECRET|PRIVATE_|private-unit|plannedCells|wizard|rng/.test(JSON.stringify(v)));assert.equal(JSON.stringify(room),before);
+assert.deepEqual(spectatorFeed(room,{after:1,epoch:'3'}).events,[]);assert.equal(spectatorFeed(room,{after:1,epoch:'old'}).reset,true);assert.equal(spectatorFeed(room,{after:999,epoch:'3'}).reset,true);
+const group=v.events.find(e=>e.kind==='contact').animation.group;
+room.host.events.push(structuredClone(room.host.events[0]));assert.equal(spectatorFeed(room,{after:1,epoch:'3'}).events.find(e=>e.kind==='contact').animation.group,group);
+room.host.state.match.units.push({id:'hero-secret',ownerId:'p1',type:'hero',cells:[{x:4,y:4}]});
+for(let n=0;n<2;n++)room.host.events.push({event:{kind:'impact',unitId:'hero-secret',meta:{targetBoardId:'b1',source:'direct-human'},cells:[{x:n,y:0}],statistics:{unitType:'hero'}}});
+const hero=spectatorFeed(room,{after:3,epoch:'3'});assert.equal(hero.events.find(e=>e.kind==='shot').cells[0].heroState,'wounded');assert.equal(hero.boards[1].hero.at(-1).state,'wounded');assert.ok(!JSON.stringify(hero).includes('hero-secret'));assert.ok(!hero.boards[1].cells.some(c=>c.x===4&&c.y===4));
+room.host.events=Array.from({length:2001},()=>({event:{kind:'work-started'}}));assert.equal(spectatorFeed(room,{after:0,epoch:'3'}).reset,true);assert.deepEqual(spectatorFeed(room,{after:0,epoch:'3'}).events,[]);
+room.host.status='placement';assert.deepEqual(spectatorFeed(room,{after:2000,epoch:'3'}).events,[]);console.log('PASS: public-only delta, cursor dedup, epoch reset, bounded catch-up, placement secrecy, no seat/state mutations');
