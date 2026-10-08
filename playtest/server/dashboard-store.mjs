@@ -1,3 +1,4 @@
+import {mergeMetrics,metricValues} from './request-metrics.mjs';
 // Owner-only aggregates. No credentials, IP addresses, combat state or request logs.
 import {createHash} from 'node:crypto';
 const HOUR=3600000,DAY=24*HOUR,RETENTION=31*DAY;
@@ -14,6 +15,7 @@ export function migrateDashboard(db,now){db.exec(`
  CREATE INDEX IF NOT EXISTS dev_usage_visits_identity ON dev_usage_visits(visitor);
  CREATE TABLE IF NOT EXISTS dev_usage_accounts(account_id TEXT PRIMARY KEY REFERENCES accounts(id) ON DELETE CASCADE,first_seen INTEGER NOT NULL);
  CREATE TABLE IF NOT EXISTS dev_usage_story(hour INTEGER PRIMARY KEY,battles INTEGER NOT NULL);
+ CREATE TABLE IF NOT EXISTS dev_request_samples(at INTEGER PRIMARY KEY,value TEXT NOT NULL);
  CREATE TABLE IF NOT EXISTS dev_health_samples(at INTEGER PRIMARY KEY,cpu REAL,ram REAL,disk REAL,response REAL);
  `);db.prepare('INSERT OR IGNORE INTO dev_usage_meta VALUES(1,?)').run(now);}
 export function dashboardStore(db,{now=Date.now}={}){
@@ -33,10 +35,11 @@ export function dashboardStore(db,{now=Date.now}={}){
    });
   },
   storyStart(){run('INSERT INTO dev_usage_story VALUES(?,1) ON CONFLICT(hour) DO UPDATE SET battles=battles+1',Math.floor(now()/HOUR)*HOUR);},
-  sample(health,response){
+  sample(health,response,timing){
    const at=now(),percent=x=>x&&x.total>0?100*(1-x.available/x.total):null;
    transaction(()=>{run('INSERT OR REPLACE INTO dev_health_samples VALUES(?,?,?,?,?)',at,health.cpuPercent,percent(health.ram),percent(health.disk),response);
-    for(const [table,column]of [['dev_usage_visits','hour'],['dev_usage_story','hour'],['dev_health_samples','at']])run(`DELETE FROM ${table} WHERE ${column}<?`,at-RETENTION);
+    if(timing)run('INSERT OR REPLACE INTO dev_request_samples VALUES(?,?)',at,JSON.stringify(timing));
+    for(const [table,column]of [['dev_request_samples','at'],['dev_usage_visits','hour'],['dev_usage_story','hour'],['dev_health_samples','at']])run(`DELETE FROM ${table} WHERE ${column}<?`,at-RETENTION);
    });
   },
   read(range='24h',serverStarted=now()){
@@ -45,10 +48,12 @@ export function dashboardStore(db,{now=Date.now}={}){
    const games=all('SELECT ended_at at FROM stat_matches WHERE finalized=1 AND ended_at>=? AND ended_at<=?',Math.min(window.start,today),at);
    const story=all('SELECT hour,battles FROM dev_usage_story WHERE hour>=? AND hour<=?',window.start,at);
    const samples=all('SELECT * FROM dev_health_samples WHERE at>=? AND at<=?',window.start,at);
+   const timings=all('SELECT at,value FROM dev_request_samples WHERE at>=? AND at<=?',window.start,at).map(r=>({at:r.at,value:JSON.parse(r.value)}));
    const first=new Map(all('SELECT account_id,first_seen FROM dev_usage_accounts').map(r=>[r.account_id,r.first_seen]));
    const mean=(rows,key)=>{const values=rows.map(r=>r[key]).filter(Number.isFinite);return values.length?values.reduce((a,b)=>a+b,0)/values.length:null;};
    const points=Array.from({length:window.count},(_,i)=>{const from=window.start+i*window.step,to=Math.min(from+window.step,at+1),available=to>recordingSince,rows=visitRows.filter(r=>r.last_seen>=from&&r.last_seen<to),accounts=new Set(rows.filter(r=>r.account_id).map(r=>r.account_id)),health=samples.filter(r=>r.at>=from&&r.at<to);
-    return {at:from,visitors:available?unique(rows):null,registered:available?accounts.size:null,returning:available?[...accounts].filter(id=>first.get(id)<window.start).length:null,games:games.filter(r=>r.at>=from&&r.at<to).length,story:available?story.filter(r=>r.hour>=from&&r.hour<to).reduce((n,r)=>n+r.battles,0):null,cpu:mean(health,'cpu'),ram:mean(health,'ram'),disk:mean(health,'disk'),response:mean(health,'response')};});
+    const recorded=timings.filter(r=>r.at>=from&&r.at<to),timing=recorded.length?metricValues(mergeMetrics(recorded.map(r=>r.value))):{responseMedian:null,responseP95:null,responseWorst:null,requestCount:null,queueP95:null,loopMax:null};
+    return {...timing,at:from,visitors:available?unique(rows):null,registered:available?accounts.size:null,returning:available?[...accounts].filter(id=>first.get(id)<window.start).length:null,games:games.filter(r=>r.at>=from&&r.at<to).length,story:available?story.filter(r=>r.hour>=from&&r.hour<to).reduce((n,r)=>n+r.battles,0):null,cpu:mean(health,'cpu'),ram:mean(health,'ram'),disk:mean(health,'disk'),response:mean(health,'response')};});
    return {range,recordingSince,start:window.start,end:at,partial:recordingSince>window.start,points,totals:{...totals(visitRows,window.start),games:games.filter(r=>r.at>=window.start).length,story:story.reduce((n,r)=>n+r.battles,0)},today:{...totals(todayVisits,today),games:games.filter(r=>r.at>=today).length},onlineNow:unique(visits(Math.max(serverStarted,at-120000),at))};
   }
  };

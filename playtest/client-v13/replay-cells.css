@@ -1,0 +1,113 @@
+/* Scoped battlefield cell presentation for standalone Replay. */
+.cs-replay{--cell:22px}
+.cs-replay .cell{width:var(--cell);height:var(--cell);border-radius:0;background:rgba(10,16,18,.16);border:1px solid rgba(126,139,124,.30);box-sizing:border-box;position:relative;cursor:pointer;user-select:none;}
+.cs-replay .cell:hover{outline:2px solid rgba(56,189,248,.35);}
+.cs-replay .cell:has(>.ghost.unit-art-ghost):hover{outline:none!important;}
+.cs-replay .cell.archer-cell::after,.cs-replay .cell.archer-hit::after{content:'A';color:#fff;font-weight:800;font-size:12px;line-height:1;text-shadow:0 1px 2px #000;position:absolute;inset:0;display:flex;align-items:center;justify-content:center;}
+.cs-replay .cell.archer-hit{background:#e53935!important;border-color:#b91c1c!important;opacity:1!important;position:relative;}
+.cs-replay .cell.archer-cell{background:linear-gradient(180deg,#2e7d32,#1b5e20);border-color:#245b2b;opacity:1;position:relative;}
+.cs-replay .cell.dwarf-cell{background:#7b6042;border-color:#6b5137;opacity:1;}
+.cs-replay .cell.dwarf-hit{background:#7a3f32!important;border-color:#5a2b22!important;opacity:1!important;}
+.cs-replay .cell.goblin-cell{background:#5f7f2b;border-color:#769b38;opacity:1;}
+.cs-replay .cell.goblin-hit{background:#5f7f2b!important;border-color:#769b38!important;opacity:1!important;}
+.cs-replay .cell.monk-cell{position:relative;}
+.cs-replay .cell.monk-cell::after,.cs-replay .cell.monk-hit::after{content:'M';position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-weight:900;color:#f8fafc;text-shadow:0 1px 2px #000;pointer-events:none;}
+.cs-replay .cell.monk-hit{background:#b91c1c!important;border-color:#ef4444!important;opacity:1!important;}
+.cs-replay .cell.castle-cell{background:#15803d;border-color:rgba(126,139,124,.30);opacity:1;}
+.cs-replay .cell.castle-cell.hit,.cs-replay .cell.castle-hit{background-color:#b91c1c!important;border-color:#8b1515!important;opacity:1!important;}
+.cs-replay .cell.castle-valid{background:rgba(34,197,94,.18)!important;border-color:#86efac!important;}
+.cs-replay .cell.castle-valid:hover{background:rgba(34,197,94,.34)!important;}
+.cs-replay .cell.castle-invalid-remove{background:#7f1d1d!important;border-color:#ef4444!important;}
+.cs-replay .cell.castle-move-ghost{box-shadow:inset 0 0 0 2px rgba(34,197,94,.7);}
+.cs-replay .cell.castle-move-conflict{box-shadow:inset 0 0 0 2px rgba(239,68,68,.9);}
+.cs-replay .cell.monk-question{position:relative;}
+.cs-replay .cell.monk-question::before{content:'?';position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-weight:950;font-size:16px;line-height:1;color:#facc15;text-shadow:0 1px 2px #000;z-index:4;pointer-events:none;}
+.cs-replay .cell.monk-question.miss::after{z-index:5;}
+.cs-replay .cell.catapult-cell{background:#3f2b1f;border-color:#5a3b29;opacity:1;}
+.cs-replay .cell.catapult-hit{background:#6b3f2a!important;border-color:#4a281a!important;opacity:1!important;}
+.cs-replay .cell.elf-hit{background:#1d4ed8!important;border-color:#1e40af!important;opacity:1!important;}
+.cs-replay .cell.elf-cell{background:#2563eb;border-color:#1d4ed8;opacity:1;}
+.cs-replay .cell.scouted,.cs-replay .cell.scouted-shot{position:relative!important;}
+.cs-replay .cell.scouted-shot>.scout-visual{opacity:.62;animation:none;transform:scale(1);box-shadow:inset 0 0 3px rgba(224,242,254,.24),0 0 3px rgba(56,189,248,.42);}
+.cs-replay .cell.scout-core{background:linear-gradient(180deg,#2e7d32,#1b5e20);border-color:#245b2b;}
+.cs-replay .cell.scout-dwarf{background:#7b6042;border-color:#6b5137;}
+.cs-replay .cell.scout-goblin{background:#5f7f2b;border-color:#769b38;}
+.cs-replay .cell.scout-catapult{background:#3f2b1f;border-color:#5a3b29;}
+.cs-replay .cell.scout-elf{background:#2563eb;border-color:#1d4ed8;}
+.cs-replay .cell.cleric-hit{background:#f8fafc!important;border-color:#94a3b8!important;opacity:1!important;}
+.cs-replay .cell.cleric-cell{background:#f8fafc;border-color:#cbd5e1;opacity:1;}
+.cs-replay .cell.scout-cleric{background:#f8fafc;border-color:#cbd5e1;}
+.cs-replay .cell.resurrection-choice,.cs-replay .cell.resurrection-suspect,.cs-replay .cell.resurrection-revived{position:relative!important;background:linear-gradient(180deg,#2e7d32,#1b5e20)!important;border-color:#245b2b!important;opacity:1!important;outline:0!important;box-shadow:none!important;}
+.cs-replay .cell.resurrection-choice::after,.cs-replay .cell.resurrection-suspect::after,.cs-replay .cell.resurrection-revived::after{content:""!important;display:block!important;position:absolute!important;inset:0!important;margin:auto!important;width:22px!important;height:22px!important;background-image:url("/assets/cursors/resurrection.png")!important;background-repeat:no-repeat!important;background-position:center!important;background-size:22px 22px!important;background-color:transparent!important;border:0!important;outline:0!important;box-shadow:none!important;pointer-events:none!important;z-index:60!important;}
+.cs-replay .cell.demon-hit{background:#7e22ce!important;border-color:#581c87!important;opacity:1!important;}
+.cs-replay .cell.demon-cell{background:#6b21a8;border-color:#4c1d95;opacity:1;}
+.cs-replay .cell.scout-demon{background:#6b21a8;border-color:#4c1d95;}
+.cs-replay .cell.dragon-hit{background:#0d9488!important;border-color:#134e4a!important;opacity:1!important;}
+.cs-replay .cell.dragon-cell{background:#0f766e;border-color:#115e59;opacity:1;}
+.cs-replay .cell.scout-dragon{background:#0f766e;border-color:#115e59;}
+.cs-replay .cell.wizard-hit{background:#d946ef!important;border-color:#701a75!important;opacity:1!important;}
+.cs-replay .cell.wizard-cell{background:#c026d3;border-color:#86198f;opacity:1;}
+.cs-replay .cell.scout-wizard{background:#c026d3;border-color:#86198f;}
+.cs-replay .cell.necro-hit{background:#020617!important;border-color:#475569!important;opacity:1!important;}
+.cs-replay .cell.necro-cell{background:#111827;border-color:#000;opacity:1;}
+.cs-replay .cell.hero-cell{background-color:#d4af37;border-color:#facc15;opacity:1;background-image:url("/assets/units/hero-alive.png");background-repeat:no-repeat;background-position:center;background-size:22px 22px;color:transparent;font-size:0;}
+.cs-replay .cell.hero-cell.hero-active{background-color:#15803d!important;border-color:#166534!important;}
+.cs-replay .cell.debug-hero-reveal{outline:3px solid #fff!important;outline-offset:-3px;box-shadow:inset 0 0 0 2px #facc15,0 0 10px rgba(250,204,21,.95)!important;position:relative;z-index:3;}
+.cs-replay .cell.debug-hero-reveal::after{content:none!important;display:none!important;}
+.cs-replay .cell.hero-hit{position:relative!important;background-color:#d4af37!important;border-color:#facc15!important;background-image:url("/assets/units/hero-alive.png")!important;background-repeat:no-repeat!important;background-position:center!important;background-size:22px 22px!important;}
+.cs-replay .cell.hero-hit.hero-active{background-color:#b52020!important;border-color:#8b1515!important;}
+.cs-replay .cell.hero-hit::after{content:""!important;display:block!important;position:absolute!important;inset:0!important;margin:auto!important;width:22px!important;height:22px!important;background-image:url("/assets/cursors/player-shot.png")!important;background-repeat:no-repeat!important;background-position:center!important;background-size:22px 22px!important;pointer-events:none!important;z-index:50!important;}
+.cs-replay .cell.hero-dead{background-color:#b52020!important;border-color:#8b1515!important;background-image:url("/assets/units/hero-dead.png")!important;background-repeat:no-repeat!important;background-position:center!important;background-size:22px 22px!important;}
+.cs-replay .cell.hero-dead::before,.cs-replay .cell.hero-dead::after{content:none!important;display:none!important;}
+.cs-replay .cell.scout-necro{background:#111827;border-color:#000;}
+.cs-replay .cell.plague-impact{animation:plagueShimmer .28s ease-out;}
+.cs-replay .cell.plague-trail{position:relative!important;isolation:isolate;}
+.cs-replay .cell.plague-on-unit>.plague-visual{opacity:.56;}
+.cs-replay .cell.plague-on-castle>.plague-visual{opacity:.48;}
+.cs-replay .cell.demon-impact{animation:demonImpact .2s linear;}
+.cs-replay .cell.loss-reveal-necro,.cs-replay .cell.necro,.cs-replay .cell.necro-btn,.cs-replay .cell.necro-cell,.cs-replay .cell.necro-hit,.cs-replay .cell.scout-necro{background-image:url("/assets/units/necromancer.png")!important;background-repeat:no-repeat!important;background-position:center!important;background-size:22px 22px!important;color:transparent!important;}
+.cs-replay .cell.loss-reveal-necro::before,.cs-replay .cell.necro::before,.cs-replay .cell.necro-btn::before,.cs-replay .cell.necro-cell::before,.cs-replay .cell.necro-hit::before,.cs-replay .cell.scout-necro::before{color:transparent!important;}
+.cs-replay .cell.infantry-cell{background-color:#178c43!important;background-image:url("/assets/units/infantry.png")!important;background-repeat:no-repeat!important;background-position:center!important;background-size:22px 22px!important;}
+.cs-replay .cell.infantry-cell::before{color:transparent!important;}
+.cs-replay .cell.infantry-cell.hit,.cs-replay .cell.hit.infantry-cell{background-color:#b52020!important;background-image:url("/assets/units/infantry.png")!important;background-repeat:no-repeat!important;background-position:center!important;background-size:22px 22px!important;color:transparent!important;}
+.cs-replay .cell.infantry-cell.hit::before,.cs-replay .cell.hit.infantry-cell::before{color:transparent!important;}
+.cs-replay .cell.archer-cell{background-color:#178c43!important;background-image:url("/assets/units/archer.png")!important;background-repeat:no-repeat!important;background-position:center!important;background-size:22px 22px!important;color:transparent!important;}
+.cs-replay .cell.archer-cell.hit,.cs-replay .cell.hit.archer-cell{background-color:#b52020!important;background-image:url("/assets/units/archer.png")!important;background-repeat:no-repeat!important;background-position:center!important;background-size:22px 22px!important;color:transparent!important;}
+.cs-replay .cell.archer-cell::before,.cs-replay .cell.archer-cell.hit::before,.cs-replay .cell.hit.archer-cell::before{color:transparent!important;}
+.cs-replay .cell.archer-cell{font-size:0!important;text-indent:-9999px!important;}
+.cs-replay .cell.archer-cell::before,.cs-replay .cell.archer-cell::after{font-size:0!important;content:none!important;}
+.cs-replay .cell.archer-cell,.cs-replay .cell.archer-cell.hit,.cs-replay .cell.hit.archer-cell{background-position:center calc(50% - 1px)!important;}
+.cs-replay .cell.monk-cell{background-image:url("/assets/units/monk-earlier.png")!important;background-repeat:no-repeat!important;background-position:center!important;background-size:22px 22px!important;background-color:#178c43!important;font-size:0!important;text-indent:-9999px!important;}
+.cs-replay .cell.monk-cell.hit,.cs-replay .cell.hit.monk-cell,.cs-replay .cell.monk-hit{background-image:url("/assets/units/monk-earlier.png")!important;background-repeat:no-repeat!important;background-position:center!important;background-size:22px 22px!important;background-color:#b52020!important;font-size:0!important;text-indent:-9999px!important;}
+.cs-replay .cell.monk-cell::before,.cs-replay .cell.monk-cell::after,.cs-replay .cell.monk-hit::before,.cs-replay .cell.monk-hit::after{content:none!important;display:none!important;}
+.cs-replay .cell.dwarf-cell,.cs-replay .cell.dwarf-hit{background-image:url("/assets/units/dwarf.png")!important;background-repeat:no-repeat!important;background-position:center!important;background-size:22px 22px!important;font-size:0!important;text-indent:-9999px!important;}
+.cs-replay .cell.dwarf-cell::before,.cs-replay .cell.dwarf-cell::after,.cs-replay .cell.dwarf-hit::before,.cs-replay .cell.dwarf-hit::after{content:none!important;display:none!important;}
+.cs-replay .cell.catapult-cell,.cs-replay .cell.catapult-hit{background-image:url("/assets/units/catapult.png")!important;background-repeat:no-repeat!important;background-position:center!important;background-size:22px 22px!important;font-size:0!important;text-indent:-9999px!important;}
+.cs-replay .cell.catapult-cell::before,.cs-replay .cell.catapult-cell::after,.cs-replay .cell.catapult-hit::before,.cs-replay .cell.catapult-hit::after{content:none!important;display:none!important;}
+.cs-replay .cell.goblin-cell,.cs-replay .cell.goblin-hit{background-image:url("/assets/units/goblin.png")!important;background-repeat:no-repeat!important;background-position:center!important;background-size:22px 22px!important;font-size:0!important;text-indent:-9999px!important;}
+.cs-replay .cell.goblin-cell::before,.cs-replay .cell.goblin-cell::after,.cs-replay .cell.goblin-hit::before,.cs-replay .cell.goblin-hit::after{content:none!important;display:none!important;}
+.cs-replay .cell.elf-cell,.cs-replay .cell.elf-hit{background-image:url("/assets/units/elf.png")!important;background-repeat:no-repeat!important;background-position:center!important;background-size:22px 22px!important;font-size:0!important;text-indent:-9999px!important;}
+.cs-replay .cell.elf-cell::before,.cs-replay .cell.elf-cell::after,.cs-replay .cell.elf-hit::before,.cs-replay .cell.elf-hit::after{content:none!important;display:none!important;}
+.cs-replay .cell.cleric-cell,.cs-replay .cell.cleric-hit{background-image:url("/assets/units/cleric.png")!important;background-repeat:no-repeat!important;background-position:center!important;background-size:22px 22px!important;background-color:#f6f2e0!important;font-size:0!important;text-indent:-9999px!important;}
+.cs-replay .cell.cleric-cell::before,.cs-replay .cell.cleric-cell::after,.cs-replay .cell.cleric-hit::before,.cs-replay .cell.cleric-hit::after{content:none!important;display:none!important;}
+.cs-replay .cell.demon-cell,.cs-replay .cell.demon-hit{background-image:url("/assets/units/demon.png")!important;background-repeat:no-repeat!important;background-position:center!important;background-size:22px 22px!important;font-size:0!important;text-indent:-9999px!important;}
+.cs-replay .cell.demon-cell::before,.cs-replay .cell.demon-cell::after,.cs-replay .cell.demon-hit::before,.cs-replay .cell.demon-hit::after{content:none!important;display:none!important;}
+.cs-replay .cell.archer-hit{background-color:#b52020!important;background-image:url("/assets/units/archer.png")!important;background-repeat:no-repeat!important;background-position:center calc(50% - 1px)!important;background-size:22px 22px!important;color:transparent!important;font-size:0!important;text-indent:-9999px!important;}
+.cs-replay .cell.archer-hit::before,.cs-replay .cell.archer-hit::after{content:none!important;display:none!important;font-size:0!important;}
+.cs-replay .cell.dragon-cell,.cs-replay .cell.dragon-hit{background-image:url("/assets/units/dragon.png")!important;background-repeat:no-repeat!important;background-position:center!important;background-size:22px 22px!important;font-size:0!important;text-indent:-9999px!important;}
+.cs-replay .cell.dragon-cell::before,.cs-replay .cell.dragon-cell::after,.cs-replay .cell.dragon-hit::before,.cs-replay .cell.dragon-hit::after{content:none!important;display:none!important;}
+.cs-replay .cell.wizard-cell,.cs-replay .cell.wizard-hit{background-image:url("/assets/units/wizard.png")!important;background-repeat:no-repeat!important;background-position:center!important;background-size:22px 22px!important;font-size:0!important;text-indent:-9999px!important;}
+.cs-replay .cell.wizard-cell::before,.cs-replay .cell.wizard-cell::after,.cs-replay .cell.wizard-hit::before,.cs-replay .cell.wizard-hit::after{content:none!important;display:none!important;}
+.cs-replay .cell.dwarf-cell,.cs-replay .cell.dwarf-hit,.cs-replay .cell.catapult-cell,.cs-replay .cell.catapult-hit,.cs-replay .cell.goblin-cell,.cs-replay .cell.goblin-hit,.cs-replay .cell.elf-cell,.cs-replay .cell.elf-hit,.cs-replay .cell.cleric-cell,.cs-replay .cell.cleric-hit,.cs-replay .cell.demon-cell,.cs-replay .cell.demon-hit,.cs-replay .cell.dragon-cell,.cs-replay .cell.dragon-hit,.cs-replay .cell.wizard-cell,.cs-replay .cell.wizard-hit,.cs-replay .cell.necro-cell,.cs-replay .cell.necro-hit,.cs-replay .cell.necromancer-cell,.cs-replay .cell.necromancer-hit{background-color:#59636F!important;}
+.cs-replay .cell.dwarf-cell,.cs-replay .cell.dwarf-hit,.cs-replay .cell.catapult-cell,.cs-replay .cell.catapult-hit,.cs-replay .cell.goblin-cell,.cs-replay .cell.goblin-hit,.cs-replay .cell.elf-cell,.cs-replay .cell.elf-hit,.cs-replay .cell.cleric-cell,.cs-replay .cell.cleric-hit,.cs-replay .cell.demon-cell,.cs-replay .cell.demon-hit,.cs-replay .cell.dragon-cell,.cs-replay .cell.dragon-hit,.cs-replay .cell.wizard-cell,.cs-replay .cell.wizard-hit,.cs-replay .cell.necro-cell,.cs-replay .cell.necro-hit,.cs-replay .cell.necromancer-cell,.cs-replay .cell.necromancer-hit{border:1px solid #344247!important;outline:none!important;box-shadow:none!important;}
+.cs-replay .cell.cav-cell{background-image:url("/assets/units/cavalry.png")!important;background-repeat:no-repeat!important;background-position:center!important;background-size:22px 22px!important;background-color:#1f7a3a!important;font-size:0!important;}
+.cs-replay .cell.cavalry-hit{background-color:#1f7a3a!important;}
+.cs-replay .cell.cavalry-dead{background-color:#d32f2f!important;background-image:url("/assets/units/cavalry.png")!important;background-repeat:no-repeat!important;background-position:center!important;background-size:22px 22px!important;}
+.cs-replay .cell.cavalry-question{position:relative!important;background:rgba(10,16,18,.16)!important;border-color:#facc15!important;background-image:none!important;}
+.cs-replay .cell.cavalry-question::before{content:'?'!important;position:absolute!important;inset:0!important;display:flex!important;align-items:center!important;justify-content:center!important;font-weight:950!important;font-size:16px!important;line-height:1!important;color:#facc15!important;text-shadow:0 1px 2px #000!important;z-index:10!important;pointer-events:none!important;}
+.cs-replay .cell.cavalry-question{background:#d32f2f!important;background-image:none!important;border-color:#344247!important;}
+.cs-replay .cell.cavalry-question::before{color:#ffe082!important;text-shadow:0 1px 2px #3a0909!important;}
+.cs-replay .cell.monk-cell,.cs-replay .cell.monk-hit{background-image:url("/assets/units/monk-later.png")!important;background-repeat:no-repeat!important;background-position:center!important;background-size:22px 22px!important;font-size:0!important;text-indent:-9999px!important;}
+.cs-replay .cell.monk-cell::before,.cs-replay .cell.monk-hit::before{content:none!important;display:none!important;}
+.cs-replay .cell.assassin-cell,.cs-replay .cell.assassin-hit{background-color:#59636F!important;background-image:url("/assets/units/assassin/assassin.png")!important;background-repeat:no-repeat!important;background-position:center!important;background-size:min(22px,var(--cell)) min(22px,var(--cell))!important;border:1px solid #344247!important;outline:none!important;box-shadow:none!important}
+.cs-replay .cell.assassin-cell::before,.cs-replay .cell.assassin-cell::after,.cs-replay .cell.assassin-hit::before,.cs-replay .cell.assassin-hit::after{content:none!important;display:none!important}

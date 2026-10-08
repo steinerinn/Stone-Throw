@@ -1,0 +1,9 @@
+// Fixed-size histograms; no request identities, paths, credentials or raw traces.
+const N=512,BASE=1.05;
+export const emptyMetrics=()=>({response:{bins:{},count:0,max:null},queue:{bins:{},count:0,max:null},loopMax:null});
+function observe(h,value){if(!Number.isFinite(value)||value<0)return;const i=Math.min(N-1,Math.max(0,Math.ceil(Math.log(Math.max(1,value/.01))/Math.log(BASE))));h.bins[i]=(h.bins[i]||0)+1;h.count++;h.max=Math.max(h.max??0,value);}
+export function mergeMetrics(rows){const result=emptyMetrics();for(const row of rows){if(!row)continue;for(const key of ['response','queue']){const h=row[key];if(!h)continue;for(const [i,n] of Object.entries(h.bins))result[key].bins[i]=(result[key].bins[i]||0)+n;result[key].count+=h.count;if(h.max!=null)result[key].max=Math.max(result[key].max??0,h.max);}if(row.loopMax!=null)result.loopMax=Math.max(result.loopMax??0,row.loopMax);}return result;}
+function percentile(h,p){if(!h.count)return null;let seen=0;for(const i of Object.keys(h.bins).map(Number).sort((a,b)=>a-b)){seen+=h.bins[i];if(seen>=Math.ceil(h.count*p))return Math.min(h.max, .01*BASE**i);}return null;}
+export function metricValues(m){return {responseMedian:percentile(m.response,.5),responseP95:percentile(m.response,.95),responseWorst:m.response.max,requestCount:m.response.count,queueP95:percentile(m.queue,.95),loopMax:m.loopMax};}
+export function requestMetrics(){let data=emptyMetrics();return {response:ms=>observe(data.response,ms),queue:ms=>observe(data.queue,ms),take(loopMax){const result=data;data=emptyMetrics();result.loopMax=Number.isFinite(loopMax)?loopMax:null;return result;}};}
+export function measuredRequest(method,url){const path=url.split('?')[0];return method==='POST'&&path.startsWith('/api/')&&!path.startsWith('/api/dev-room/')&&!path.startsWith('/api/registry/dev-')&&!['/api/pvp/watch','/api/registry/usage-visit'].includes(path);}

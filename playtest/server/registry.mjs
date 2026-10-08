@@ -74,6 +74,14 @@ export function openRegistry(directory,{now=Date.now}={}){
   }
   if(action==='review-notice'){if(Object.keys(b).length)fail('Invalid request.');const a=session(token);return {notice:a?review.notice(a.id):null,playerId:a?.id||null};}
   if(action.startsWith('dev-review-')){const developer=requireDeveloper(token);
+   if(action==='dev-review-games'){
+    if(Object.keys(b).some(k=>!['query','offset'].includes(k))||typeof (b.query??'')!=='string'||(b.query||'').length>100||!Number.isSafeInteger(b.offset??0)||(b.offset??0)<0)fail('Invalid game search.');
+    const query=(b.query||'').trim(),pattern='%'+query.replace(/[\\%_]/g,c=>'\\'+c)+'%',offset=b.offset??0;
+    const where=`m.finalized=1 AND (?='' OR m.id LIKE ? ESCAPE '\\' OR m.mode LIKE ? ESCAPE '\\' OR EXISTS(SELECT 1 FROM stat_participants p JOIN accounts a ON a.id=p.player_id WHERE p.match_id=m.id AND a.display_name LIKE ? ESCAPE '\\'))`;
+    const args=[query,pattern,pattern,pattern],total=q('SELECT count(*) total FROM stat_matches m WHERE '+where,...args).total;
+    const items=db.prepare('SELECT m.id,m.mode,m.started_at,m.ended_at,m.descriptor,EXISTS(SELECT 1 FROM stat_replays r WHERE r.match_id=m.id) replay FROM stat_matches m WHERE '+where+' ORDER BY m.started_at DESC,m.id LIMIT 50 OFFSET ?').all(...args,offset).map(r=>{const d=JSON.parse(r.descriptor);return {matchId:r.id,mode:r.mode,startedAt:r.started_at,endedAt:r.ended_at,replayAvailable:!!r.replay,players:(d.participants||[]).map(p=>({name:p.displayName||'Guest',ai:p.kind==='ai',outcome:p.outcome||null}))};});
+    return {items,total,offset};
+   }
    if(action==='dev-review-decide'&&Object.keys(b).sort().join(',')==='action,caseId')return tx(()=>review.decideCase(b.caseId,developer.playerId,b.action));
    if(action==='dev-review-result'&&Object.keys(b).join(',')==='matchId'&&typeof b.matchId==='string'&&b.matchId.length<=200){
     statistics.ensureAggregates();for(const row of db.prepare("SELECT player_id FROM stat_participants WHERE match_id=? AND kind='account'").all(b.matchId)){try{return profileReadModel(db,statistics,row.player_id,{section:'result',matchId:b.matchId});}catch(e){if(e.status!==404)throw e;}}
