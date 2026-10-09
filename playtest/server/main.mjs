@@ -4,13 +4,13 @@ import {transactionQueue,serialDurableQueue} from './transaction-queue.mjs';
 import {publicAssetCache} from './static-cache.mjs';
 import {publicStreamWriter} from './public-stream-compression.mjs';
 import {incrementalPublicStream} from './public-stream.mjs';
-import {devRoomGames,devRoomHealthReader,localPlayActivity} from './dev-room.mjs';
+import {devRoomGames,devRoomHealthReader,localPlayActivity,devLocalObserver} from './dev-room.mjs';
 import {persistenceContract} from './persistence-contract.mjs';
 import {registryClientIp} from './client-ip.mjs';
 import {protectServerRecovery} from './shared-incidents.mjs';
 import {persistenceDetails} from './durable-file.mjs';
 import {livenessStore} from './liveness-store.mjs';
-import {spectatorView,spectatorFeed} from './spectator.mjs';
+import {spectatorView,spectatorFeed,developerSpectatorView} from './spectator.mjs';
 import {createRingService} from './ring-pvp.mjs';
 import {AVATARS} from '../assets/avatars/catalog.mjs';
 import {serveMusic} from './music-assets.mjs';
@@ -46,7 +46,7 @@ export async function startServer({registryDir=registryDirectory(),port=3211,bet
  if(publicOrigin){const u=new URL(publicOrigin);if(!['http:','https:'].includes(u.protocol)||u.origin!==publicOrigin)throw Error('invalid-public-origin');secureCookies=u.protocol==='https:';}
  const log=(event,extra={})=>logger({event,...extra});
  const build=createHash('sha256').update(fs.readFileSync(path.join(root,'build-manifest.json'))).digest('hex'),started=Date.now();let recovery='disabled',fatal=false,stopping=false,mutationPending=0;const mutations=transactionQueue();const serializeSave=serialDurableQueue();
- const localActivity=localPlayActivity(now);
+ const localActivity=localPlayActivity(now),localObserver=devLocalObserver();
  const sessions=new Map(),pvp=createPvpService(roster,{seed,now,stateDir,reliability:id=>getRegistry().statistics.reliability(id),refreshIdentity:i=>i?.kind==='account'?(getRegistry().identityById(i.playerId)||i):i});let origin;const addresses=['127.0.0.1',...Object.values(os.networkInterfaces()).flat().filter(a=>a?.family==='IPv4').map(a=>a.address)];const address=bind||(lan?'0.0.0.0':'127.0.0.1');if(!['0.0.0.0',...addresses].includes(address))throw Error('Select a local interface');if(!lan&&address!=='127.0.0.1')throw Error('Non-loopback bind requires --lan');
  // Persist browser credentials across a browser close; revocation remains authoritative.
  const cookieFlags='; HttpOnly; SameSite=Strict; Path=/'+(secureCookies?'; Secure':'');
@@ -138,10 +138,10 @@ let body;try{body=JSON.parse(req.intake||Buffer.alloc(0));if(!body||typeof body!
     if(req.headers.origin!==(publicOrigin||'http://'+req.headers.host))return reply(403,{error:'invalid-origin'});
     const accountToken=(req.headers.cookie||'').split(';').map(x=>x.trim()).find(x=>x.startsWith('csAccount='))?.slice(10);
     try{const developer=getRegistry().requireDeveloper(accountToken);
-     if(url.pathname==='/api/dev-room/overview'&&Object.keys(body).every(k=>k==='range')){const games=await devRoomGames(pvp.rooms,sessions,lan,now(),localActivity.active);return reply(200,{developer,build,version:JSON.parse(fs.readFileSync(path.join(root,'package.json'),'utf8')).version,uptimeSeconds:Math.floor((Date.now()-started)/1000),...getRegistry().devRoomCounts(accountToken),dashboard:getRegistry().dashboard.read(body.range??'24h',started),dashboardIssue,health:currentHealth||devHealth(registryDir),healthAt,announcement:getRegistry().welcomeMessage(),activeGames:games.length});}
+     if(url.pathname==='/api/dev-room/overview'&&Object.keys(body).every(k=>k==='range')){const games=await devRoomGames(pvp.rooms,sessions,lan,now(),localActivity.active,localObserver);return reply(200,{developer,build,version:JSON.parse(fs.readFileSync(path.join(root,'package.json'),'utf8')).version,uptimeSeconds:Math.floor((Date.now()-started)/1000),...getRegistry().devRoomCounts(accountToken),dashboard:getRegistry().dashboard.read(body.range??'24h',started),dashboardIssue,health:currentHealth||devHealth(registryDir),healthAt,announcement:getRegistry().welcomeMessage(),activeGames:games.length});}
      if(url.pathname==='/api/dev-room/message'&&Object.keys(body).join(',')==='text')return reply(200,getRegistry().setWelcomeMessage(accountToken,body.text));
-     if(url.pathname==='/api/dev-room/games'&&Object.keys(body).length===0)return reply(200,{games:await devRoomGames(pvp.rooms,sessions,lan,now(),localActivity.active)});
-     if(url.pathname==='/api/dev-room/spectate'&&Object.keys(body).every(k=>['code','after','epoch'].includes(k))&&(body.after===undefined||Number.isSafeInteger(body.after)&&body.after>=0)&&(body.epoch===undefined||typeof body.epoch==='string'&&body.epoch.length<=80)&&typeof body.code==='string'&&/^[A-Z0-9]{6}$/.test(body.code)){if(!lan)return reply(403,{error:'lan-disabled'});const room=pvp.getRoom(body.code);if(!room)return reply(404,{error:'bad-game-code'});return reply(200,Object.hasOwn(body,'after')?spectatorFeed(room,body):spectatorView(room));}
+     if(url.pathname==='/api/dev-room/games'&&Object.keys(body).length===0)return reply(200,{games:await devRoomGames(pvp.rooms,sessions,lan,now(),localActivity.active,localObserver)});
+     if(url.pathname==='/api/dev-room/spectate'&&Object.keys(body).every(k=>['code','after','epoch'].includes(k))&&(body.after===undefined||Number.isSafeInteger(body.after)&&body.after>=0)&&(body.epoch===undefined||typeof body.epoch==='string'&&body.epoch.length<=80)&&typeof body.code==='string'&&/^(?:[A-Z0-9]{6}|LOCAL-[a-f0-9]{32})$/.test(body.code)){if(body.code.startsWith('LOCAL-')){const view=await localObserver.read(sessions,body);return view?reply(200,view):reply(404,{error:'bad-game-code'});}if(!lan)return reply(403,{error:'lan-disabled'});const room=pvp.getRoom(body.code);if(!room)return reply(404,{error:'bad-game-code'});return reply(200,developerSpectatorView(room,body));}
      return reply(400,{error:'invalid-request'});
     }catch(e){return reply(e.status||503,{error:e.status?e.message:'Dev Room temporarily unavailable.'});}
    }

@@ -24,3 +24,19 @@ export function spectatorFeed(room,{after,epoch}={}){
  base.events=buildReplay(d,facts,[],{heroHits}).timeline.filter(e=>!['checkpoint','result'].includes(e.kind));
  return base;
 }
+
+// Called exclusively after Dev Room authorization. Never use for public spectators.
+export function developerSpectatorView(room,request={}){
+ const view=Object.hasOwn(request,'after')?spectatorFeed(room,request):spectatorView(room);
+ view.inspection=true;
+ for(const board of view.boards){
+  const player=room.host.config.players[board.seat],seat=room.host.state.seats.find(s=>s.playerId===player.id),shots=new Set(seat.shots),cells=new Map(board.cells.map(c=>[c.x+','+c.y,c]));
+  for(const u of room.host.state.match.units.filter(u=>u.ownerId===player.id)){
+   const positions=u.type==='hero'&&u.hero?.activated&&u.hero.currentCell?[u.hero.currentCell]:u.cells;
+   const own=new Set(positions.map(c=>c.x+','+c.y));
+   for(const c of positions){const k=c.x+','+c.y,hit=shots.has(k);cells.set(k,{...cells.get(k),x:c.x,y:c.y,hit,kind:u.type,observation:hit?'hit':'revealed',...(u.type==='castle'?{castleMask:(own.has(c.x+','+(c.y-1))?1:0)|(own.has((c.x+1)+','+c.y)?2:0)|(own.has(c.x+','+(c.y+1))?4:0)|(own.has((c.x-1)+','+c.y)?8:0)}:{})});}
+  }
+  board.cells=[...cells.values()];
+ }
+ return view;
+}

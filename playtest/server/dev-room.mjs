@@ -1,3 +1,5 @@
+import {randomUUID} from 'node:crypto';
+import {developerSpectatorView} from './spectator.mjs';
 import os from 'node:os';
 import fs from 'node:fs';
 import {presence} from './disconnect-policy.mjs';
@@ -10,7 +12,7 @@ export function localPlayActivity(now=Date.now){
  return {observe:slot=>seen.set(slot,now()),forget:slot=>seen.delete(slot),active:slot=>seen.has(slot)&&now()-seen.get(slot)<LOCAL_PLAY_WINDOW_MS};
 }
 // Metadata only. Never return session keys, host state, placements or RNG.
-export async function devRoomGames(rooms,sessions,spectatorEnabled,now=Date.now(),localActive=()=>false){
+export async function devRoomGames(rooms,sessions,spectatorEnabled,now=Date.now(),localActive=()=>false,localObserver=null){
  const games=[];
  for(const room of rooms.values()){
   if(room.closed||!['awaiting-command','awaiting-decision','awaiting-turn','running'].includes(room.host.status))continue;
@@ -26,7 +28,7 @@ export async function devRoomGames(rooms,sessions,spectatorEnabled,now=Date.now(
   const {snapshot:s}=await slot.session.client.read();
   if(['placement','finished'].includes(s.phase))continue;
   games.push({code:null,mode:entry.mode==='story'?'Story':'Single Player',status:s.phase,round:s.round??null,
-   players:[{name:slot.statIdentity?.displayName||'Player',ai:false},...(slot.configuration.singlePlayer?.npcNames||['AI']).map(name=>({name,ai:true}))],spectate:false});
+   players:[{name:slot.statIdentity?.displayName||'Player',ai:false},...(slot.configuration.singlePlayer?.npcNames||['AI']).map(name=>({name,ai:true}))],spectate:!!localObserver&&typeof slot.session.visitStatistics==='function',...(localObserver&&typeof slot.session.visitStatistics==='function'?{spectateCode:localObserver.code(slot)}:{})});
  }
  return games;
 }
@@ -41,3 +43,21 @@ export function devRoomHealthReader(){
 export function migrateDevRoom(db){db.exec(`CREATE TABLE IF NOT EXISTS dev_room_messages(id INTEGER PRIMARY KEY,text TEXT NOT NULL,developer_id TEXT NOT NULL REFERENCES accounts(id),created_at INTEGER NOT NULL);`);}
 export function welcomeMessage(db){return {text:db.prepare('SELECT text FROM dev_room_messages ORDER BY id DESC LIMIT 1').get()?.text||''};}
 export function saveWelcomeMessage(db,text,developer,now){if(typeof text!=='string'||text.length>500)throw Object.assign(Error('Use a message up to 500 characters.'),{status:400});db.prepare('INSERT INTO dev_room_messages(text,developer_id,created_at) VALUES(?,?,?)').run(text.trim(),developer,now);return welcomeMessage(db);}
+
+// Opaque observer IDs are process-local and never reveal a session credential.
+// Weak keys avoid retaining saved games; observation never refreshes activity.
+export function devLocalObserver(){
+ const ids=new WeakMap();
+ const code=slot=>{if(!ids.has(slot))ids.set(slot,'LOCAL-'+randomUUID().replaceAll('-',''));return ids.get(slot);};
+ return {code,async read(sessions,request){
+  for(const entry of sessions.values())for(const mode of ['single','story']){
+   const slot=entry.slots?.[mode];if(!slot||ids.get(slot)!==request.code)continue;
+   return slot.session.visitStatistics((host,epoch)=>{
+    const names=slot.configuration.singlePlayer?.npcNames||['AI'];
+    const room={host,epoch,code:request.code,revision:host.events.length,closed:host.status==='complete',seats:host.config.players.map((p,i)=>({name:i?names[i-1]||'AI':slot.statIdentity?.displayName||'Player',controller:i?'ai':'human'}))};
+    return developerSpectatorView(room,request);
+   });
+  }
+  return null;
+ }};
+}

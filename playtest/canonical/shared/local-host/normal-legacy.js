@@ -31,11 +31,20 @@ function enemyOldestUnfinishedMultiHitTarget(protectedCells = null) {
                 queue.push(nk);
             }
         }
+        // Finish only through cells consistent with publicly known spacing.
+        // The target cluster itself, relocated Heroes and Assassins do not
+        // establish an exclusion boundary for this unfinished unit.
+        const boundary = new Set();
+        for (const k of new Set([...enemyKnownHits, ...[...enemyScoutKnowledge].filter(([,kind]) => kind === 'special').map(([k]) => k)])) {
+            if (cluster.has(k) || env.heroSpacingExemptCells?.has(k) || sideUnitAt('player', k) === 'assassin') continue;
+            const p = parseKey(k);
+            for (const n of neighbors8(p.x, p.y)) boundary.add(n);
+        }
         const scored = new Map();
         for (const hk of cluster) {
             const { x, y } = parseKey(hk);
             for (const nk of neighbors4(x, y)) {
-                if (enemyShots.has(nk) || (protectedCells?.has(nk) && !env.groupPlagueFinalCoreCell(nk)))
+                if (enemyShots.has(nk) || boundary.has(nk) || (protectedCells?.has(nk) && !env.groupPlagueFinalCoreCell(nk)))
                     continue;
                 const known = enemyScoutKnowledge.get(nk);
                 if (known === 'empty' || known === 'special')

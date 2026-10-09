@@ -1,0 +1,17 @@
+import assert from 'node:assert/strict';import fs from 'node:fs';import os from 'node:os';import path from 'node:path';
+import {DatabaseSync} from 'node:sqlite';import {openRegistry} from '../server/registry.mjs';import {startServer} from '../server/main.mjs';
+const {launch}=await import(process.env.ST_BROWSER_HARNESS);
+const dir=fs.mkdtempSync(path.join(os.tmpdir(),'cs-activity-badges-')),registry=openRegistry(dir),ctx={browser:'a'.repeat(48),ip:'badge-test'},challenge=await registry.handle('challenge',{},ctx),n=challenge.question.match(/\d+/g);
+const user=await registry.handle('register',{username:'BadgeTester',password:'Password42',confirmPassword:'Password42',country:'IS',challengeId:challenge.id,answer:String(+n[0]+ +n[1])},ctx);
+const db=new DatabaseSync(registry.file);db.prepare("UPDATE accounts SET moderation_role='developer' WHERE id=?").run(user.account.playerId);db.close();registry.close();
+const app=await startServer({port:0,registryDir:dir,playtestSnapshotOnly:true,logger:()=>{}}),browser=await launch();let checks=0,newCount=3,liveCount=2;
+try{const page=await browser.newPage();await page.context().addCookies([{name:'csAccount',value:user.token,url:app.origin}]);await page.clock.install();
+ await page.route('**/api/registry/dev-feedback-list',r=>r.fulfill({json:{items:[],counts:{types:{ALL:20,BUG:12,IDEA:8}},inboxCounts:{NEW:newCount,TODO:10,IGNORED:4,FINISHED:3}}}));
+ await page.route('**/api/dev-room/games',r=>r.fulfill({json:{games:Array.from({length:liveCount},(_,i)=>({code:'Game'+i,mode:'Duel',players:[],status:'Playing',round:1,spectate:false}))}}));
+ await page.goto(app.origin+'/dev-room');await page.locator('#feedback-count').filter({hasText:'3'}).waitFor();assert.equal(await page.locator('#live-count').innerText(),'2');checks+=2;
+ await page.getByRole('button',{name:'Feedback',exact:true}).click();await page.getByRole('button',{name:'To Do List (10)',exact:true}).click();assert.equal(await page.locator('#feedback-count').innerText(),'3');checks++;
+ await page.locator('[aria-label="Feedback status"] button[aria-pressed="true"]').filter({hasText:'To Do List'}).waitFor();const before=await page.locator('#content').innerHTML();newCount=4;liveCount=1;await page.clock.runFor(30000);await page.waitForFunction(()=>document.getElementById('feedback-count').textContent==='4');assert.equal(await page.locator('#live-count').innerText(),'1');assert.equal(await page.locator('#content').innerHTML(),before);checks+=3;
+ newCount=0;liveCount=0;await page.evaluate(()=>document.dispatchEvent(new Event('visibilitychange')));await page.waitForFunction(()=>document.getElementById('feedback-count').style.display==='none'&&document.getElementById('live-count').style.display==='none');checks+=2;
+ newCount=1;liveCount=2;await page.getByRole('button',{name:'Live Games',exact:true}).click();await page.locator('#feedback-count').filter({hasText:'1'}).waitFor();assert.equal(await page.locator('#live-count').innerText(),'2');assert.equal(await page.locator('#feedback-count').evaluate(e=>getComputedStyle(e).backgroundColor),'rgb(244, 207, 88)');checks+=3;
+ console.log(JSON.stringify({passed:true,checks,globalNewCount:true,activeGamesSource:true,pollPreservesContent:true}));
+}finally{await browser.close();await app.close();}

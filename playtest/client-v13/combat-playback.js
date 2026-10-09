@@ -31,6 +31,15 @@ export function mountCombatPlayback(resolve){
    a.screenShake('heavy',target);const blast=a.demonMegaBlast(target,pattern);await a.sleep(70);for(const f of frames)if(a.alive())await paint({...f,events:[],soundEvents:[]});for(const f of frames){if(!a.alive())return;await feedback(f);await a.sleep(105);}await blast;
   }
  }
- const play=(...args)=>Promise.race([run(...args),cancelled]);
+ // Keep the final painted contact visible before the next map/turn starts.
+ // This is presentation-only and shared by local, Story and Online playback.
+ const play=(frames,paint,...rest)=>Promise.race([(async()=>{
+  let lastContact=null;
+  await run(frames,async f=>{await paint(f);if(f.events?.some(e=>e.cell))lastContact=performance.now();},...rest);
+  if(lastContact!==null&&a.alive()&&matchMedia('(max-width:650px)').matches){
+   const remaining=200-(performance.now()-lastContact);
+   if(remaining>0)await a.sleep(remaining);
+  }
+ })(),cancelled]);
  return {play,prepare,clearTransient:()=>{revolt.clear();a.clearTransient();},turn:()=>{followPhoneBattlefield(document.getElementById('stEnemyGridHost'));return a.showTransientSalesBlast('enemy','YOUR TURN!!!',[],'alert',null,475,'stYourTurnBlast',{enter:150,exit:150});},hideTurn:()=>a.hideTurn(),coverage:frames=>{const f=frames[0],c=f?.animation;if(!c)return null;a.setSize(f.snapshot.size);const origin=c.origin?key(c.origin):null;return c.kind==='demon'?a.demonPatternFrom(origin).length:c.kind==='dragon'?a.dragonFlightPathsFrom(origin).flat().length:c.kind==='wizard'?a.wizardBlastLayersFrom(origin).flat().length:null;},unmount:()=>{revolt.clear();cancel();goblinGroups.clear();a.unmount();}};
 }
