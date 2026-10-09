@@ -842,7 +842,7 @@
     "client-v13/reliability-bar.js": "270296158f57c033115c88d4f87dcc58bfe6db55b9c44731d8c75fcf24e20440",
     "client-v13/replay-cells.css": "35e757fb47d2b49a82ae9e3ea14c2ce27e0e8ba0c8678074765adcc7fbfbf736",
     "client-v13/replay-state.js": "d8213ea67f6425344e512fd1010f812bd4b59861af0af6f06918b861ee7442df",
-    "client-v13/replay-viewer.js": "0d959ea0b166cee0f164254c3dab345abf6bb89ab441b8c462cd47cfe332afca",
+    "client-v13/replay-viewer.js": "46504baf57c3b9a878175a87ef7931bc82863d4c47317d9bff33fdf207f99b47",
     "client-v13/result-screen.js": "9afc986dbaefe85f078bff2888b07961554d72f0de2f0b438ba23195f52356c3",
     "client-v13/resurrection-sparks.js": "ef5c9ca1a4b3b48acf74004f9d428a6cf45eee42037c0185961646dfd2cce9ca",
     "client-v13/revolt-playback.js": "e50a182b52f08106fe0651c219f9874cb45fbc5ad68e736160322fc491cadf75",
@@ -862,7 +862,7 @@
     "client/audio-options.js": "e5216971f1a13d44802651e46b0aae71203b7822c46d467f4645c5549acacf00",
     "client/loading-screen.js": "5a6fcc7044c0c38c02944e64cb447dac05447a79d10278f29a11c2976f61a195",
     "client/story-presentation.js": "9581884c1c2188e92bd7e7a706180bd7726f25ab7473a3576fa4772901abd3e4",
-    "dev-room/app.js": "5532bdc7bf7d246d6b45c90e6eaa5367af387d822bc97a80ee4f63819be675ea",
+    "dev-room/app.js": "172b7762ebaa3bc6ef8b938a152f5e07063f0e5f4127febf65e1bfca61873162",
     "dev-room/index.html": "553fe8001426c58cc58fa5d4f2d881f0d8688896898ad956e69d88a085e90331",
     "dev-room/labels.js": "b986d660be711491290da7ec56d748e33a7b7e1c038dca7b87271d46dd39454d",
     "dev-room/style.css": "b39ddf9df74735e81ba25abc006dceae54d57b48fb2c2905a15266480691651b",
@@ -1203,7 +1203,7 @@
     "tools/worker-presentation-check.mjs": "f111fd70a08b45a28348bc623c6f3892b01482d25bcfc1532639a3f6e5352b32",
     "tools/compaction-tail-check.mjs": "496623457f9ccbc60e84b4c35134ee0bbe62793af4ed137a313134d13c68e070",
     "tools/feedback-last-game-log-check.mjs": "71dc1077df2c2b9372d649c810bc7b3e00edecd0ff2d5e1825ed0705067db62b",
-    "tools/replay-readability-browser-check.mjs": "a2992469cb13419717bb86a9638616787ecec2a8c1eb85feb79981f8e726c5da"
+    "tools/replay-readability-browser-check.mjs": "b6db93f029902c93267a5a540f5b452e57370277815109359644ec9754c0f7cc"
   },
   "candidateScope": [
     "Owner/public Profile and Player Card",

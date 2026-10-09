@@ -79,7 +79,7 @@ async function playerCases(root,playerId,name){
 }
 async function watchReplay(root,matchId,parent){
  const back=el('div',undefined,'actions');if(parent&&!parent.recent)back.append(button(parent.recent?'Back to Recent / Find Game':'Back to '+parent.name,()=>backToPlayer(root,parent)));back.append(button(parent?.recent?'Back to Recent / Find Game':'Back to Flags / Review',parent?.recent?render:showFlags),button('VIEW RESULT',()=>viewResult(root,matchId,parent)));root.replaceChildren(back,el('h3','Match '+shortId(matchId)));
- try{const replay=await registry('dev-review-replay',{matchId});const host=el('div');root.append(host);const {mountReplayViewer}=await import('/client-v13/replay-viewer.js');mountReplayViewer(host,replay);}catch(error){if(error.message==='Replay unavailable')root.append(el('p','Replay unavailable'));else throw error;}
+ try{const replay=await registry('dev-review-replay',{matchId});const host=el('div');root.append(host);const {mountReplayViewer}=await import('/client-v13/replay-viewer.js?v=46504baf57c3b9a878175a87ef7931bc82863d4c47317d9bff33fdf207f99b47');mountReplayViewer(host,replay);}catch(error){if(error.message==='Replay unavailable')root.append(el('p','Replay unavailable'));else throw error;}
  root.append(technical({matchId}));
 }
 async function viewResult(root,matchId,parent){
