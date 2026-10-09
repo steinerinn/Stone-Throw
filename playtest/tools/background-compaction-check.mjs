@@ -7,7 +7,8 @@ for(const stale of [false,true]){
  value={...value,extra:'x'.repeat(50000)};store.write(value);
  if(stale){value={...value,counter:1};store.write(value);}
  await store.maintenanceReady();store.write(value);
- if(stale){assert.ok(store.diagnostics.discardedCompactions>=1);for(let n=0;n<5;n++){await new Promise(r=>setTimeout(r,10));store.write(value);await store.maintenanceReady();}assert.equal(store.diagnostics.backgroundCompactions,undefined,'Busy journal must back off after a stale preparation');await new Promise(r=>setTimeout(r,30010));store.write(value);await store.maintenanceReady();store.write(value);}
+ if(stale)assert.equal(store.diagnostics.carriedCompactionRecords,1,'Intervening durable append is retained without repeating full preparation');
+ assert.equal(store.diagnostics.discardedCompactions,undefined);
  assert.equal(store.diagnostics.backgroundCompactions,1,JSON.stringify(store.diagnostics));
  const expected=structuredClone(value);await store.cacheReady();store.release();
  // Recovery must work without the derivative cache, from the published journal.
@@ -16,4 +17,4 @@ for(const stale of [false,true]){
  store.write({...expected,counter:2});store.release();
  store=openStore(dir,'rollback-build','production');assert.equal(store.value.counter,2);store.release();
 }
-console.log(JSON.stringify({passed:true,preparedPublication:true,staleCandidateRejected:true,cachelessRecovery:true,continuedWrites:true,evidence:root}));
+console.log(JSON.stringify({passed:true,preparedPublication:true,interveningDurableRecordsPreserved:true,cachelessRecovery:true,continuedWrites:true,evidence:root}));

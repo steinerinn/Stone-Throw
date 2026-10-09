@@ -1,4 +1,4 @@
-import {compactJournal,publishCompactJournal} from './compact-journal.mjs';
+import {compactJournal,publishCompactJournal,catchUpCompactJournal} from './compact-journal.mjs';
 import {journalJson,journalBuffers,appendBuffers} from './journal-json.mjs';
 import {stateVersion,readableStateVersion} from './persistence-contract.mjs';
 import {journalRecords} from './journal-reader.mjs';
@@ -8,7 +8,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import {createHash,randomUUID} from 'node:crypto';
 import {Worker} from 'node:worker_threads';
-import {measured} from './beta-metrics.mjs';
+import {measured,metric} from './beta-metrics.mjs';
 import {journalArchiveEncoder,archiveDecoder} from './archive-wire.mjs';
 const digest=s=>createHash('sha256').update(s).digest('hex');
 export const checkpointId='controlled-playtest-v1';
@@ -54,12 +54,12 @@ export function openStore(directory,build,mode,{journalEnabled=true,journalMaxBy
   const closeJournal=()=>{cacheWriter.close();if(journalFd!==null){fs.closeSync(journalFd);journalFd=null;}};
   const installAnchor=(anchor,before,started,background=false)=>{
    sequence=anchor.sequence;previous=anchor.previous;end=anchor.end;compactAt=Math.max(journalMaxBytes,end*4);
-   diagnostics.compactions=(diagnostics.compactions||0)+1;diagnostics.compactedFromBytes=before;diagnostics.compactedToBytes=end;diagnostics.compactionMs=Math.round(performance.now()-started);
+   diagnostics.compactions=(diagnostics.compactions||0)+1;diagnostics.compactedFromBytes=before;diagnostics.compactedToBytes=end;diagnostics.compactionMs=Math.round(performance.now()-started);metric('journal-compaction',performance.now()-started);
    if(background)diagnostics.backgroundCompactions=(diagnostics.backgroundCompactions||0)+1;
    cacheWriter=recoveryCacheWriter(cacheFile,journal,stateVersion,mode,()=>encode.checkpoint());cacheWriter.record(anchor);
   };
-  // A busy journal invalidates prepared snapshots. Back off after a discard
-  // instead of cloning and validating another doomed candidate on every write.
+  // Prepare the expensive reset once. Later durable records can be carried
+  // forward without re-encoding or re-validating all retained histories.
   const prepareBackground=next=>{
    if(!backgroundCompaction||pendingCompact||retiringCompact||closed||performance.now()<nextPreparationAt||end<compactAt/2)return;
    const file=preparedFile,started=performance.now();
@@ -70,10 +70,10 @@ export function openStore(directory,build,mode,{journalEnabled=true,journalMaxBy
   };
   return {value,release,diagnostics,cacheReady:()=>cacheWriter?.idle(),maintenanceReady:async()=>{const pending=pendingCompact;if(!pending)return;pending.worker.ref();try{await pending.done;}finally{pending.worker.unref();}},write(next){if(failed||closed)throw Error('checkpoint-write-failed');try{
    // Publication stays synchronous at the existing durable-write boundary. The
-   // worker never touches the live journal; a single intervening append makes
-   // its candidate ineligible. The foreground bound remains the fallback.
+   // worker never touches the live journal. Carry forward validated intervening
+   // records before publication. The foreground bound remains the fallback.
    if(pendingCompact?.result){const pending=pendingCompact;
-    if(pending.result.ok&&pending.sequence===sequence&&pending.previous===previous&&pending.end===end){const before=end,started=performance.now();publishCompactJournal(journal,pending.file,pending.result.anchor,closeJournal);installAnchor(pending.result.anchor,before,started,true);diagnostics.backgroundPreparationMs=Math.round(pending.result.ms);pendingCompact=null;}
+    if(pending.result.ok){const before=end,started=performance.now(),tailRecords=sequence-pending.sequence;const anchor=measured('compact-tail-catchup',()=>catchUpCompactJournal(journal,pending.file,pending,pending.result.anchor,{sequence,previous,end}));publishCompactJournal(journal,pending.file,anchor,closeJournal);installAnchor(anchor,before,started,true);diagnostics.backgroundPreparationMs=Math.round(pending.result.ms);diagnostics.carriedCompactionRecords=(diagnostics.carriedCompactionRecords||0)+tailRecords;pendingCompact=null;}
     else{diagnostics.discardedCompactions=(diagnostics.discardedCompactions||0)+1;discardCompact();}
    }
    const packet=measured('archive-encode',()=>encode(next)),json=prepareJson(),preparedValue=measured('checkpoint-live-serialization',()=>json(packet.value)),valueText=preparedValue.sha256;

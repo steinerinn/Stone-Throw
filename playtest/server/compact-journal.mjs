@@ -24,6 +24,37 @@ export function prepareCompactJournal(temporary,entry,expectedValue){
  if(restored.reset!==true||!measured('compact-recovery-compare',()=>isDeepStrictEqual(archiveDecoder()(restored.packet),expected)))throw Error('Compact journal recovery mismatch');
  return {sequence:1,previous:encoded.sha256,start:0,end:bytes};
 }
+// A verified reset snapshot remains a valid base after later durable appends.
+// Preserve every intervening payload byte-for-byte, rewriting only the envelope
+// sequence/previous links. Validate the source chain and read back the appended
+// candidate before the existing atomic publication; the live journal is untouched.
+export function catchUpCompactJournal(journal,temporary,base,anchor,current){
+ if(base.sequence>current.sequence||base.end>current.end||fs.statSync(journal).size!==current.end)throw Error('Compact source boundary mismatch');
+ if(fs.statSync(temporary).size!==anchor.end)throw Error('Compact candidate boundary mismatch');
+ let source={...base},next={...anchor};const appended=[];
+ const fd=fs.openSync(temporary,'a');
+ try{
+  for(const row of journalRecords(journal,base.end)){
+   const record=JSON.parse(row.line);
+   if(row.start!==source.end||row.end>current.end||record.sequence!==source.sequence+1||record.previous!==source.previous||typeof record.payload!=='string'||createHash('sha256').update(record.payload).digest('hex')!==record.sha256)throw Error('Compact source chain mismatch');
+   const entry={sequence:next.sequence+1,previous:next.previous,sha256:record.sha256,payload:record.payload};
+   const bytes=appendBuffers(fs,fd,[Buffer.from(JSON.stringify(entry)+'\n')]);
+   next={sequence:entry.sequence,previous:entry.sha256,start:next.end,end:next.end+bytes};
+   appended.push({sequence:entry.sequence,previous:entry.previous,sha256:entry.sha256,end:next.end});
+   source={sequence:record.sequence,previous:record.sha256,end:row.end};
+  }
+  if(source.sequence!==current.sequence||source.previous!==current.previous||source.end!==current.end)throw Error('Compact source tail missing');
+  if(appended.length)fs.fsyncSync(fd);
+ }finally{fs.closeSync(fd);}
+ let index=0;
+ for(const row of journalRecords(temporary,anchor.end)){
+  const expected=appended[index++],record=JSON.parse(row.line);
+  if(!expected||row.end!==expected.end||record.sequence!==expected.sequence||record.previous!==expected.previous||record.sha256!==expected.sha256||typeof record.payload!=='string'||createHash('sha256').update(record.payload).digest('hex')!==expected.sha256)throw Error('Compact candidate tail mismatch');
+ }
+ if(index!==appended.length||fs.statSync(temporary).size!==next.end)throw Error('Compact candidate tail missing');
+ return next;
+}
+
 export function publishCompactJournal(journal,temporary,anchor,beforePublish){
  beforePublish();
  retryFile('compact-rename',journal,()=>fs.renameSync(temporary,journal));

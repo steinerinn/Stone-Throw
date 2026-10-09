@@ -8,11 +8,11 @@ for(const phase of ['before','after']){
  fs.writeFileSync(child,`import fs from 'node:fs';import {openStore} from ${JSON.stringify(new URL('../server/store.mjs',import.meta.url).href)};
  const s=openStore(${JSON.stringify(directory)},'build','production',{journalMaxBytes:200000});
  const value={local:[{token:'player',checkpoint:'x'.repeat(110000),rng:[4,5,6],history:[1,2,3]}],round:9};
- s.write(value);await s.maintenanceReady();
+ s.write(value);s.write({...value,round:10,rng:[7,8,9],history:[1,2,3,4]});await s.maintenanceReady();
  const rename=fs.renameSync;fs.renameSync=(a,b)=>{if(String(a).includes('.compact.prepared.')){if(${JSON.stringify(phase)}==='before')process.exit(72);rename(a,b);process.exit(73);}return rename(a,b);};s.write(value);throw Error('Expected publication');`);
  let code;try{execFileSync(process.execPath,[child],{windowsHide:true});}catch(e){code=e.status;}
  assert.equal(code,phase==='before'?72:73);
- const restored=openStore(directory,'rollback-build','production');assert.equal(restored.value.round,9);assert.deepEqual(restored.value.local[0].rng,[4,5,6]);assert.deepEqual(restored.value.local[0].history,[1,2,3]);restored.release();
+ const restored=openStore(directory,'rollback-build','production');assert.equal(restored.value.round,10);assert.deepEqual(restored.value.rng,[7,8,9]);assert.deepEqual(restored.value.history,[1,2,3,4]);assert.deepEqual(restored.value.local[0].rng,[4,5,6]);restored.release();
 }
 // Termination of an old store's preparer must never unlink a newly opened
 // store's preparation. Each store owns its own temporary candidate pathname.
