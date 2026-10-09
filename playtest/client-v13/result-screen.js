@@ -16,7 +16,8 @@ export function scoreLines(score){
  if(!score||!Number.isFinite(score.score))return [];
  const number=n=>new Intl.NumberFormat('en-US',{maximumFractionDigits:0}).format(n);
  const lines=['MATCH SCORE: '+number(score.score)],c=score.comparison;
- if(c&&c.samples>=5)lines.push(Math.abs(c.percent).toFixed(1).replace(/\.0$/, '')+'% '+(c.percent<0?'below':'above')+' average for '+c.label);
+ if(c&&c.samples>0&&Number.isFinite(c.percent))lines.push(Math.abs(c.percent).toFixed(1).replace(/\.0$/, '')+'% '+(c.percent<0?'below':'above')+' average for '+c.label+(c.samples<5?' (based on '+c.samples+' result'+(c.samples===1?'':'s')+')':''));
+ else if(score.comparisonLabel)lines.push('Average comparison unavailable for '+score.comparisonLabel+' — not enough comparable score data.');
  return lines;
 }
 export function participantScoreLines(players=[]){return players.map(p=>p.name+(p.ai?' (AI)':'')+': '+(Number.isFinite(p.matchScore?.score)?new Intl.NumberFormat('en-US',{maximumFractionDigits:0}).format(p.matchScore.score):'Unavailable'));}
