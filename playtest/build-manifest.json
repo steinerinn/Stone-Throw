@@ -909,7 +909,7 @@
     "server/journal-json.mjs": "d859fcf877a69c71671529837319e23d23e32c23c7f116f9275d8c2fadcd0339",
     "server/journal-reader.mjs": "06021f5e04d49c319c1a9ed5b82a866cd6cb47fbf571c571653bb22067869902",
     "server/liveness-store.mjs": "ccfa61f1f0eafec70a8a38ddc724c736531766e90125da69aed8c629a63c6b42",
-    "server/main.mjs": "1d164d4aa548ce68dd85e41539ddc36ccef357460785668d96e1aac4c812576a",
+    "server/main.mjs": "72b6eebb279a849115501a9b7dc939869a747b2a5cf61266cf2812d0bbe4f734",
     "server/match-classification.mjs": "9a435d348d9dcd0c34448468624061691d6899e482e7bc879b9dee4dd88e158a",
     "server/match-score.mjs": "2e9bf7edfdc00ebac809145e719c019eed6ca41e40b142a1f2e6de957532c3f3",
     "server/multiplayer.mjs": "d7cb8ae99f8c644340972f23fe63fd51a41238a203fea741c092dddfc8c12438",
@@ -1206,7 +1206,9 @@
     "tools/replay-readability-browser-check.mjs": "b6db93f029902c93267a5a540f5b452e57370277815109359644ec9754c0f7cc",
     "tools/multi-hit-spacing-check.mjs": "8ada302485f2cee7784f9988997e701f03d99b5c8776606ab950fe1bd1f14488",
     "tools/phone-impact-hold-check.mjs": "3207f002fdf3455d7728d032e65bd66dafa5d82e380042a1f52bf8039a83d5b9",
-    "tools/dev-room-activity-badges-check.mjs": "38ca068d6f1947e302c90e35dc0b142b702177082053dcae5275f756e0f9731f"
+    "tools/dev-room-activity-badges-check.mjs": "38ca068d6f1947e302c90e35dc0b142b702177082053dcae5275f756e0f9731f",
+    "server/performance-log.mjs": "135901999f3f1d4a31a851bdc91855ec96e58d864304121e3fc693eb175eb323",
+    "tools/performance-log-check.mjs": "76f9530ca8f281a3f2a794659947e8f4d07a9469047cd800b02280db49988e25"
   },
   "candidateScope": [
     "Owner/public Profile and Player Card",
