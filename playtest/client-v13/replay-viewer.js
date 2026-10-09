@@ -20,7 +20,7 @@ export function mountReplayViewer(container,initial,{live=false}={}){
   }
  }
  root.append(style,title,meta,nav,...(live?[]:[slider]),status,boards);container.append(root);show(0);
- const playback=publicPlayback({grid:seat=>cards.get(seat)?.grid,paint:show,size:replay.size,identity:replay.matchId});
+ const playback=publicPlayback({grid:seat=>cards.get(seat)?.grid,paint:show,size:replay.size,identity:replay.matchId,onEffectFailure:()=>{root.dataset.effectFallback='true';note.textContent='An animation could not play. Recorded battle events continue without that effect.';}});
  const play=document.createElement('button');play.textContent='PLAY';play.setAttribute('aria-label',live?'Pause live playback':'Play replay');
  function pause(){generation++;playing=false;playback.cancel();play.textContent=live?'RESUME':'PLAY';play.setAttribute('aria-label',live?'Resume live playback':'Play replay');}
  async function run({resume=false}={}){if(disposed||playing)return;if(resume&&live)show(cursor.length);if(index===cursor.length&&!live){seenAnimations.clear();show(0);}playing=true;play.textContent='PAUSE';play.setAttribute('aria-label',live?'Pause live playback':'Pause replay');const token=++generation;

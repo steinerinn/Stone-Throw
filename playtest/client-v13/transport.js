@@ -1,5 +1,5 @@
 import {serverMetrics,requestLog,responseLog,logEvent,gameLogEnabled} from './game-log.js';
-function timingLog(value,trace){if(!value)return;logEvent('SERVER COMMAND TIMING',{request:trace?.id,commandAction:trace?.action,build:value.build,totalMs:value.totalMs,queueMs:value.queueMs,persistenceMs:value.persistenceMs,fsyncMs:value.fsyncMs});}
+function timingLog(value,trace){if(!value)return;logEvent('SERVER COMMAND TIMING',{request:trace?.id,commandAction:trace?.action,build:value.build,totalMs:value.totalMs,queueMs:value.queueMs,persistenceMs:value.persistenceMs,fsyncMs:value.fsyncMs,snapshotPrepareMs:value.snapshotPrepareMs,statisticsFreezeMs:value.statisticsFreezeMs,durableStoreMs:value.durableStoreMs,statisticsCaptureMs:value.statisticsCaptureMs,archiveEncodeMs:value.archiveEncodeMs});}
 function headersLog(response,trace){if(trace)logEvent('RESPONSE HEADERS',{request:trace.id,route:trace.route,status:response.status,durationMs:performance.now()-trace.t});try{timingLog(JSON.parse(response.headers.get('X-St-Command-Timing')),trace);}catch{}try{serverMetrics(JSON.parse(response.headers.get('X-St-Beta-Metrics')),trace);}catch{}}
 export class TransportError extends Error {constructor(code){super(code);this.code=code;}}
 export function createHttpSession(){
