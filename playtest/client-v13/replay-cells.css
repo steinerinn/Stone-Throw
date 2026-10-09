@@ -111,3 +111,7 @@
 .cs-replay .cell.monk-cell::before,.cs-replay .cell.monk-hit::before{content:none!important;display:none!important;}
 .cs-replay .cell.assassin-cell,.cs-replay .cell.assassin-hit{background-color:#59636F!important;background-image:url("/assets/units/assassin/assassin.png")!important;background-repeat:no-repeat!important;background-position:center!important;background-size:min(22px,var(--cell)) min(22px,var(--cell))!important;border:1px solid #344247!important;outline:none!important;box-shadow:none!important}
 .cs-replay .cell.assassin-cell::before,.cs-replay .cell.assassin-cell::after,.cs-replay .cell.assassin-hit::before,.cs-replay .cell.assassin-hit::after{content:none!important;display:none!important}
+
+/* Keep public misses visible when Replay is opened outside the game page. */
+.cs-replay .cell.miss{background:rgba(71,85,105,.18);border-color:rgba(100,116,139,.34);}
+.cs-replay .cell.miss::after{content:"";position:absolute;left:50%;top:50%;width:4px;height:4px;margin:-2px 0 0 -2px;background:rgba(148,163,184,.85);box-shadow:0 0 0 1px rgba(15,23,42,.28);pointer-events:none;}
