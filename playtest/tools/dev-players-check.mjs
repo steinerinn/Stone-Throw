@@ -13,9 +13,9 @@ try{
  db.prepare('UPDATE accounts SET created_at=? WHERE id=?').run(clock-week,admin.account.playerId);
  db.prepare('UPDATE accounts SET created_at=? WHERE id=?').run(clock,normal.account.playerId);
  const store=playerAdminStore(db,{now:()=>clock});
- assert.deepEqual(store.search().counts,{total:3,new:2});
+ assert.deepEqual(store.search().counts,{total:3,new:2,online:0});
  assert.equal(store.search('',true).items.length,2);
- assert.deepEqual(store.search('NO_MATCH',true).counts,{total:3,new:2});
+ assert.deepEqual(store.search('NO_MATCH',true).counts,{total:3,new:2,online:0});
  assert.equal(store.search('NO_MATCH',true).items.length,0);
  assert.equal(store.search('Raven',true).items.length,0);
  assert.equal(store.search('Matti',true).items.length,1);
@@ -27,6 +27,14 @@ try{
  const filtered=await api('dev-player-search',{query:'NO_MATCH',newOnly:true});assert.equal(filtered.counts.total,3);assert.equal(filtered.items.length,0);
  await assert.rejects(api('dev-player-search',{newOnly:true},normal.token),e=>e.status===403);
  checks+=12;
+ // Registered presence reuses existing visits, expires, deduplicates, and ignores pre-restart history.
+ const {dashboardStore}=await import('../server/dashboard-store.mjs');let presenceClock=clock+1000;
+ const presence=dashboardStore(db,{now:()=>presenceClock}),onlineStore=playerAdminStore(db,{now:()=>presenceClock,onlineAccounts:()=>presence.onlineAccounts(clock)});
+ presence.visit('guest-browser',null);presence.visit('owner-browser',id);presence.visit('owner-second-browser',id);
+ assert.equal(onlineStore.search().counts.online,1);assert.equal(onlineStore.search().items[0].playerId,id);
+ assert.equal(onlineStore.search('NO_MATCH',true).counts.online,1);assert.equal(onlineStore.search('NO_MATCH').items.length,0);
+ assert.deepEqual(presence.onlineAccounts(presenceClock+1),[]);
+ presenceClock+=120001;assert.equal(onlineStore.search().counts.online,0);assert.ok(onlineStore.search().items.every(p=>!p.online));checks+=7;
  let d=await get();assert.ok(!/password|salt|token|recovery|session/i.test(JSON.stringify(d)));assert.equal(d.penalties.filter(p=>p.kind==='AFK').length,2);assert.equal(d.penalties.filter(p=>p.kind==='Disconnect').length,1);checks+=3;
  const protectedTables=['stat_matches','stat_participants','stat_facts','stat_career','stat_factions','review_accounts','review_decisions','review_signals','profile_saved_battles'];const protectedData=()=>JSON.stringify(protectedTables.map(t=>db.prepare('SELECT * FROM '+t).all()));const beforeProtected=protectedData(),beforeStats=d.stats,globalBefore=r.statistics.globalMenuStats(),hofBefore=r.statistics.globalHallOfFame('All',id,{now:1800000000000}),afk=d.penalties.find(p=>p.kind==='AFK'),disconnect=d.penalties.find(p=>p.kind==='Disconnect');
  await api('dev-player-correct',edit(d,{streak:4,bestStreak:7,penalties:[{matchId:afk.matchId,excluded:true},{matchId:disconnect.matchId,excluded:true}]}),admin.token);let after=await get();assert.equal(after.editable.streak,4);assert.equal(after.editable.bestStreak,7);assert.equal(after.reliability.AFK,1);assert.equal(after.reliability.Disconnect,0);assert.equal(after.penalties.find(p=>p.matchId===afk.matchId).excluded,true);assert.ok(after.audit.some(a=>a.field==='Current login streak'&&a.oldValue==='1'&&a.newValue==='4'&&a.developer==='TestMatti'));assert.ok(after.audit.some(a=>a.field==='Disconnect penalties'&&a.oldValue==='1'&&a.newValue==='0'));checks+=7;

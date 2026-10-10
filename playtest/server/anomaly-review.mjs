@@ -100,6 +100,7 @@ export function reviewStore(db,{now=Date.now,policy=REVIEW_POLICY}={}){
  function search({metric='matchScore',limit=50,scope}={}){
   if(scope==='cases'){
    const items=all(`SELECT s.id,s.player_id AS playerId,a.display_name AS displayName,s.match_id AS matchId,s.reason,s.measurements,m.mode,s.created_at AS timestamp,
+    (SELECT new_value FROM dev_player_corrections WHERE field='Case NOT OK '||s.id AND player_id=s.player_id ORDER BY id DESC LIMIT 1) AS ownerReason,
     coalesce((SELECT action FROM review_case_decisions WHERE signal_id=s.id ORDER BY id DESC LIMIT 1),CASE WHEN s.id<=coalesce(r.cleared_through,0) THEN 'OK' ELSE 'CHECK LATER' END) AS decision,
     EXISTS(SELECT 1 FROM stat_replays WHERE match_id=s.match_id) AND m.finalized=1 AS replayAvailable
     FROM review_signals s JOIN accounts a ON a.id=s.player_id JOIN stat_matches m ON m.id=s.match_id

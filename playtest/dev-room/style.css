@@ -16,3 +16,6 @@
 .moderation-field{border-top:1px solid #34424e;padding:12px 0}.moderation-field h4{margin:0 0 6px}.moderation-field p{margin-bottom:6px}.lock-state{font-size:12px;color:#e2c578}.review-confirm input,.review-confirm textarea{width:100%;box-sizing:border-box}.review-confirm [role=status]{color:#ffbf9b}
 
 .new-player{color:#f4cf58;margin-left:8px;white-space:nowrap}#player-new{border-radius:50%;min-width:28px;min-height:28px;line-height:28px}.filter-group{margin-top:10px}
+
+.count-badge.online-count{background:#70d694;color:#102719}
+.online-player{color:#70d694;font-weight:bold}

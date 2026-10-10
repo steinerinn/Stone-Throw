@@ -26,6 +26,7 @@ export function dashboardStore(db,{now=Date.now}={}){
  function visits(from,to){return all('SELECT visitor,account_id,last_seen FROM dev_usage_visits WHERE hour>=? AND hour<=? AND last_seen>=? AND last_seen<=?',Math.floor(from/HOUR)*HOUR,to,from,to);}
  function totals(rows,from){const accounts=new Set(rows.filter(r=>r.account_id).map(r=>r.account_id));const first=new Map(all('SELECT account_id,first_seen FROM dev_usage_accounts').map(r=>[r.account_id,r.first_seen]));return {visitors:unique(rows),registered:accounts.size,returning:[...accounts].filter(id=>first.get(id)<from).length};}
  return {
+  onlineAccounts(serverStarted){const at=now();return [...new Set(visits(Math.max(serverStarted,at-120000),at).map(r=>r.account_id).filter(Boolean))];},
   visit(browser,accountId){
    const at=now(),hour=Math.floor(at/HOUR)*HOUR,guest='b:'+createHash('sha256').update(browser).digest('hex'),visitor=accountId?'a:'+accountId:guest;
    // One row per observed identity/hour. A guest who signs in is folded into that account.
