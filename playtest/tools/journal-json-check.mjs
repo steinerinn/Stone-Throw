@@ -14,5 +14,16 @@ for(let i=0;i<20;i++){const v={a:'old'.repeat(1000),b:String(i).repeat(2000)};as
 for(const value of samples){const json=prepare(),live=json(value),envelope={before:1,packet:{value,updates:[{n:2}]},after:'end'},encoded=json(envelope,{value,parts:live.parts}),native=JSON.stringify(envelope);assert.equal(Buffer.concat(encoded.parts.map(p=>p.raw)).toString(),native);assert.equal(encoded.sha256,hash(native));assert.equal(JSON.parse(Buffer.concat(journalBuffers(1,'',encoded))).payload,native);checks+=3;}
 // An in-place edit on the next write must be re-encoded, never use an old cache.
 const mutable={rows:[{n:1}]};const first=prepare()(mutable);mutable.rows[0].n=2;const second=prepare()(mutable);assert.notEqual(first.sha256,second.sha256);assert.equal(Buffer.concat(second.parts.map(p=>p.raw)).toString(),JSON.stringify(mutable));checks+=2;
-console.log(JSON.stringify({passed:true,checks,byteExactV1:true,partialWrites:true,failedAppendsNotRetried:true}));
+// New ordinary archive rows should be classified once, not once for each
+// special-fragment type. JSON.stringify does not call Object.values.
+const ordinary=Array.from({length:100},(_,i)=>({event:{index:i,cell:{x:i%15,y:i%15}}})),tracked=new Set(ordinary),values=Object.values;
+let scans=0,combined;
+try{Object.values=v=>{if(tracked.has(v))scans++;return values(v);};const json=prepare(),value={checkpoint:'retained'.repeat(100)},live=json(value);combined={value,updates:ordinary};const encoded=json(combined,{value,parts:live.parts});assert.equal(Buffer.concat(encoded.parts.map(p=>p.raw)).toString(),JSON.stringify(combined));}finally{Object.values=values;}
+assert.equal(scans,ordinary.length);checks+=2;
+// Repeated and nested references to a prepared fragment retain every byte.
+for(const value of [{text:'large'.repeat(1000)},[null,'large'.repeat(1000)],null,17]){
+ const json=prepare(),live=json(value),outer={first:value,nested:[{again:value}],updates:ordinary};
+ const encoded=json(outer,{value,parts:live.parts});assert.equal(Buffer.concat(encoded.parts.map(p=>p.raw)).toString(),JSON.stringify(outer));checks++;
+}
+console.log(JSON.stringify({passed:true,checks,byteExactV1:true,partialWrites:true,failedAppendsNotRetried:true,singleClassificationWalk:true}));
 

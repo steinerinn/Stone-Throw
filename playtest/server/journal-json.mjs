@@ -8,18 +8,26 @@ export function journalJson({budget=64*1024*1024,threshold=16384}={}){
   const raw=JSON.stringify(text);p={raw:Buffer.from(raw),quoted:Buffer.from(JSON.stringify(raw).slice(1,-1))};p.bytes=p.raw.length+p.quoted.length+text.length*2;
   if(p.bytes<=budget){while(bytes+p.bytes>budget){const [key,old]=cache.entries().next().value;cache.delete(key);bytes-=old.bytes;}cache.set(text,p);bytes+=p.bytes;}return p;
  }
- return function prepare(){const large=new WeakMap();
-  function contains(v){if(typeof v==='string')return v.length>=threshold;if(!v||typeof v!=='object')return false;if(large.has(v))return large.get(v);const yes=Object.values(v).some(contains);large.set(v,yes);return yes;}
+ return function prepare(){
   // The caller may splice a value encoded earlier in this same synchronous write.
   // This is explicit per-call reuse, never a cross-write mutable-object cache.
   return (value,prepared)=>{const parts=[];let pending=[];
-   const includesPrepared=new WeakMap();
-   const containsPrepared=v=>{if(!prepared||!v||typeof v!=='object')return false;if(v===prepared.value)return true;if(includesPrepared.has(v))return includesPrepared.get(v);const yes=Object.values(v).some(containsPrepared);includesPrepared.set(v,yes);return yes;};
+   // Find cached-string/prepared fragments in one walk. Two independent walks
+   // used to scan every new archive row twice before JSON.stringify scanned it
+   // again. The cache is per encoding call, so mutable values cannot go stale.
+   const special=new WeakMap();
+   function contains(v){
+    if(prepared&&v===prepared.value)return true;
+    if(typeof v==='string')return v.length>=threshold;
+    if(!v||typeof v!=='object')return false;
+    if(special.has(v))return special.get(v);
+    const yes=Object.values(v).some(contains);special.set(v,yes);return yes;
+   }
    function flush(){if(!pending.length)return;const raw=pending.join('');parts.push({raw:Buffer.from(raw),quoted:Buffer.from(JSON.stringify(raw).slice(1,-1))});pending=[];}
    function emit(v,array=false){
     if(prepared&&v===prepared.value){flush();parts.push(...prepared.parts);return;}
     if(typeof v==='string'&&v.length>=threshold){flush();parts.push(textParts(v));return;}
-    if(!containsPrepared(v)&&!contains(v)){const text=JSON.stringify(v);pending.push(text===undefined&&array?'null':text);return;}
+    if(!contains(v)){const text=JSON.stringify(v);pending.push(text===undefined&&array?'null':text);return;}
     if(Array.isArray(v)){pending.push('[');for(let i=0;i<v.length;i++){if(i)pending.push(',');emit(v[i],true);}pending.push(']');return;}
     pending.push('{');let first=true;for(const key of Object.keys(v)){if(v[key]===undefined||typeof v[key]==='function'||typeof v[key]==='symbol')continue;if(!first)pending.push(',');first=false;pending.push(JSON.stringify(key),':');emit(v[key]);}pending.push('}');
    }
