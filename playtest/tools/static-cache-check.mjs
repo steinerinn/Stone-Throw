@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';import fs from 'node:fs';import os from 'node:os';import path from 'node:path';
+import {Writable} from 'node:stream';
 import {startServer} from '../server/main.mjs';import {publicAssetCache} from '../server/static-cache.mjs';
 const dir=fs.mkdtempSync(path.join(os.tmpdir(),'cs-static-cache-')),app=await startServer({port:0,registryDir:dir+'/registry',stateDir:dir+'/state',logger:()=>{}});
 try{
@@ -9,7 +10,7 @@ try{
  const denied=await fetch(app.origin+'/dev-room');assert.equal(denied.status,403);assert.equal(denied.headers.get('etag'),null);await denied.arrayBuffer();
  // A changed file must invalidate the old validator, even at the same byte size.
  const file=dir+'/public-fixture.js',serve=publicAssetCache();fs.writeFileSync(file,'first');let prior;
- function response(){return {headers:{},setHeader(k,v){this.headers[k]=v;},writeHead(status){this.status=status;},end(body){this.body=body;}};}
- let r=response();serve({headers:{}},r,file);prior=r.headers.ETag;fs.writeFileSync(file,'other');const future=new Date(Date.now()+2000);fs.utimesSync(file,future,future);r=response();serve({headers:{'if-none-match':prior}},r,file);assert.equal(r.status,200);assert.notEqual(r.headers.ETag,prior);assert.equal(r.body.toString(),'other');
+ function response(){const r=new Writable({write(chunk,encoding,done){this.body=Buffer.concat([this.body,chunk]);done();}});return Object.assign(r,{body:Buffer.alloc(0),headers:{},setHeader(k,v){this.headers[k]=v;},writeHead(status){this.status=status;}});}
+ let r=response();await serve({headers:{}},r,file);prior=r.headers.ETag;fs.writeFileSync(file,'other');const future=new Date(Date.now()+2000);fs.utimesSync(file,future,future);r=response();await serve({headers:{'if-none-match':prior}},r,file);assert.equal(r.status,200);assert.notEqual(r.headers.ETag,prior);assert.equal(r.body.toString(),'other');
  console.log(JSON.stringify({passed:true,firstBodyBytes:Buffer.byteLength(body),repeatBodyBytes:0,changedAssetInvalidates:true,privateAndHtmlUncached:true}));
 }finally{await app.close();}

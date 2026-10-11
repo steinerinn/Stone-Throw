@@ -1,6 +1,15 @@
 import {buildReplay} from './replay.mjs';
+const publicViews=new WeakMap();
 // Explicit public projection: no seat credentials, placements, Scout knowledge or RNG.
 export function spectatorView(room){
+ const h=room.host,cached=publicViews.get(room),key=JSON.stringify([room.epoch,room.revision,!!room.closed,h.status,h.round,h.activePlayerId,room.seats.map(s=>[s?.name,s?.controller])]);
+ if(cached&&cached.host.deref()===h&&cached.events.deref()===h.events&&cached.length===h.events.length&&cached.key===key)return structuredClone(cached.view);
+ const view=buildSpectatorView(room);publicViews.set(room,{host:new WeakRef(h),events:new WeakRef(h.events),length:h.events.length,key,view});
+ // Developer inspection adds private cells. It must never mutate the cached
+ // public projection or another spectator's response.
+ return structuredClone(view);
+}
+function buildSpectatorView(room){
  const h=room.host,match=h.state.match,units=new Map(match.units.map(u=>[u.id,u])),dead=new Set(),eliminated=new Set(),heroHits=new Map(),heroes=new Map();
  for(const {event:e} of h.events){if(e.kind==='unit-destroyed'&&e.unitId)dead.add(e.unitId);for(const id of e.statistics?.eliminationBoundary?.dead||[])eliminated.add(id);}
  const boards=h.config.players.map((p,i)=>({seat:i,ai:room.seats[i]?.controller==='ai',name:room.seats[i]?.name||'Waiting for PLAYER',size:h.config.size,eliminated:eliminated.has(p.id),cells:[],hero:[]})),byBoard=new Map(h.config.players.map((p,i)=>[p.boardId,{board:boards[i],cells:new Map()}]));
@@ -17,7 +26,7 @@ export function spectatorView(room){
 export function spectatorFeed(room,{after,epoch}={}){
  const view=spectatorView(room),h=room.host,end=h.events.length,current=String(room.epoch??0),valid=Number.isSafeInteger(after)&&after>=0&&after<=end&&epoch===current&&end-after<=2000;
  const base={...view,epoch:current,cursor:end,reset:!valid,events:[]};
- if(!valid||h.status==='placement')return base;
+ if(!valid||h.status==='placement'||after===end)return base;
  const d={id:room.code,configuration:h.config,participants:h.config.players.map((p,seat)=>({actor:p.id,seat,displayName:room.seats[seat]?.name,kind:room.seats[seat]?.controller==='ai'?'ai':'guest'}))};
  const facts=h.events.slice(after).map((r,i)=>({...r,index:after+i}));
  const heroHits=new Map();for(let i=0;i<after;i++){const e=h.events[i].event;if(e.kind==='impact'&&e.unitId&&e.statistics?.unitType==='hero')heroHits.set(e.unitId,(heroHits.get(e.unitId)||0)+1);}

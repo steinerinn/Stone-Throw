@@ -17,7 +17,7 @@ if(process.argv.includes('--serve')){
 }
 db.close();fixture.registry.close();
 const serve=process.argv.includes('--serve');
-const app=await startServer({port:serve?3214:0,lan:true,bind:'127.0.0.1',registryDir:dir,logger:()=>{}});
+const app=await startServer({port:serve?3214:0,lan:true,bind:'127.0.0.1',registryDir:dir,seed:42,logger:()=>{}});
 if(serve){console.log(JSON.stringify({url:app.origin+'/dev-room',login:app.origin,username:'TestRaven',password:'Password42',isolatedRegistry:dir}));for(const sig of ['SIGINT','SIGTERM'])process.on(sig,async()=>{await app.close();process.exit();});}
 else{
 let checks=0,browser,heartbeat;
@@ -61,7 +61,8 @@ try{
  // Story counter follows an accepted authoritative start, never a configure/view/rejected retry.
  const storyOpen=await request('/api/open'),storyCookies=storyOpen.headers.getSetCookie().map(c=>c.split(';')[0]).join('; '),storyPost=(route,data={})=>request('/api/'+route,data,undefined,{Cookie:storyCookies});
  const old=(await (await storyPost('read')).json()).snapshot;
- const army={inf:1,cav:0,archer:0,monk:0,castle:0,dwarf:0,goblin:0,catapult:0,elf:0,cleric:0,demon:0,dragon:0,wizard:0,necro:0,hero:0,assassin:0};
+ // Keep enough core units to survive the opening AI volley: this fixture tests a live Story battle.
+ const army={inf:5,cav:0,archer:0,monk:0,castle:0,dwarf:0,goblin:0,catapult:0,elf:0,cleric:0,demon:0,dragon:0,wizard:0,necro:0,hero:0,assassin:0};
  assert.equal((await storyPost('configure',{battle:old.battle,revision:old.revision,configuration:{size:5,story:true,battle:0,player:{size:5,...army},enemy:{size:5,...army}}})).status,200);
  const overviewData=async()=>(await (await request('/api/dev-room/overview',{},developer.token)).json()).dashboard;
  assert.equal((await overviewData()).totals.story,0);

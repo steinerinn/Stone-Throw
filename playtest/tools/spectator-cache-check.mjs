@@ -1,0 +1,24 @@
+import assert from 'node:assert/strict';
+import {spawnSync} from 'node:child_process';
+import {spectatorView,spectatorFeed,developerSpectatorView} from '../server/spectator.mjs';
+let visits=0;
+const events=Array.from({length:20000},()=>({get event(){visits++;return {kind:'work-started'};}}));
+const room={code:'PUBLIC',epoch:1,revision:1,seats:[{name:'Human',controller:'human'},{name:'AI',controller:'ai'}],host:{round:1,status:'awaiting-command',activePlayerId:'p0',config:{size:5,players:[{id:'p0',boardId:'b0'},{id:'p1',boardId:'b1'}]},state:{match:{units:[{id:'private',ownerId:'p1',type:'wizard',cells:[{x:4,y:4}]}]},seats:[{playerId:'p0',shots:[]},{playerId:'p1',shots:[]}]},events}};
+const initial=spectatorView(room);assert.ok(visits>=events.length);
+visits=0;const start=performance.now();
+for(let i=0;i<100;i++){const next=spectatorFeed(room,{after:events.length,epoch:'1'});assert.deepEqual(next.boards,initial.boards);assert.deepEqual(next.events,[]);}
+const cachedMs=performance.now()-start;assert.equal(visits,0,'Unchanged spectator polls must not rescan history');
+const dev=developerSpectatorView(room);assert.equal(dev.boards[1].cells[0].kind,'wizard');
+assert.deepEqual(spectatorView(room).boards[1].cells,[],'Developer inspection must not contaminate public cache');
+initial.boards[1].cells.push({kind:'private'});assert.deepEqual(spectatorView(room).boards[1].cells,[]);
+events.push({event:{kind:'impact',meta:{targetBoardId:'b1'},cells:[{x:1,y:1}]}});
+assert.equal(spectatorView(room).boards[1].cells[0].hit,false);
+room.seats[0].name='Replacement';room.seats[0].controller='ai';room.closed=true;
+let v=spectatorView(room);assert.equal(v.boards[0].name,'Replacement');assert.equal(v.boards[0].ai,true);assert.equal(v.closed,true);
+room.epoch++;room.revision=0;room.host={...room.host,events:[],status:'placement',round:0};
+v=spectatorView(room);assert.equal(v.phase,'placement');assert.deepEqual(v.boards[1].cells,[]);
+room.host.events=[{event:{kind:'impact',meta:{targetBoardId:'b1'},cells:[{x:2,y:2}]}}];room.host.status='complete';room.revision++;
+v=spectatorView(room);assert.equal(v.phase,'finished');assert.deepEqual(v.boards[1].cells.map(c=>[c.x,c.y]),[[2,2]]);
+const gcProbe="import assert from 'node:assert/strict';import {spectatorView} from '__SPECTATOR_URL__';\nconst room={code:'GC',epoch:1,revision:1,seats:[{name:'Human',controller:'human'}],host:{round:1,status:'awaiting-command',activePlayerId:'p0',config:{size:5,players:[{id:'p0',boardId:'b0'}]},state:{match:{units:[]},seats:[{playerId:'p0',shots:[]}]},events:[]}};\nfunction replace(){spectatorView(room);const refs=[new WeakRef(room.host),new WeakRef(room.host.events)];room.host={...room.host,events:[]};return refs;}const refs=replace();\nfor(let i=0;i<8;i++){await new Promise(r=>setImmediate(r));global.gc();await new Promise(r=>setImmediate(r));}\nassert.equal(refs[0].deref(),undefined,'Spectator cache must not retain a replaced authoritative host');assert.equal(refs[1].deref(),undefined,'Spectator cache must not retain replaced history');assert.ok(room.host);console.log('Replaced host/history collected: PASS');\n".replace("__SPECTATOR_URL__",new URL("../server/spectator.mjs",import.meta.url).href);
+const gc=spawnSync(process.execPath,["--expose-gc","--input-type=module","-e",gcProbe],{encoding:"utf8"});assert.equal(gc.status,0,gc.stderr);
+console.log(JSON.stringify({passed:true,checks:14,historyEvents:20000,unchangedPolls:100,unchangedHistoryVisits:0,cachedMs,developerCacheIsolation:true}));

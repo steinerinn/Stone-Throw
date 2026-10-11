@@ -1,8 +1,9 @@
 import fs from 'node:fs';
+import fsp from 'node:fs/promises';
 // Called only after the exact static asset allowlist. Stream selected music;
 // byte ranges let phone browsers seek/loop without redownloading whole tracks.
-export function serveMusic(req,res,file){
- const size=fs.statSync(file).size,headers={'Content-Type':'audio/mpeg','Accept-Ranges':'bytes','Cache-Control':'private, max-age=3600','X-Content-Type-Options':'nosniff'};
+export async function serveMusic(req,res,file){
+ const size=(await fsp.stat(file)).size,headers={'Content-Type':'audio/mpeg','Accept-Ranges':'bytes','Cache-Control':'private, max-age=3600','X-Content-Type-Options':'nosniff'};
  let start=0,end=size-1,status=200;
  if(req.headers.range){const m=/^bytes=(\d*)-(\d*)$/.exec(req.headers.range);if(!m||(!m[1]&&!m[2])){res.writeHead(416,{...headers,'Content-Range':'bytes */'+size});return res.end();}
   if(!m[1])start=Math.max(0,size-Number(m[2]));else{start=Number(m[1]);if(m[2])end=Math.min(end,Number(m[2]));}

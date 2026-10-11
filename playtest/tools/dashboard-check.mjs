@@ -28,7 +28,7 @@ try{
  time+=32*DAY;store.sample({...reading,cpuPercent:null},null);eq(db.prepare('SELECT count(*) n FROM dev_usage_visits').get().n,0);eq(db.prepare('SELECT count(*) n FROM dev_usage_story').get().n,0);eq(db.prepare('SELECT count(*) n FROM dev_health_samples').get().n,1);
  store.visit('one','old');eq(store.read('7d',time).totals.returning,1);eq(store.read('7d',time).points.at(-1).cpu,null);eq(store.read('7d',time).points.at(-1).response,null);eq(store.read('7d',time+1).onlineNow,0);
  db.prepare('INSERT INTO accounts VALUES(?,?)').run('legacy',time-DAY);store.visit('legacy-browser','legacy');eq(store.read('24h',time).today.returning,2);
- const readHealth=devRoomHealthReader();eq(readHealth('.').cpuPercent,null);eq(readHealth('Z:/missing-dashboard-drive').disk,null);
+ const readHealth=devRoomHealthReader();eq((await readHealth('.')).cpuPercent,null);eq((await readHealth('Z:/missing-dashboard-drive')).disk,null);
  assert.ok(!/password|token|browser|account_id|visitor:/.test(JSON.stringify(store.read('7d',time))));checks++;
  console.log(JSON.stringify({passed:true,checks,metrics:true,boundedHistory:true,missingSamples:true}));
 }finally{db.close();}
