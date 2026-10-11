@@ -880,7 +880,7 @@
     "server/afk-policy.mjs": "7536f460f8cd9eda2c16f42dd315fc8be553468641f98c69a65a5035be17d91d",
     "server/anomaly-review.mjs": "324b2d750b64292641c2ce819ada40c5eb4d0e6e1e2fde7c51317a14af85dfb5",
     "server/archive-wire.mjs": "b0b4b77349bedbabbca588ab47621101f4e8f2292c01bd1c9a946efe4ebef646",
-    "server/async-store.mjs": "f13ed067ad1288c5d1300d6277476143eacde103bc569c9d703853699e7c13ba",
+    "server/async-store.mjs": "0b6a583286469d924ec1099f2ff982044e83457f2482b0e76b90125aebefa778",
     "server/beta-metrics.mjs": "2f00a9081582a81bb338c2d0a7e7ba0c18c58345b54969d77176905849fc1853",
     "server/board-overview.mjs": "5caa2011faef0123d095f49a6cc945566df9e6fc8e5345138d7f0fae7c98c342",
     "server/checkpoint-transfer.mjs": "6a925c0dc2367d2967387f38055c29d8088938b2ff52ffe44ed4ab396a796cc4",
@@ -918,7 +918,7 @@
     "server/online-entry.mjs": "92dac7b47d6e4a26ea49ee145ee2259150a89a1ca634c246bebf1202e7f9547b",
     "server/performance-log.mjs": "135901999f3f1d4a31a851bdc91855ec96e58d864304121e3fc693eb175eb323",
     "server/persistence-contract.mjs": "5634dcbeeeec3da69627ed9becd90bf06c1a65c0a687052cd9027082b607099d",
-    "server/persistence-worker.mjs": "b43ec0c7f74a0f2efb174fa73d2331306ae20d284f1c7bf6359b2e29b2dc046b",
+    "server/persistence-worker.mjs": "e421927cdfdc59517cac2810725e602033626a27fd7040e5a781d2bf71929d85",
     "server/plague-capture.mjs": "c4175f37d5b0a73e5a4afa8a60d59cf1e87de0e4813977abd5c331ee1cd675b2",
     "server/presentation-records.mjs": "94993370770e13ee52a9adfd4262f507f4b3a9dfa2d15ddb8d4523901ac647b8",
     "server/profile-aggregates.mjs": "27e290910b32a4b483c5ca814d3bb6d8671328a6e2172098c9d8979fed874afa",
@@ -1217,7 +1217,9 @@
     "tools/unit-lore-review-check.mjs": "ad83ac9423ac7ec9651fec291e1bf5bca1612b3cd0f7db60425745e8d1a70b7e",
     "tools/verify.mjs": "0f8b0fbc782f3c6482017be00ac9782963dbb2e0eb16dac69a9daf49f73c1d54",
     "tools/worker-cache-check.mjs": "02910eabdc9860eff244166fd50dba41fd4263c345dd5549fe24edd5315d36d1",
-    "tools/worker-presentation-check.mjs": "f111fd70a08b45a28348bc623c6f3892b01482d25bcfc1532639a3f6e5352b32"
+    "tools/worker-presentation-check.mjs": "f111fd70a08b45a28348bc623c6f3892b01482d25bcfc1532639a3f6e5352b32",
+    "server/checkpoint-archives.mjs": "1ac560160b0bfa4e34b4d3cbe76882cf279cb57afd3e089c1d4a0bb8e9b27e27",
+    "tools/persistence-archive-transfer-check.mjs": "b107024a14ec23f2f371a4355429158fad8705c0038357a5029bca8bf7891f51"
   },
   "candidateScope": [
     "Owner/public Profile and Player Card",

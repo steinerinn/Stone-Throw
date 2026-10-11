@@ -2,10 +2,11 @@ import {parentPort,workerData} from 'node:worker_threads';
 import {openStore} from './store.mjs';
 import {metricsContext,measured} from './beta-metrics.mjs';
 import {checkpointStringDecoder} from './checkpoint-transfer.mjs';
+import {checkpointArchiveDecoder} from './checkpoint-archives.mjs';
 
 // This thread alone owns the journal, its lock, codec and compaction boundary.
 // The on-disk store and validation are identical to the synchronous reader.
-let store,failed=false;const decode=checkpointStringDecoder();
+let store,failed=false;const decode=checkpointStringDecoder(),decodeArchives=checkpointArchiveDecoder();
 const failure=e=>({message:e.message,code:e.code,persistenceOperation:e.persistenceOperation,persistenceFile:e.persistenceFile,persistenceAttempts:e.persistenceAttempts});
 try {
  store=openStore(...workerData);
@@ -19,7 +20,7 @@ if(store){
   tail=tail.then(async()=>{
    const metrics=message.metrics?{}:undefined;
    try {
-    if(message.operation==='write'){if(failed)throw Error('checkpoint-write-failed');metricsContext.run(metrics,()=>{const value=measured('persistence-decode',()=>decode(message.packet));measured('persistence-write-worker',()=>store.write(value));});}
+    if(message.operation==='write'){if(failed)throw Error('checkpoint-write-failed');metricsContext.run(metrics,()=>{const value=measured('persistence-decode',()=>decode(decodeArchives(message.packet)));measured('persistence-write-worker',()=>store.write(value));});}
     else if(message.operation==='release')store.release();
     else throw Error('Invalid persistence operation');
     parentPort.postMessage({id:message.id,ok:true,diagnostics:store.diagnostics,metrics});
