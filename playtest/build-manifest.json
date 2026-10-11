@@ -74,8 +74,8 @@
     "STORY-CAUSAL-UI-REPORT.md": "fb6ca1a8f2f61ba1cec329e3ea1df3c29547ae9012ada48d5989bbe3745d6d78",
     "STORY-DEPLOYMENT-FIX.md": "02cda3c0a19a53f0dd2c8272fd729fe12fe0ab7eef5310be2a28deb878a53ad4",
     "STORY-NARRATION.md": "a979bcae695d27b59787685da44d7e5eb8622e9e7a106650cc68e0e28ac2b86d",
-    "StoneThrow-v1.427-stage13-development.html": "a731e2052ade3dcc30662944304b66374711d0f79411d1db8e0bbff951739819",
-    "StoneThrow-v1.427-stage13-production.html": "8e0918255338324aa83a0234096a9d857b9f021811bf62ab672fa633a144dff9",
+    "StoneThrow-v1.427-stage13-development.html": "100487ebd68744717aa595d0a8954a18e19b4a08698c7c8d265fdaf8f3122a49",
+    "StoneThrow-v1.427-stage13-production.html": "2a916ba85006fef54c8837a1adaebe3f2c82cc032a687904065cec4c4fe746d2",
     "TRUSTED-PROXY-IP.md": "b449563588e1bed2cc462a8026c6b9b2b17923ff71d04adde935fe1d70028491",
     "asset-manifest.json": "b4e1788db0c51216516d1675d713bf40b8823fbda7813286a245892adaec92a3",
     "assets/about/early-paper-game.jpeg": "c1cd45eb79406acd8b56621dadb19c8c31f86ab7a943e0a1d26ae25c8fd1acc2",
@@ -824,7 +824,7 @@
     "client-v13/lan.js": "26c342aebf8cff76390b3a2a05fd1aefc0696c0322d4412b42b0225ac5d57fad",
     "client-v13/legacy-animations.js": "e82bf6b373aa87d490d72ea37b19b2b91011c4dbca2ec8f9b71db71f11a2eeab",
     "client-v13/local-group.js": "667d839fe80a85ff3ee85ade83d21073ac8b394697742400d7758384c66788c3",
-    "client-v13/main-menu.js": "886262b209a28ec598ddb9438e3de9343f4b44a81f453053e20ca061fea6f305",
+    "client-v13/main-menu.js": "c82a3af0abfae92046c77141c6e1daf1d1dec6367e0e127465d6576b729b2191",
     "client-v13/music.js": "ddf60a252a3c7bf9a88d951c78c75b387260280a28010408900696c0f10297d2",
     "client-v13/node-development.js": "1f6274852c3466c50d9bece51af274a6f061f2d9fa40978cf4ca54c04bc73dcd",
     "client-v13/online-entry.js": "46263c626696d577bd4fec9839e982a3b2667d6a67ad48e610fe64c55db31f81",
@@ -1219,7 +1219,8 @@
     "tools/worker-cache-check.mjs": "02910eabdc9860eff244166fd50dba41fd4263c345dd5549fe24edd5315d36d1",
     "tools/worker-presentation-check.mjs": "f111fd70a08b45a28348bc623c6f3892b01482d25bcfc1532639a3f6e5352b32",
     "server/checkpoint-archives.mjs": "1ac560160b0bfa4e34b4d3cbe76882cf279cb57afd3e089c1d4a0bb8e9b27e27",
-    "tools/persistence-archive-transfer-check.mjs": "b107024a14ec23f2f371a4355429158fad8705c0038357a5029bca8bf7891f51"
+    "tools/persistence-archive-transfer-check.mjs": "b107024a14ec23f2f371a4355429158fad8705c0038357a5029bca8bf7891f51",
+    "tools/menu-final-copy-check.mjs": "834584aef7f4f4958d4d789bef8c1c709af1ae828476e661b3c5b97d78ec3346"
   },
   "candidateScope": [
     "Owner/public Profile and Player Card",
