@@ -929,7 +929,7 @@
     "server/pvp.mjs": "4c38c1ce1e8cf2ad35c0d4102c819266036f7e9f7560d8459267522fcc0bd24e",
     "server/recovery-cache-worker.mjs": "d7c899e6510de15863276617ddeb3db53c7391d6f07355111022ccfde950b150",
     "server/recovery-cache.mjs": "35eb47e68d88305dbf2332e28e3bcd70caaaa36fc33b03b5f46c06ff79d522bd",
-    "server/registry.mjs": "30e8e363507fa0cda60688c8d0a90574ac6ca8aed13c6f8b49bf98ada83d2646",
+    "server/registry.mjs": "f056fabb83f2798a4a58e064428ca1a72e3100bb9df421d6cb44bdfe53bc8a80",
     "server/reliability-outcome.mjs": "546fbaa873122df9c7a8fad4d0c7afe6eef66f36f19bf92c44888220a9ed216f",
     "server/replay-store.mjs": "5e7cf19da122387bc6fb11d2f8c9190b3cbeda491606b3ea72cf34c0e1f189ce",
     "server/replay.mjs": "56c97040c74a4bd724de2ae3cd17b3f707a9cc9933d2b0abc13a9aa8684c7d01",
@@ -1220,7 +1220,10 @@
     "tools/worker-presentation-check.mjs": "f111fd70a08b45a28348bc623c6f3892b01482d25bcfc1532639a3f6e5352b32",
     "server/checkpoint-archives.mjs": "1ac560160b0bfa4e34b4d3cbe76882cf279cb57afd3e089c1d4a0bb8e9b27e27",
     "tools/persistence-archive-transfer-check.mjs": "b107024a14ec23f2f371a4355429158fad8705c0038357a5029bca8bf7891f51",
-    "tools/menu-final-copy-check.mjs": "834584aef7f4f4958d4d789bef8c1c709af1ae828476e661b3c5b97d78ec3346"
+    "tools/menu-final-copy-check.mjs": "834584aef7f4f4958d4d789bef8c1c709af1ae828476e661b3c5b97d78ec3346",
+    "server/usage-visit.mjs": "2f22c8e4a056b55493e2da8938e393bcaeacda0cf22c073bc7b8507bf5264432",
+    "server/usage-visit-worker.mjs": "d74b0209a2830c52f76be1759ae0033566bc7d4a51cc80df974182423928b1d8",
+    "tools/usage-visit-check.mjs": "e7cd60a7bcb0e2b06648978705ea04234ad2e2cf7ed618d7b0b694ac26fd4bec"
   },
   "candidateScope": [
     "Owner/public Profile and Player Card",
